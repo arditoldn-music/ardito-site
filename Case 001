@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case 001 — Omjine | Ardito</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0d0d0d;--cream:#e8e0d0;--green-dark:#1a2e1a;--green-mid:#2d4a2d;--warm-dark:#1c1a14}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(232,224,208,0.08);padding:0 40px}
+.nav-inner{max-width:800px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:#e8e0d0;letter-spacing:2px;text-decoration:none}
+.nav-back{font-size:13px;color:rgba(232,224,208,0.5);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--cream)}
+
+.page{max-width:800px;margin:0 auto;padding:120px 40px 80px}
+
+.case-label{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:16px}
+.case-title{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--cream);line-height:1.2;margin-bottom:8px}
+.case-sub{font-size:15px;color:rgba(232,224,208,0.5);margin-bottom:48px}
+
+.divider{height:1px;background:rgba(232,224,208,0.07);margin:48px 0}
+
+h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--cream);margin-bottom:16px;margin-top:48px}
+
+p{font-size:14px;color:rgba(232,224,208,0.75);line-height:1.9;margin-bottom:18px}
+
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:rgba(232,224,208,0.07);border:1px solid rgba(232,224,208,0.07);border-radius:8px;overflow:hidden;margin-bottom:48px}
+.meta-item{background:var(--black);padding:16px 20px}
+.meta-key{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,224,208,0.3);margin-bottom:6px}
+.meta-val{font-size:13px;color:var(--cream)}
+
+.contacts-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.contact-tag{background:rgba(232,224,208,0.05);border:1px solid rgba(232,224,208,0.1);border-radius:4px;padding:4px 10px;font-size:12px;color:rgba(232,224,208,0.6)}
+
+.table{width:100%;border-collapse:collapse;margin-bottom:18px}
+.table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,224,208,0.3);text-align:left;padding:8px 0;border-bottom:1px solid rgba(232,224,208,0.07)}
+.table td{font-size:13px;color:rgba(232,224,208,0.7);padding:10px 0;border-bottom:1px solid rgba(232,224,208,0.05);vertical-align:top}
+.table td:first-child{color:var(--cream);width:180px;padding-right:16px}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;margin:24px 0}
+.stat-box{background:#111;border:1px solid rgba(232,224,208,0.07);border-radius:8px;padding:20px}
+.stat-n{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--cream);margin-bottom:4px}
+.stat-l{font-size:11px;color:rgba(232,224,208,0.35);letter-spacing:0.5px}
+
+.learned-item{border-left:2px solid #2d4a2d;padding:4px 0 4px 20px;margin-bottom:20px}
+.learned-item strong{display:block;font-size:13px;color:var(--cream);margin-bottom:4px;font-weight:500}
+.learned-item p{margin:0;font-size:13px}
+
+.cta{margin-top:64px;padding:40px;background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;text-align:center}
+.cta p{color:rgba(232,224,208,0.5);font-size:13px;margin-bottom:20px}
+.cta a{display:inline-block;background:#2d4a2d;color:#e8e0d0;font-size:13px;font-weight:500;padding:12px 28px;border-radius:4px;text-decoration:none;letter-spacing:0.5px}
+.cta a:hover{background:#3d6a3d}
+
+footer{border-top:1px solid rgba(232,224,208,0.07);padding:32px 40px;text-align:center;font-size:12px;color:rgba(232,224,208,0.25);margin-top:80px}
+
+@media(max-width:600px){
+  .page{padding:100px 24px 60px}
+  nav{padding:0 24px}
+  .case-title{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Ardito</a>
+    <a href="/" class="nav-back">← Back</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="case-label">Case 001</div>
+  <h1 class="case-title">Omjine — Precious One</h1>
+  <p class="case-sub">A full release campaign built from scratch in two weeks.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><div class="meta-key">Artist</div><div class="meta-val">Omjine</div></div>
+    <div class="meta-item"><div class="meta-key">Location</div><div class="meta-val">Seoul, South Korea</div></div>
+    <div class="meta-item"><div class="meta-key">Release date</div><div class="meta-val">10 April 2026</div></div>
+    <div class="meta-item"><div class="meta-key">Lead time</div><div class="meta-val">2 weeks</div></div>
+    <div class="meta-item"><div class="meta-key">Sound</div><div class="meta-val">Cat Power, The xx</div></div>
+    <div class="meta-item"><div class="meta-key">Fee</div><div class="meta-val">Pro bono</div></div>
+  </div>
+
+  <h2>The Artist</h2>
+  <p>Omjine is the project of Eomjin Cho, a singer-songwriter born in Chuncheon, South Korea and raised in Selangor, Malaysia. She has been writing and recording her own music since her teens and started experimenting with home production in 2008. Her debut EP Big Hearts came out in 2021, followed by the single Bus Driver in 2023.</p>
+  <p>She came to Ardito ahead of her third release with a clear artistic identity but no campaign infrastructure in place: no press contacts, no outreach system, no mailing list, and no experience pitching to media.</p>
+
+  <div class="divider"></div>
+
+  <h2>The Brief</h2>
+  <p>Precious One is Omjine's debut single under Ardito's management. It is written from the perspective of the antagonist in someone else's story, imagining what they would want to say back after everything had already been told. The production is sparse and home recorded, built around a strong vocal and a rhythm that keeps pulling forward.</p>
+  <p>Ardito took this campaign on without a fee. The brief came in two weeks before release date, so consider this a stress test of what's possible with a tight window and no runway.</p>
+
+  <div class="divider"></div>
+
+  <h2>What Ardito Did</h2>
+
+  <p>The first thing that needed fixing was not the pitching. Omjine had never registered with a collecting society, which meant every radio play she had ever received had earned her nothing in performance royalties. She registered with KOMCA before the campaign started and backdated her catalogue. That one conversation was probably the most valuable thing that happened.</p>
+
+  <p>From there: 62 contacts imported from DistroKid into Mailchimp, two email campaigns written in her voice, a pre-save and a release day send. Distribution submitted with ISRC and UPC filed. Spotify for Artists editorial pitch submitted. Platform access set up across Spotify, Apple Music, YouTube, and DistroKid. Content planned around what she was actually comfortable making rather than what looked good on paper.</p>
+
+  <p>Fifteen pitch emails went out to blogs and radio stations on the Tuesday morning before release. Each one was written for the specific publication, not adapted from a template. Blogs got a private SoundCloud link. Radio got the MP3 attached directly.</p>
+
+  <div class="contacts-list">
+    <span class="contact-tag">The Line of Best Fit</span>
+    <span class="contact-tag">Atwood Magazine</span>
+    <span class="contact-tag">Obscure Sound</span>
+    <span class="contact-tag">A&R Factory</span>
+    <span class="contact-tag">GoldFlakePaint</span>
+    <span class="contact-tag">KLOF Mag</span>
+    <span class="contact-tag">For The Love Of Bands</span>
+    <span class="contact-tag">Beats Per Minute</span>
+    <span class="contact-tag">BBC Introducing</span>
+    <span class="contact-tag">Radio Fandango</span>
+    <span class="contact-tag">Denmark Street Radio</span>
+    <span class="contact-tag">Soho Radio</span>
+    <span class="contact-tag">Amazing Radio</span>
+    <span class="contact-tag">WFUV</span>
+    <span class="contact-tag">KEXP</span>
+  </div>
+
+  <p>SubmitHub was used on the free tier with Advanced Mode enabled. Genre tags were corrected before submission so the track reached relevant curators. Post-release submissions to Soundplate, BIRP, Indiemono, and Pitchplaylists were queued once the track was confirmed live on Spotify.</p>
+
+  <div class="divider"></div>
+
+  <h2>Platform Access</h2>
+
+  <table class="table">
+    <thead><tr><th>Platform</th><th>Access</th></tr></thead>
+    <tbody>
+      <tr><td>Spotify for Artists</td><td>Editor (Ardito)</td></tr>
+      <tr><td>Apple Music for Artists</td><td>Admin (Ardito)</td></tr>
+      <tr><td>YouTube</td><td>Manager</td></tr>
+      <tr><td>DistroKid</td><td>Direct — Omjine shared details</td></tr>
+      <tr><td>Mailchimp</td><td>Omjine added as user under Ardito account</td></tr>
+    </tbody>
+  </table>
+
+  <div class="divider"></div>
+
+  <h2>Results</h2>
+  <p>Precious One was two weeks old at the point of writing.</p>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-n">&lt;1,000</div><div class="stat-l">Spotify streams</div></div>
+    <div class="stat-box"><div class="stat-n">32</div><div class="stat-l">Monthly listeners</div></div>
+    <div class="stat-box"><div class="stat-n">6%</div><div class="stat-l">Popularity score</div></div>
+    <div class="stat-box"><div class="stat-n">#1</div><div class="stat-l">Most-streamed track</div></div>
+  </div>
+
+  <p>None of the 15 pitches received a response. For a release with no existing press profile, no prior coverage to reference, and a two-week campaign window, that is about what to expect. The contacts have the track. The second pitch, on the next release, will have context behind it.</p>
+
+  <p>The response that did come was off-platform. Omjine received direct messages and comments from listeners saying the song meant something to them. At this scale, people going out of their way to say that is worth paying attention to.</p>
+
+  <div class="divider"></div>
+
+  <h2>What Ardito Learned</h2>
+
+  <div class="learned-item">
+    <strong>Press shot first.</strong>
+    <p>It came up mid-campaign with no quick fix available. Several radio contacts require one and outreach to them was limited as a result. This is now confirmed at onboarding before anything else moves.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>PRO registration is almost always missing.</strong>
+    <p>Most independent artists at this stage have not registered with their national collecting society. Without it, every radio play goes uncompensated. For Omjine it was KOMCA. For a UK-based artist it would be PRS and PPL. It takes one conversation to fix and needs to happen before the campaign starts.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>Quality over quantity on pitching.</strong>
+    <p>15 researched, specific emails is more useful than 50 generic ones. Publications can tell the difference between someone who read their work and someone who found their email address.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>No replies does not mean no impact.</strong>
+    <p>The value of the first campaign is building the contact list, getting the track in front of the right people, and having something to reference on the second release. The second pitch to the same contacts will land differently.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>Blog and radio need different assets.</strong>
+    <p>Blogs get a private SoundCloud link. Radio gets an MP3 attached directly, plus a Google Drive link, artwork, press shot, and bio. Getting this wrong wastes the contact.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>What Comes Next</h2>
+  <p>Sync submissions are planned for Music Vine, Musicbed, Artlist, and Songtradr using the instrumental version. After that, direct outreach to UK sync agencies including Music Gateway and A&G Sync.</p>
+  <p>Streaming data will be reviewed at four weeks post-release to shape the approach for her next campaign.</p>
+
+  <div class="cta">
+    <p>Working on a release? This is what a properly managed campaign looks like.</p>
+    <a href="mailto:ardito.ldn@gmail.com?subject=I'd like to work with Ardito">Get in touch</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Ardito. London. <a href="/" style="color:rgba(232,224,208,0.3);text-decoration:none;margin-left:16px">ardito.co.uk</a></footer>
+
+</body>
+</html>
