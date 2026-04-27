@@ -1,1443 +1,465 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ardito — Command Centre</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ardito — Artist Development & Release Management</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>:opsz,wght@9..40,400;9..40,500&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#0a0a0a;--surface:#141414;--s2:#1a1a1a;--cream:#e8e0d0;--cmid:#b8afa0;--cdim:#706860;--green:#1e3a1e;--gmid:#2d4a2d;--gbright:#4a7c4a;--gtext:#8dc48d;--amber:#c8890a;--abg:rgba(200,137,10,0.12);--atext:#d4a040;--rbg:rgba(139,32,32,0.12);--rtext:#c06060;--bbg:rgba(26,45,74,0.5);--btext:#7aaad4;--b1:rgba(232,224,208,0.08);--b2:rgba(232,224,208,0.14);--b3:rgba(232,224,208,0.22)}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(232,224,208,0.1);border-radius:2px}
-#login{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2rem}
-.lw{font-family:'Playfair Display',serif;font-size:2rem;letter-spacing:.1em;color:var(--cream)}
-.ls{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--cdim);margin-top:4px;text-align:center}
-.lbox{background:var(--surface);border:1px solid var(--b2);border-radius:12px;padding:2rem;width:320px;display:flex;flex-direction:column;gap:12px}
-.lerr{color:var(--rtext);font-size:12px;display:none;text-align:center}
-#app{display:none}
-.sb{position:fixed;top:0;left:0;width:200px;height:100vh;background:var(--surface);border-right:1px solid var(--b1);display:flex;flex-direction:column;z-index:100;overflow-y:auto}
-.sb-brand{padding:1.5rem;border-bottom:1px solid var(--b1)}
-.sb-wm{font-family:'Playfair Display',serif;font-size:1.1rem;letter-spacing:.08em}
-.sb-tg{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--cdim);margin-top:3px}
-.ns{padding:.875rem 0 .25rem}
-.nl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cdim);padding:0 1.25rem;margin-bottom:4px}
-.ni{display:flex;align-items:center;gap:10px;padding:9px 1.25rem;color:var(--cmid);cursor:pointer;font-size:13px;transition:all .15s;border-left:2px solid transparent}
-.ni:hover{color:var(--cream);background:rgba(255,255,255,.02)}
-.ni.active{color:var(--cream);border-left-color:var(--gbright);background:rgba(74,124,74,.08)}
-.ni-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
-.sb-ft{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid var(--b1)}
-.lo{font-size:11px;color:var(--cdim);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s}
-.lo:hover{color:var(--cmid)}
-.main{margin-left:200px;min-height:100vh}
-.page{display:none;padding:2rem 2.5rem}
-.page.active{display:block}
-.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--b1)}
-.pt{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream)}
-.ps{font-size:12px;color:var(--cdim);margin-top:4px}
-.ha{display:flex;gap:8px;align-items:center}
-.btn{padding:8px 16px;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
-.bp{background:var(--gmid);color:var(--cream)}.bp:hover{background:var(--gbright)}
-.bg{background:transparent;color:var(--cmid);border:1px solid var(--b2)}.bg:hover{border-color:var(--b3);color:var(--cream)}
-.bd{background:transparent;color:var(--rtext);border:1px solid rgba(139,32,32,.3)}.bd:hover{background:var(--rbg)}
-.bsm{padding:5px 10px;font-size:11px}
-input,select,textarea{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:9px 12px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--b3)}
-select option{background:var(--s2)}
-textarea{resize:vertical;min-height:80px}
-.fg{margin-bottom:1rem}
-.fl{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--cdim);margin-bottom:6px}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
-.mo.open{display:flex}
-.md{background:var(--surface);border:1px solid var(--b2);border-radius:12px;padding:1.75rem;width:540px;max-width:100%;max-height:88vh;overflow-y:auto}
-.mt{font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:1.5rem;color:var(--cream)}
-.ma{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--b1)}
-.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;letter-spacing:.05em}
-.tg{background:rgba(74,124,74,.2);color:var(--gtext)}
-.ta{background:var(--abg);color:var(--atext)}
-.tr{background:var(--rbg);color:var(--rtext)}
-.tb{background:var(--bbg);color:var(--btext)}
-.td{background:rgba(232,224,208,.06);color:var(--cmid)}
-/* HOME */
-.hg{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--cream)}
-.hd{color:var(--cdim);font-size:13px;margin-top:4px;margin-bottom:2rem}
-.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.hcol{display:flex;flex-direction:column;gap:1rem}
-.bc{background:var(--surface);border:1px solid var(--b1);border-radius:10px;overflow:hidden}
-.bch{padding:1rem 1.25rem .75rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
-.bct{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim)}
-.bcb{padding:.5rem 0}
-.bi{padding:.6rem 1.25rem;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--b1);transition:background .1s}
-.bi:last-child{border-bottom:none}
-.bi:hover{background:rgba(255,255,255,.02)}
-.pd{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.dr{background:var(--rtext)}.da{background:var(--atext)}.dg{background:var(--gtext)}.dd{background:var(--cdim)}
-.bit{flex:1}
-.bit-t{font-size:12px;color:var(--cream);line-height:1.4}
-.bit-s{font-size:11px;color:var(--cdim);margin-top:2px}
-.bem{padding:1.25rem;font-size:12px;color:var(--cdim);text-align:center}
-/* CALENDAR */
-.cc{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
-.mn{display:flex;align-items:center;gap:10px}
-.mn button{width:28px;height:28px;background:var(--s2);border:1px solid var(--b2);border-radius:5px;color:var(--cream);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
-.mn button:hover{border-color:var(--b3)}
-.ml{font-family:'Playfair Display',serif;font-size:1rem;color:var(--cream);min-width:130px;text-align:center}
-.vt{display:flex;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:2px;gap:2px}
-.vb{padding:5px 12px;border-radius:4px;border:none;background:transparent;color:var(--cdim);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;transition:all .15s}
-.vb.active{background:var(--gmid);color:var(--cream)}
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.ch{text-align:center;padding:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cdim)}
-.cd{background:var(--surface);border:1px solid var(--b1);border-radius:6px;min-height:88px;padding:7px;cursor:pointer;transition:border-color .15s}
-.cd:hover{border-color:var(--b2)}
-.cd.empty{background:transparent;border-color:transparent;cursor:default}
-.post-time{font-size:9px;color:var(--gtext);margin-top:2px;letter-spacing:.03em}
-.cdn{font-size:11px;color:var(--cdim);margin-bottom:4px}
-.cd.today .cdn{color:var(--gbright);font-weight:600}
-/* CALENDAR PILLS */
-.cp{display:flex;font-size:9px;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;cursor:grab;align-items:flex-start;gap:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal}
-.cp.dragging{opacity:0.4;cursor:grabbing}
-.cd.drag-over{border-color:var(--gbright);background:rgba(74,124,74,.1)}
-.cp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-/* Post types - all yellow base */
-.pe{background:rgba(200,170,10,.18);color:#d4b800}
-.ph2{background:rgba(200,170,10,.18);color:#d4b800}
-.pv{background:rgba(200,170,10,.18);color:#d4b800}
-.pu{background:rgba(200,170,10,.18);color:#d4b800}
-.po{background:rgba(200,170,10,.18);color:#d4b800}
-/* Dot colours per series */
-.dot-explains{background:#4a7c4a}
-.dot-hot{background:#c06060}
-.dot-video{background:#c8890a}
-.dot-recent{background:#7aaad4}
-.dot-post{background:#d4b800}
-/* Meeting - purple */
-.pm{background:rgba(120,60,180,.2);color:#b08ad4}
-.dot-meeting{background:#9b59d4}
-/* Artist - blue */
-.pa{background:rgba(26,80,140,.3);color:#7aaad4}
-.dot-artist{background:#3a7fd4}
-.ppost{opacity:.5}
-/* LIST */
-.li{background:var(--surface);border:1px solid var(--b1);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;margin-bottom:6px;transition:border-color .15s}
-.li:hover{border-color:var(--b2)}
-.db{background:var(--green);border-radius:6px;padding:6px 10px;text-align:center;min-width:44px;flex-shrink:0}
-.dbd{font-size:16px;font-weight:700;color:var(--cream);line-height:1}
-.dbm{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(232,224,208,.5)}
-/* ROSTER */
-.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
-.ac{background:var(--surface);border:1px solid var(--b1);border-radius:10px;overflow:hidden;transition:border-color .15s;cursor:pointer}
-.ac:hover{border-color:var(--b2)}
-.act{padding:1.25rem;border-bottom:1px solid var(--b1)}
-.ach{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.av{width:38px;height:38px;border-radius:50%;background:var(--gmid);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:14px;color:var(--cream);flex-shrink:0}
-.an{font-weight:500;color:var(--cream);font-size:14px}
-.al{font-size:11px;color:var(--cdim)}
-.acb{padding:.875rem 1.25rem}
-.amr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.aml{font-size:11px;color:var(--cdim)}
-.amv{font-size:11px;color:var(--cmid);text-align:right;max-width:160px}
-.ans{background:var(--s2);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--cmid);margin-top:8px;line-height:1.5}
-.of{color:var(--rtext);font-size:10px;margin-left:4px}
-/* DETAIL */
-.adh{display:flex;align-items:center;gap:16px;margin-bottom:2rem}
-.ada{width:56px;height:56px;border-radius:50%;background:var(--gmid);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:22px;color:var(--cream)}
-.adg{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
-.dc{background:var(--surface);border:1px solid var(--b1);border-radius:10px;padding:1.25rem}
-.dct{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim);margin-bottom:1rem}
-.dr2{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--b1);gap:1rem}
-.dr2:last-child{border-bottom:none}
-.dk{font-size:12px;color:var(--cdim);flex-shrink:0}
-.dv{font-size:12px;color:var(--cmid);text-align:right}
-.dv a{color:var(--gtext);text-decoration:none}
-.dv a:hover{text-decoration:underline}
-/* RELEASES */
-.rc{background:var(--surface);border:1px solid var(--b1);border-radius:10px;margin-bottom:1rem;overflow:hidden}
-.rch{padding:1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;cursor:pointer;transition:background .15s;user-select:none}
-.rch:hover{background:rgba(255,255,255,.02)}
-.rch.open{border-bottom:1px solid var(--b1)}
-.rc-toggle{font-size:11px;color:var(--cdim);transition:transform .2s;display:inline-block;margin-left:6px}
-.rch.open .rc-toggle{transform:rotate(180deg)}
-.rc-body{display:none}.rc-body.open{display:block}
-.rn{font-weight:500;color:var(--cream);font-size:15px}
-.ran{font-size:12px;color:var(--cdim);margin-top:2px}
-.rp{padding:1.25rem;border-bottom:1px solid var(--b1)}
-.rpl{display:flex;justify-content:space-between;font-size:11px;color:var(--cdim);margin-bottom:8px}
-.rpb{height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
-.rpf{height:100%;background:var(--gbright);border-radius:2px;transition:width .3s}
-.rw{padding:1rem 1.25rem;border-bottom:1px solid var(--b1)}
-.rw:last-child{border-bottom:none}
-.rn{font-weight:500;color:var(--cream);font-size:15px}
-.ran{font-size:12px;color:var(--cdim);margin-top:2px}
-.rp{padding:1.25rem;border-bottom:1px solid var(--b1)}
-.rpl{display:flex;justify-content:space-between;font-size:11px;color:var(--cdim);margin-bottom:8px}
-.rpb{height:3px;background:var(--b2);border-radius:2px;overflow:hidden}
-.rpf{height:100%;background:var(--gbright);border-radius:2px;transition:width .3s}
-.rw{padding:1rem 1.25rem;border-bottom:1px solid var(--b1)}.rw:last-child{border-bottom:none}
-.rwh{display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;user-select:none}
-.rwh:hover .wl{color:var(--cmid)}
-.wl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim);font-weight:500;transition:color .15s}
-.wc{font-size:9px;background:var(--abg);color:var(--atext);padding:2px 6px;border-radius:3px}
-.w-tog{font-size:10px;color:var(--cdim);margin-left:auto;transition:transform .2s;display:inline-block}
-.rw.wclosed .w-tog{transform:rotate(-90deg)}
-.cl{display:flex;flex-direction:column;gap:4px}
-.rw.wclosed .cl{display:none}
-.ci{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none}
-.ci:hover{border-color:var(--b2)}
-.ci.done{background:rgba(74,124,74,.1);border-color:rgba(74,124,74,.2)}
-.cc2{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--b3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .15s}
-.ci.done .cc2{background:var(--gbright);border-color:var(--gbright);color:white}
-.ct{font-size:12px;color:var(--cmid)}
-.ci.done .ct{color:var(--gtext)}
-/* LIBRARY */
-.lf{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
-.fb{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:transparent;color:var(--cdim);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;transition:all .15s}
-.fb:hover{border-color:var(--b3);color:var(--cmid)}
-.fb.active{background:var(--gmid);border-color:var(--gmid);color:var(--cream)}
-.li2{background:var(--surface);border:1px solid var(--b1);border-left:3px solid transparent;border-radius:8px;padding:1rem 1.25rem;margin-bottom:6px;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:all .15s}
-.li2:hover{border-color:var(--b2)}
-.li2.se{border-left-color:var(--gbright)}
-.li2.sh{border-left-color:var(--rtext)}
-.li2.sv{border-left-color:var(--atext)}
-.li2.su{border-left-color:var(--btext)}
-.lit{font-size:13px;color:var(--cream);flex:1}
-.lim{font-size:11px;color:var(--cdim);margin-top:3px}
-/* IDEAS */
-.ii{background:var(--surface);border:1px solid var(--b1);border-radius:8px;padding:1rem 1.25rem;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:1rem;transition:border-color .15s}
-.ii:hover{border-color:var(--b2)}
-/* NEWS */
-.ng{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.nc{background:var(--surface);border:1px solid var(--b1);border-radius:8px;padding:1.25rem;cursor:pointer;transition:border-color .15s}
-.nc:hover{border-color:var(--b2)}
-.ns2{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gtext);margin-bottom:8px}
-.nt{font-size:13px;color:var(--cream);line-height:1.5;margin-bottom:8px}
-.nd{font-size:11px;color:var(--cdim)}
-.empty{text-align:center;padding:3rem 2rem;color:var(--cdim)}
-.ei{font-size:2rem;margin-bottom:1rem;opacity:.5}
-.back{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--cdim);cursor:pointer;margin-bottom:1.5rem;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0}
-.back:hover{color:var(--cmid)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0d0d0d;
+  --cream:#e8e0d0;
+  --green-dark:#1a2e1a;
+  --green-mid:#2d4a2d;
+  --slate:#1e2a38;
+  --off-white:#f0ece4;
+  --warm-dark:#1c1a14;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(232,224,208,0.1);padding:0 40px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-logo-svg{width:40px;height:40px}
+.nav-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:18px;color:#e8e0d0;letter-spacing:2px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{color:rgba(232,224,208,0.75);font-size:13px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;font-family:'DM Sans',sans-serif}
+.nav-links a:hover{color:#e8e0d0}
+.nav-cta{background:#2d4a2d;color:#e8e0d0 !important;padding:9px 20px;border-radius:4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:#3a5e3a !important}
+.nav-team{color:rgba(232,224,208,0.35) !important;font-size:11px;letter-spacing:1px;text-decoration:none}
+.nav-team:hover{color:rgba(232,224,208,0.55) !important}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 40px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%, rgba(45,74,45,0.15) 0%, transparent 60%),radial-gradient(ellipse at 70% 20%, rgba(30,42,56,0.1) 0%, transparent 50%)}
+.hero-inner{max-width:900px;width:100%;position:relative;z-index:1}
+.hero-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.55);margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.hero-headline{font-family:'Playfair Display',Georgia,serif;font-size:clamp(48px,7vw,84px);font-weight:700;line-height:1.05;margin-bottom:28px;color:#e8e0d0}
+.hero-headline em{font-style:italic;color:rgba(232,224,208,0.8)}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:rgba(232,224,208,0.8);max-width:560px;line-height:1.75;margin-bottom:48px;font-family:'DM Sans',sans-serif}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-primary{background:var(--cream);color:var(--black);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;font-weight:700;transition:all .2s}
+.btn-primary:hover{background:var(--off-white)}
+.btn-secondary{background:transparent;color:var(--cream);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.25);transition:all .2s}
+.btn-secondary:hover{border-color:rgba(232,224,208,0.5)}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(232,224,208,0.3);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom, rgba(232,224,208,0.3), transparent)}
+
+/* SECTIONS */
+section{padding:100px 40px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.5);margin-bottom:16px;font-family:'DM Sans',sans-serif}
+.section-heading{font-family:'Playfair Display',Georgia,serif;font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.15;margin-bottom:20px;color:#e8e0d0}
+.section-sub{font-size:16px;color:rgba(232,224,208,0.75);max-width:560px;line-height:1.75;margin-bottom:60px;font-family:'DM Sans',sans-serif}
+.divider{width:100%;height:1px;background:rgba(232,224,208,0.06)}
+
+/* WHAT WE DO */
+#services{background:var(--warm-dark)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px}
+.service-card{background:rgba(232,224,208,0.03);border:1px solid rgba(232,224,208,0.06);padding:40px 36px;transition:background .2s}
+.service-card:hover{background:rgba(232,224,208,0.05)}
+.service-num{font-family:'Playfair Display',Georgia,serif;font-size:48px;color:rgba(232,224,208,0.08);font-weight:700;line-height:1;margin-bottom:16px}
+.service-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:12px;color:#e8e0d0}
+.service-desc{font-size:14px;color:rgba(232,224,208,0.75);line-height:1.75;font-family:'DM Sans',sans-serif}
+
+/* TOOLS */
+#tools{background:var(--black)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.tool-card{background:var(--green-dark);border:1px solid rgba(45,74,45,0.4);border-radius:8px;padding:36px 32px;position:relative;overflow:hidden;transition:border-color .2s}
+.tool-card:hover{border-color:rgba(45,74,45,0.8)}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-mid),transparent)}
+.tool-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:12px}
+.tool-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:10px;color:var(--cream)}
+.tool-desc{font-size:14px;color:rgba(232,224,208,0.6);line-height:1.7;margin-bottom:24px}
+.tool-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:var(--cream);margin-bottom:20px}
+.tool-price span{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;color:rgba(232,224,208,0.4)}
+.tool-features{list-style:none;margin-bottom:28px}
+.tool-features li{font-size:13px;color:rgba(232,224,208,0.6);padding:7px 0;border-bottom:1px solid rgba(232,224,208,0.06);display:flex;gap:10px;align-items:flex-start}
+.tool-features li::before{content:'—';color:var(--green-mid);flex-shrink:0}
+.tool-btn{display:block;background:rgba(232,224,208,0.08);color:var(--cream);text-align:center;padding:12px;border-radius:4px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.12);transition:all .2s}
+.tool-btn:hover{background:rgba(232,224,208,0.12)}
+.tool-card.featured{background:var(--green-mid);border-color:rgba(45,74,45,0.8)}
+.tool-card.featured .tool-btn{background:var(--cream);color:var(--black);border-color:var(--cream)}
+.tool-card.featured .tool-btn:hover{background:var(--off-white)}
+
+/* PRICING */
+#pricing{background:var(--warm-dark)}
+.pricing-table{width:100%;border-collapse:collapse}
+.pricing-table th{text-align:left;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.35);padding:12px 20px;border-bottom:1px solid rgba(232,224,208,0.08)}
+.pricing-table td{padding:20px;border-bottom:1px solid rgba(232,224,208,0.05);font-size:14px;color:rgba(232,224,208,0.7);vertical-align:top}
+.pricing-table tr.clickable{cursor:pointer}
+.pricing-table tr.clickable:hover td{background:rgba(232,224,208,0.04)}
+.tier-name{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);font-weight:700}
+.tier-price{font-family:'Playfair Display',Georgia,serif;font-size:24px;color:var(--cream);font-weight:700}
+.tier-badge{display:inline-block;background:var(--green-mid);color:var(--cream);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-left:8px;vertical-align:middle}
+
+/* ABOUT */
+#about{background:var(--black)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-logo{width:200px;height:200px;border-radius:50%;border:1px solid rgba(232,224,208,0.15);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:32px}
+.about-logo-inner{width:160px;height:160px;border-radius:50%;border:0.5px solid rgba(232,224,208,0.08);display:flex;align-items:center;justify-content:center}
+.about-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:28px;color:var(--cream);letter-spacing:3px}
+.about-text p{font-size:16px;color:rgba(232,224,208,0.65);line-height:1.8;margin-bottom:20px}
+.about-text p strong{color:var(--cream);font-weight:500}
+.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;padding-top:48px;border-top:1px solid rgba(232,224,208,0.08)}
+.stat-num{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;color:var(--cream)}
+.stat-label{font-size:12px;color:rgba(232,224,208,0.4);letter-spacing:0.5px;margin-top:4px}
+@media(max-width:768px){.about-grid{grid-template-columns:1fr}}
+
+/* CONTACT */
+#contact{background:var(--green-dark)}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center}
+.contact-inner .section-heading{font-size:clamp(36px,5vw,60px)}
+.contact-inner .section-sub{margin:0 auto 48px;max-width:480px}
+.contact-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+.contact-card{background:rgba(232,224,208,0.05);border:1px solid rgba(232,224,208,0.1);border-radius:6px;padding:28px 24px;text-align:left}
+.contact-card-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:8px}
+.contact-card-title{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);margin-bottom:8px}
+.contact-card-desc{font-size:13px;color:rgba(232,224,208,0.5);line-height:1.6;margin-bottom:16px}
+.contact-card-link{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream);text-decoration:none;border-bottom:1px solid rgba(232,224,208,0.2);padding-bottom:2px;transition:border-color .2s}
+.contact-card-link:hover{border-color:var(--cream)}
+@media(max-width:600px){.contact-options{grid-template-columns:1fr}}
+
+/* FOOTER */
+footer{background:var(--black);padding:40px;border-top:1px solid rgba(232,224,208,0.06)}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:16px;letter-spacing:1px;color:rgba(232,224,208,0.4)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:rgba(232,224,208,0.3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:rgba(232,224,208,0.6)}
+.footer-copy{font-size:11px;color:rgba(232,224,208,0.2)}
+
+/* MOBILE NAV */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:1.5px;background:var(--cream);transition:all .3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Playfair Display',Georgia,serif;font-size:32px;color:var(--cream);text-decoration:none}
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-links{display:none}
+  section{padding:70px 24px}
+  nav{padding:0 24px}
+  .hero{padding:100px 24px 60px}
+  .pricing-table{display:block;overflow-x:auto}
+  .tools-grid{grid-template-columns:1fr}
+  .about-grid{grid-template-columns:1fr}
+  .about-grid>div:last-child{order:-1}
+  .about-grid img{width:140px;height:140px}
+  .services-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column}
+  .btn-primary,.btn-secondary{text-align:center}
+  .contact-options{grid-template-columns:1fr}
+  .about-stats{grid-template-columns:repeat(3,1fr)}
+  .footer-inner{flex-direction:column;text-align:center}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
+}
 </style>
 </head>
 <body>
-<div id="login">
-  <div><div class="lw">Ardito</div><div class="ls">Command Centre</div></div>
-  <div class="lbox">
-    <input type="password" id="pw" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
-    <p class="lerr" id="lerr">Incorrect password</p>
-    <button class="btn bp" onclick="login()" style="width:100%;padding:10px">Enter</button>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <img src="logo.png" alt="Ardito" style="width:44px;height:44px;object-fit:contain"/>
+    </a>
+    <div class="nav-links">
+      <a href="#services">What we do</a>
+      <a href="#tools">Tools</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="#contact">Work with us</a>
+      <a href="#contact" class="nav-cta">Get in touch</a>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
   </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#services" onclick="toggleMenu()">What we do</a>
+  <a href="#tools" onclick="toggleMenu()">Tools</a>
+  <a href="#pricing" onclick="toggleMenu()">Pricing</a>
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#contact" onclick="toggleMenu()">Work with us</a>
+  <a href="/dashboard" style="font-size:16px;opacity:0.4">Team login →</a>
 </div>
 
-<div id="app">
-  <nav class="sb">
-    <div class="sb-brand"><div class="sb-wm">Ardito</div><div class="sb-tg">Command Centre</div></div>
-    <div class="ns"><div class="nl">Overview</div><div class="ni active" onclick="nav('home')" id="nav-home"><span class="ni-icon">◈</span>This Week</div></div>
-    <div class="ns"><div class="nl">Releases</div>
-      <div class="ni" onclick="nav('releases')" id="nav-releases"><span class="ni-icon">🚀</span>Release Tracker</div>
-      <div class="ni" onclick="nav('roster')" id="nav-roster"><span class="ni-icon">🎤</span>Artist Roster</div>
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-label">Artist Development & Release Management</div>
+    <h1 class="hero-headline">
+      Your music deserves<br/>
+      <em>to be heard.</em>
+    </h1>
+    <p class="hero-sub">Ardito works with independent artists who are serious about their releases. We handle the strategy, the outreach, and the parts most artists never get to.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Work with us</a>
+      <a href="#tools" class="btn-secondary">Browse the tools</a>
     </div>
-    <div class="ns"><div class="nl">Content</div>
-      <div class="ni" onclick="nav('calendar')" id="nav-calendar"><span class="ni-icon">📅</span>Calendar</div>
-      <div class="ni" onclick="nav('library')" id="nav-library"><span class="ni-icon">📚</span>Content Library</div>
-      <div class="ni" onclick="nav('ideas')" id="nav-ideas"><span class="ni-icon">💡</span>Post Ideas</div>
-    </div>
-    <div class="ns"><div class="nl">Intel</div><div class="ni" onclick="nav('news')" id="nav-news"><span class="ni-icon">📰</span>News Feed</div>
-      <div class="ni" onclick="nav('brain')" id="nav-brain"><span class="ni-icon">🧠</span>Ardito Brain</div>
-    </div>
-    <div class="ns"><div class="nl">Business</div>
-      <div class="ni" onclick="nav('income')" id="nav-income"><span class="ni-icon">💷</span>Income Tracker</div>
-      <div class="ni" onclick="nav('templates')" id="nav-templates"><span class="ni-icon">✉️</span>Outreach Templates</div>
-    </div>
-    <div class="sb-ft"><button class="lo" onclick="logout()">Log out</button></div>
-  </nav>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</section>
 
-  <main class="main">
-    <!-- HOME -->
-    <div class="page active" id="page-home">
-      <div class="hg" id="greet">Good morning, Laura.</div>
-      <div class="hd" id="gdate"></div>
-      <div class="hgrid">
-        <div class="hcol">
-          <div class="bc"><div class="bch"><div class="bct">🚀 Release tasks</div><button class="btn bg bsm" onclick="nav('releases')">View all</button></div><div class="bcb" id="h-tasks"><div class="bem">Loading...</div></div></div>
-          <div class="bc"><div class="bch"><div class="bct">🎤 Artist follow-ups</div><button class="btn bg bsm" onclick="nav('roster')">View all</button></div><div class="bcb" id="h-followups"><div class="bem">Loading...</div></div></div>
-        </div>
-        <div class="hcol">
-          <div class="bc"><div class="bch"><div class="bct">📅 Posting this week</div><button class="btn bg bsm" onclick="nav('calendar')">View all</button></div><div class="bcb" id="h-posts"><div class="bem">Loading...</div></div></div>
-          <div class="bc"><div class="bch"><div class="bct">💡 Ideas to develop</div><button class="btn bg bsm" onclick="nav('ideas')">View all</button></div><div class="bcb" id="h-ideas"><div class="bem">Loading...</div></div></div>
-        </div>
+<div class="divider"></div>
+
+<!-- WHAT WE DO -->
+<section id="services">
+  <div class="section-inner">
+    <div class="section-label">What we do</div>
+    <h2 class="section-heading">Release management<br/>done right.</h2>
+    <p class="section-sub">From distribution setup to post-release follow-up. We handle the campaign so you can focus on the music.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-title">Release Management</div>
+        <p class="service-desc">Full campaign management for single releases. Distribution, editorial pitching, blog and radio outreach, playlist pitching, social strategy, and post-release analysis.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <div class="service-title">Artist Development</div>
+        <p class="service-desc">For artists at the start. Brand identity, release readiness, audience building, and a plan that makes sense for where you actually are.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <div class="service-title">Strategy Sessions</div>
+        <p class="service-desc">A focused 60-minute session to map your next release, fix what's not working, and leave with a clear plan. Pre-call audit included.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">04</div>
+        <div class="service-title">DIY Tools</div>
+        <p class="service-desc">Not ready to work with us yet? Our playbooks, outreach tracker, and budget calculator give you the system to run your own campaign properly.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- CALENDAR -->
-    <div class="page" id="page-calendar">
-      <div class="ph"><div><div class="pt">Posting Calendar</div><div class="ps">Plan and track content</div></div>
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#4a7c4a;display:inline-block"></span>Explains</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#c06060;display:inline-block"></span>Hot Take</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#c8890a;display:inline-block"></span>Video</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#7aaad4;display:inline-block"></span>Updates</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#9b59d4;display:inline-block"></span>Meeting</span>
-            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#3a7fd4;display:inline-block"></span>Artist</span>
+<div class="divider"></div>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="section-inner">
+    <div class="section-label">The Tools</div>
+    <h2 class="section-heading">Do it yourself.<br/><em>Do it well.</em></h2>
+    <p class="section-sub">Built by a release manager for artists who want to run their own campaigns without guessing what comes next.</p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-tag">Playbook</div>
+        <div class="tool-title">Release Management Playbook</div>
+        <p class="tool-desc">28 days. Every action mapped to your real release date. Day-by-day briefs, tasks, and example copy - from distribution setup to post-release.</p>
+        <div class="tool-price">£14.99 <span>one-off</span></div>
+        <ul class="tool-features">
+          <li>28-day interactive checklist</li>
+          <li>Date-aware calendar</li>
+          <li>Example pitch copy included</li>
+          <li>Pre-save and distribution guides</li>
+          <li>Works for any genre or budget</li>
+        </ul>
+        <a href="https://arditox.gumroad.com/l/suiwnp" target="_blank" class="tool-btn">Get the Playbook</a>
+      </div>
+      <div class="tool-card featured">
+        <div class="tool-tag">Bundle</div>
+        <div class="tool-title">Playbook + Outreach Tracker + Budget Calculator</div>
+        <p class="tool-desc">The full DIY release toolkit. Playbook, 93+ pre-loaded curator and blog contacts filtered by genre, and a budget calculator that tells you where every pound should go.</p>
+        <div class="tool-price">£29 <span>one-off</span></div>
+        <ul class="tool-features">
+          <li>Everything in the Playbook</li>
+          <li>93+ vetted contacts across 6 genres</li>
+          <li>Blogs, playlists, radio - UK and EU</li>
+          <li>Status tracking and CSV export</li>
+          <li>Budget calculator with spend breakdown</li>
+        </ul>
+        <a href="https://arditox.gumroad.com/l/jzhenz" target="_blank" class="tool-btn">Get the Bundle</a>
+      </div>
+      <div class="tool-card">
+        <div class="tool-tag">Coming Soon</div>
+        <div class="tool-title">Gig Promo Playbook</div>
+        <p class="tool-desc">21 days to a full room. The same system as the release playbook, built for promoting live shows. Join the waitlist to be notified first.</p>
+        <div class="tool-price">£15 <span>at launch</span></div>
+        <ul class="tool-features">
+          <li>21-day gig promo system</li>
+          <li>Date-aware posting calendar</li>
+          <li>Venue and ticket link guides</li>
+          <li>Works for solo artists and bands</li>
+          <li>Reusable for every show</li>
+        </ul>
+        <a href="mailto:ardito.ldn@gmail.com?subject=Gig Playbook Waitlist" class="tool-btn">Join the Waitlist</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-heading">Start where you are.</h2>
+    <p class="section-sub">From the tools to the full managed service. Every tier includes everything in the one below it.</p>
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Price</th>
+          <th>What's included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/suiwnp','_blank')">
+          <td><div class="tier-name">The Playbook</div></td>
+          <td><div class="tier-price">£14.99</div></td>
+          <td>28-day release management checklist. Day-by-day briefs, tasks, and example copy. Self-serve, no support. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jzhenz','_blank')">
+          <td><div class="tier-name">Bundle</div><span class="tier-badge">Best value</span></td>
+          <td><div class="tier-price">£29</div></td>
+          <td>Playbook + 93+ contact outreach tracker (genre-filtered, UK and EU) + budget calculator. Everything you need to run a release yourself. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jtrli','_blank')">
+          <td><div class="tier-name">Pitch Review</div></td>
+          <td><div class="tier-price">£35 <span style="font-size:12px;color:rgba(232,224,208,0.4)">intro</span></div></td>
+          <td>Everything in the Bundle, plus a written review of your pitch copy, bio, and artwork from Laura. One round of feedback, 48-hour turnaround. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('mailto:ardito.ldn@gmail.com?subject=Strategy Call','_blank')">
+          <td><div class="tier-name">Strategy Call</div></td>
+          <td><div class="tier-price">£120</div></td>
+          <td>Everything above, plus a 60-minute call. Pre-call intake form, tailored campaign plan, three actions to leave with. The playbook customised for your release. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.location='mailto:ardito.ldn@gmail.com?subject=Full Management Enquiry'">
+          <td><div class="tier-name">Full Management</div></td>
+          <td><div class="tier-price">Bespoke</div></td>
+          <td>Ardito runs the campaign with you. Distribution, pitching, blog and radio outreach, social strategy, post-release follow-up. Enquire for a quote. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div>
+        <div class="section-label">About</div>
+        <h2 class="section-heading">Artist-first.<br/><em>Always.</em></h2>
+        <div class="about-text">
+          <p>Ardito is a release management and artist development agency for <strong>early-stage independent artists</strong>. We work with artists who are serious about their music and ready to put it out - not artists who already have a team.</p>
+          <p>Founded by <strong>Laura</strong>, a Music Business MA graduate (Distinction) from BIMM London with a background spanning live events co-production, touring administration, distribution, and artist management. Laura built Ardito because she kept seeing the same pattern: artists making genuinely good music who had no idea what to do with it once it was finished.</p>
+          <p>We work with artists under 5,000 followers. That's not a limitation - it's the point. Before the wave is where the work matters most.</p>
+        </div>
+        <div class="about-stats">
+          <div>
+            <div class="stat-num">28</div>
+            <div class="stat-label">Days in a full campaign</div>
           </div>
-          <div class="ha"><div class="vt"><button class="vb active" onclick="setCV('cal',this)">Calendar</button><button class="vb" onclick="setCV('list',this)">List</button></div>
-          <button class="btn bp" onclick="openLM()">+ New</button></div>
+          <div>
+            <div class="stat-num">93+</div>
+            <div class="stat-label">Vetted contacts in the tracker</div>
+          </div>
+          <div>
+            <div class="stat-num">6</div>
+            <div class="stat-label">Genres covered</div>
+          </div>
         </div>
       </div>
-      <div class="cc"><div class="mn"><button onclick="chM(-1)">‹</button><div class="ml" id="mlbl"></div><button onclick="chM(1)">›</button></div></div>
-      <div id="cv"><div class="cg" id="cgrid"></div></div>
-      <div id="lv" style="display:none"><div id="litems"></div></div>
-    </div>
-
-    <!-- ROSTER -->
-    <div class="page" id="page-roster">
-      <div id="rlv">
-        <div class="ph"><div><div class="pt">Artist Roster</div><div class="ps">Pipeline and active artists</div></div><button class="btn bp" onclick="openAM()">+ Add artist</button></div>
-        <div class="rg" id="rgrid"></div>
-      </div>
-      <div id="adv" style="display:none">
-        <button class="back" onclick="showRL()">← Back to roster</button>
-        <div id="adcont"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <img src="logo.png" alt="Ardito" style="width:220px;height:220px;object-fit:contain;opacity:0.85;margin-bottom:32px"/>
+        <p style="font-size:13px;color:rgba(232,224,208,0.35);text-align:center;max-width:260px;line-height:1.6">London-based. Working with independent artists across the UK and internationally.</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- RELEASES -->
-    <div class="page" id="page-releases">
-      <div class="ph"><div><div class="pt">Release Tracker</div><div class="ps">Campaign timelines per release</div></div><button class="btn bp" onclick="openRM()">+ New release</button></div>
-      <div id="rcont"></div>
+<div class="divider"></div>
+
+<!-- CASE 001 -->
+<section id="work" style="background:var(--warm-dark)">
+  <div class="section-inner">
+    <div class="section-label">Real work</div>
+    <h2 class="section-heading" style="margin-bottom:8px">Case 001</h2>
+    <p class="section-sub" style="margin-bottom:40px">A full release campaign built from scratch in two weeks.</p>
+    <div style="background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;padding:40px;max-width:720px">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:20px">April 2026</div>
+      <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#e8e0d0;margin-bottom:8px">Omjine — Precious One</h3>
+      <p style="font-size:13px;color:rgba(232,224,208,0.5);margin-bottom:24px">Seoul-based singer-songwriter. Home recorded, minimal, vocally strong. Somewhere between Cat Power and The xx.</p>
+      <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:24px">Omjine came to Ardito two weeks before her single was due out with a finished track and no campaign infrastructure behind it. No mailing list, no press contacts, no outreach history. The brief came in without a fee attached — two weeks, one single, build everything from scratch.</p>
+      <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:32px">What followed was a full release: PRO registration fixed, 62 contacts imported into Mailchimp, 15 personalised pitch emails to blogs and radio stations, Spotify editorial pitch submitted, platform access secured, and two email campaigns written and sent. Precious One is now her most-streamed track.</p>
+      <a href="/case-001.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.5px;padding:10px 22px;border-radius:4px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#3d6a3d'" onmouseout="this.style.background='#2d4a2d'">Read the full case study</a>
     </div>
+  </div>
+</section>
 
-    <!-- LIBRARY -->
-    <div class="page" id="page-library">
-      <div class="ph"><div><div class="pt">Content Library</div><div class="ps" id="lcnt"></div></div><button class="btn bp" onclick="openLM()">+ Add post</button></div>
-      <div class="lf" id="lfilt"></div>
-      <div id="litems2"></div>
-    </div>
+<div class="divider"></div>
 
-    <!-- IDEAS -->
-    <div class="page" id="page-ideas">
-      <div class="ph"><div><div class="pt">Post Ideas</div><div class="ps">Ideas to develop into posts</div></div><button class="btn bp" onclick="openIM()">+ Add idea</button></div>
-      <div id="icont"></div>
-    </div>
-
-    <!-- NEWS -->
-    <div class="page" id="page-news">
-      <div class="ph"><div><div class="pt">News Feed</div><div class="ps">Latest from music industry publications</div></div></div>
-      <div class="ng" id="ngrid"><div style="color:var(--cdim);font-size:13px">Loading...</div></div>
-    </div>
-
-    <!-- BRAIN -->
-    <div class="page" id="page-brain">
-      <div class="ph">
-        <div><div class="pt">Ardito Brain</div><div class="ps">Independent thinking on what matters today</div></div>
-        <button class="btn bg" onclick="runBrain()" id="brain-run-btn">Refresh</button>
-      </div>
-      <div id="brain-output">
-        <div style="text-align:center;padding:4rem 2rem;color:var(--cdim)">
-          <div style="font-size:2rem;margin-bottom:1rem;opacity:0.5">🧠</div>
-          <div style="font-size:13px">Loading briefing...</div>
+<!-- CONTACT -->
+<section id="contact" style="background:var(--green-dark)">
+  <div class="section-inner">
+    <div class="contact-inner">
+      <div class="section-label">Work with us</div>
+      <h2 class="section-heading">Ready when you are.</h2>
+      <p class="section-sub">Whether you want to run your own release or want Ardito to run it with you - start here and we'll figure out the right fit.</p>
+      <div class="contact-options">
+        <div class="contact-card">
+          <div class="contact-card-label">For artists</div>
+          <div class="contact-card-title">Start a conversation</div>
+          <p class="contact-card-desc">Tell us about your release, where you are, and what you're trying to achieve. No hard sell, no obligations.</p>
+          <a href="mailto:ardito.ldn@gmail.com?subject=I'd like to work with Ardito" class="contact-card-link">Email us</a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-label">Strategy call</div>
+          <div class="contact-card-title">Book a session</div>
+          <p class="contact-card-desc">60 minutes, £120. Fill in the pre-call intake form and we'll come prepared. Three actions to leave with.</p>
+          <a href="/intake.html" class="contact-card-link">Fill in the form</a>
         </div>
       </div>
-      <div id="auto-scout-output" style="margin-top:1.5rem"></div>
-      <div style="margin-top:2rem;padding-top:2rem;border-top:1px solid var(--b1)">
-        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream);margin-bottom:6px">Artist Scouting</div>
-        <div style="font-size:12px;color:var(--cdim);margin-bottom:1rem">Paste Instagram handles (one per line) and get a verdict on each one.</div>
-        <textarea id="scout-input" style="width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:10px 12px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;min-height:80px;resize:vertical;outline:none" placeholder="@artistname&#10;@anotherone&#10;@thirdone"></textarea>
-        <button class="btn bp" style="margin-top:8px" onclick="runScout()">Research these artists</button>
-        <div id="scout-output" style="margin-top:1rem"></div>
-      </div>
+      <p style="font-size:13px;color:rgba(232,224,208,0.35)">Or find us on Instagram: <a href="https://instagram.com/ardito.ldn" style="color:rgba(232,224,208,0.5);text-decoration:none">@ardito.ldn</a></p>
     </div>
+  </div>
+</section>
 
-    <!-- INCOME -->
-    <div class="page" id="page-income">
-      <div class="ph"><div><div class="pt">Income Tracker</div><div class="ps" id="inc-sub">Logging payments</div></div><button class="btn bp" onclick="openPayM()">+ Log payment</button></div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem">
-        <div class="dc"><div class="dct">This month</div><div id="inc-month" style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--cream);margin-top:6px">—</div></div>
-        <div class="dc"><div class="dct">This year</div><div id="inc-year" style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--cream);margin-top:6px">—</div></div>
-        <div class="dc"><div class="dct">Pending</div><div id="inc-pending" style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--atext);margin-top:6px">—</div></div>
-      </div>
-      <div id="paycont"></div>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo"><img src="logo.png" alt="Ardito" style="height:32px;object-fit:contain;opacity:0.5"/></div>
+    <div class="footer-links">
+      <a href="#services">What we do</a>
+      <a href="#tools">Tools</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://instagram.com/ardito.ldn">Instagram</a>
+      <a href="/dashboard" style="opacity:0.4">Team</a>
     </div>
-
-    <!-- TEMPLATES -->
-    <div class="page" id="page-templates">
-      <div class="ph"><div><div class="pt">Outreach Templates</div><div class="ps">Copy and personalise before sending</div></div></div>
-      <div style="display:flex;flex-direction:column;gap:1.5rem" id="tmpl-list"></div>
-    </div>
-  </main>
-</div>
-
-<!-- LIBRARY/POST MODAL -->
-<div class="mo" id="lmod">
-  <div class="md">
-    <div class="mt" id="lmt">New post</div>
-    <div class="fg"><label class="fl">Title</label><input type="text" id="l-title" placeholder="What's this?"></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Type</label><select id="l-type" onchange="updateSeriesOptions()"><option value="post">Post</option><option value="meeting">Meeting</option><option value="artist">Artist</option></select></div>
-      <div class="fg"><label class="fl">Date</label><input type="date" id="l-date" onchange="checkPostDay()"></div>
-    </div>
-    <div id="l-day-hint" style="font-size:11px;margin-bottom:12px;margin-top:-8px"></div>
-    <div class="fg" id="l-series-wrap"><label class="fl">Series</label><select id="l-series"><option value="">None</option><option>Ardito Explains</option><option>Hot Take</option><option>Recent Updates</option><option>Video</option></select></div>
-    <div class="fg" id="l-format-wrap"><label class="fl">Format</label><select id="l-format"><option value="">Unknown</option><option>Single image</option><option>Carousel 3 slides</option><option>Carousel 4 slides</option><option>Carousel 5 slides</option><option>Reel</option></select></div>
-    <div class="fg"><label class="fl">Notes</label><input type="text" id="l-topic" placeholder="Artist name, meeting name, or topic"></div>
-    <div class="fg"><label class="fl">Status</label><select id="l-status"><option value="planned">Planned</option><option value="ready">Ready</option><option value="posted">Done</option></select></div>
-    <div class="fg"><label class="fl">Caption / details</label><textarea id="l-cap"></textarea></div>
-    <div class="ma"><button class="btn bg" onclick="closeM('lmod')">Cancel</button><button class="btn bd bsm" id="ldel" style="display:none" onclick="delLib()">Delete</button><button class="btn bp" onclick="saveLib()">Save</button></div>
+    <div class="footer-copy">© 2026 Ardito. London.</div>
   </div>
-</div>
-
-<!-- ARTIST MODAL -->
-<div class="mo" id="amod">
-  <div class="md">
-    <div class="mt" id="amt">Add artist</div>
-    <div class="fr"><div class="fg"><label class="fl">Name</label><input type="text" id="a-name"></div><div class="fg"><label class="fl">Location</label><input type="text" id="a-loc"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Stage</label><select id="a-stage"><option>Spotted</option><option>First Contact</option><option>In Conversation</option><option>Active</option><option>Paused</option><option>Alumni</option></select></div>
-    <div class="fg"><label class="fl">Priority</label><select id="a-pri"><option>This week</option><option>Watching</option><option>On hold</option></select></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Email</label><input type="email" id="a-email"></div><div class="fg"><label class="fl">Instagram</label><input type="text" id="a-ig" placeholder="@handle"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Spotify URL</label><input type="text" id="a-spot"></div><div class="fg"><label class="fl">Last contact</label><input type="date" id="a-lc"></div></div>
-    <div class="fg"><label class="fl">How found</label><input type="text" id="a-hf"></div>
-    <div class="fg"><label class="fl">Next step</label><input type="text" id="a-ns"></div>
-    <div class="fg"><label class="fl">Notes</label><textarea id="a-notes"></textarea></div>
-    <div class="ma"><button class="btn bg" onclick="closeM('amod')">Cancel</button><button class="btn bd bsm" id="adel" style="display:none" onclick="delArtist()">Delete</button><button class="btn bp" onclick="saveArtist()">Save</button></div>
-  </div>
-</div>
-
-<!-- RELEASE MODAL -->
-<div class="mo" id="rmod">
-  <div class="md">
-    <div class="mt" id="rmt">New release</div>
-    <div class="fr"><div class="fg"><label class="fl">Release name</label><input type="text" id="r-name"></div><div class="fg"><label class="fl">Artist</label><select id="r-art"></select></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Release date</label><input type="date" id="r-date"></div><div class="fg"><label class="fl">Campaign start</label><input type="date" id="r-cs"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Distributor</label><input type="text" id="r-dist"></div><div class="fg"><label class="fl">ISRC</label><input type="text" id="r-isrc"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Status</label><select id="r-stat"><option>In Progress</option><option>Released</option><option>On Hold</option></select></div><div class="fg"><label class="fl">Pre-save link</label><input type="text" id="r-pre"></div></div>
-    <div class="fg"><label class="fl">Streaming link</label><input type="text" id="r-str"></div>
-    <div class="fg"><label class="fl">Notes</label><textarea id="r-notes"></textarea></div>
-    <div class="ma"><button class="btn bg" onclick="closeM('rmod')">Cancel</button><button class="btn bd bsm" id="rdel" style="display:none" onclick="delRelease()">Delete</button><button class="btn bp" onclick="saveRelease()">Save</button></div>
-  </div>
-</div>
-
-<!-- IDEA MODAL -->
-<div class="mo" id="imod">
-  <div class="md">
-    <div class="mt">Post idea</div>
-    <div class="fg"><label class="fl">Idea</label><input type="text" id="i-title" placeholder="What's the post about?"></div>
-    <div class="fr"><div class="fg"><label class="fl">Series</label><select id="i-ser"><option value="">None</option><option>Ardito Explains</option><option>Hot Take</option><option>Recent Updates</option><option>Video</option></select></div>
-    <div class="fg"><label class="fl">Status</label><select id="i-stat"><option value="pending">Pending</option><option value="yes">Yes — do it</option><option value="maybe">Maybe</option></select></div></div>
-    <div class="fg"><label class="fl">Notes</label><textarea id="i-notes"></textarea></div>
-    <div class="ma"><button class="btn bg" onclick="closeM('imod')">Cancel</button><button class="btn bd bsm" id="idel" style="display:none" onclick="delIdea()">Delete</button><button class="btn bp" onclick="saveIdea()">Save</button></div>
-  </div>
-</div>
-
-<!-- CONTACT LOG MODAL -->
-<div class="mo" id="logmod">
-  <div class="md" style="width:420px">
-    <div class="mt">Add contact note</div>
-    <div class="fg"><label class="fl">Date</label><input type="date" id="log-date"></div>
-    <div class="fg"><label class="fl">Note</label><textarea id="log-note" style="min-height:100px" placeholder="What happened? What was said?"></textarea></div>
-    <div class="ma"><button class="btn bg" onclick="closeM('logmod')">Cancel</button><button class="btn bp" onclick="saveLog()">Save</button></div>
-  </div>
-</div>
-
-<!-- PAYMENT MODAL --><div class="mo" id="paymod">
-  <div class="md">
-    <div class="mt" id="paymt">Log payment</div>
-    <div class="fr"><div class="fg"><label class="fl">Client</label><input type="text" id="pay-client" placeholder="Artist or project name"></div><div class="fg"><label class="fl">Amount (£)</label><input type="number" id="pay-amount" placeholder="0.00" step="0.01"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Date</label><input type="date" id="pay-date"></div><div class="fg"><label class="fl">Type</label><select id="pay-type"><option value="">Select type</option><option>Release management</option><option>Strategy call</option><option>Pitch review</option><option>Playbook sale</option><option>Bundle sale</option><option>Other</option></select></div></div>
-    <div class="fg"><label class="fl">Status</label><select id="pay-status"><option value="paid">Paid</option><option value="pending">Pending</option><option value="invoiced">Invoiced</option></select></div>
-    <div class="fg"><label class="fl">Notes</label><textarea id="pay-notes" style="min-height:60px"></textarea></div>
-    <div class="ma"><button class="btn bg" onclick="closeM('paymod')">Cancel</button><button class="btn bd bsm" id="paydel" style="display:none" onclick="delPay()">Delete</button><button class="btn bp" onclick="savePay()">Save</button></div>
-  </div>
-</div>
+</footer>
 
 <script>
-const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN',PW='ArditoIsTheBest';
-let cM=new Date().getMonth(),cY=new Date().getFullYear(),cvMode='cal';
-let eLib=null,eArt=null,eRel=null,eIdea=null;
-let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[];
-let ePay=null;
-
-const RW=[
-  {k:'w6',l:'Week 6 — Admin setup',tasks:[{k:'track_mixed',l:'Track professionally mixed and mastered'},{k:'distrokid_upload',l:'Upload to DistroKid (or distributor of choice)'},{k:'isrc_done',l:'Assign ISRC codes'},{k:'artwork_done',l:'Finalise and upload artwork (3000x3000px)'},{k:'release_date_set',l:'Set release date — no major competing releases that day'},{k:'metadata_done',l:'Confirm all metadata (title, credits, genre tags, splits)'},{k:'royalty_splits',l:'Confirm royalty splits with collaborators in writing'},{k:'prs_registered',l:'Register song with PRS (UK) / ASCAP / BMI'}]},
-  {k:'w5',l:'Week 5 — Pre-save + Spotify pitch',tasks:[{k:'presave_link',l:'Set up pre-save link (Feature.fm or Toneden)'},{k:'spotify_pitch_done',l:'Submit Spotify editorial pitch (4 weeks before release)'},{k:'spotify_canvas_done',l:'Set up Spotify Canvas (8-second looping vertical video)'},{k:'apple_music_done',l:'Update Apple Music for Artists profile'},{k:'amazon_music',l:'Update Amazon Music for Artists profile'},{k:'epk_updated',l:'Update EPK, website and bio with release info'},{k:'presave_socials',l:'Start pushing pre-save on socials'},{k:'presave_bio',l:'Pin pre-save link in bio across all platforms'}]},
-  {k:'w4',l:'Week 4 — Content plan locked',tasks:[{k:'content_calendar_locked',l:'Lock content calendar for release week'},{k:'clips_filmed',l:'Film minimum 10-15 short-form clips'},{k:'first_prerelease',l:'Post first piece of pre-release content'},{k:'spotify_playlist',l:'Create a themed Spotify playlist featuring your track + similar artists'}]},
-  {k:'w3',l:'Week 3 — Press + blog outreach',tasks:[{k:'blog_outreach_done',l:'Submit to SubmitHub (blogs + playlist curators)'},{k:'playlist_pitch_done',l:'Identify 5-10 independent playlist curators to pitch directly'},{k:'personal_outreach',l:'Send personal outreach emails / DMs to key contacts'},{k:'pr_done',l:'Write and distribute a music press release'},{k:'youtube_shorts',l:'Plan YouTube Shorts strategy'}]},
-  {k:'w2',l:'Week 2 — Content ramp up',tasks:[{k:'posting_frequency',l:'Increase posting frequency across all channels'},{k:'presave_push',l:'Push pre-save link harder — stories, posts, DMs'},{k:'independent_curators',l:'Pitch directly to independent playlist curators'},{k:'email_announcement',l:'Send email newsletter / mailing list announcement'},{k:'release_assets',l:'Prepare all release day social assets'}]},
-  {k:'w1',l:'Week 1 — Release day prep',tasks:[{k:'track_live_dsps',l:'Confirm track is live and correctly delivered to all DSPs'},{k:'release_posts_scheduled',l:'Schedule all release day posts in advance'},{k:'brief_close_contacts',l:'Brief close contacts to SAVE (not just stream) on release day'},{k:'story_content',l:'Prepare story content for release day'},{k:'paid_promo',l:'Set up any paid promotion / boost if budget allows'}]},
-  {k:'rw',l:'Release Week — Go live + monitor',tasks:[{k:'release_day_content',l:'Post release day content across all channels'},{k:'monitor_streams',l:'Monitor streams + saves in Spotify for Artists'},{k:'engage_comments',l:'Engage with every comment, share and tag'},{k:'check_radar',l:'Check Release Radar delivery to followers'},{k:'thank_supporters',l:'Thank supporters publicly'},{k:'daily_content',l:'Post at least one piece of content every day this week'}]},
-  {k:'post',l:'Post-release — Follow through',tasks:[{k:'apple_editorial',l:'Pitch to Apple Music editorial via Apple Music for Artists'},{k:'amazon_playlists',l:'Submit to Amazon Music playlists'},{k:'spotify_data',l:'Review Spotify for Artists data — saves, skip rate, listener locations'},{k:'check_dsps_paid',l:'Check all DSPs have paid out correctly'},{k:'followup_press',l:'Follow up with press or curator leads that haven\'t responded'},{k:'next_release',l:'Schedule next release to maintain momentum'}]}
-];
-
-async function db(t,m='GET',b=null,id=null,ex=''){
-  const u=`${SB}/rest/v1/${t}${id?`?id=eq.${id}`:''}${ex}`;
-  const r=await fetch(u,{method:m,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':m==='POST'?'return=representation':m==='PATCH'?'return=representation':''},body:b?JSON.stringify(b):undefined});
-  if(m==='DELETE')return true;
-  const tx=await r.text();return tx?JSON.parse(tx):[];
+function toggleMenu(){
+  document.getElementById('mobile-menu').classList.toggle('open');
 }
-
-function login(){
-  if(document.getElementById('pw').value===PW){sessionStorage.setItem('aa','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';init();}
-  else document.getElementById('lerr').style.display='block';
-}
-function logout(){sessionStorage.removeItem('aa');location.reload();}
-
-async function init(){
-  aLib=[];aArt=[];aRel=[];aIdeas=[];
-  setG();
-  [aLib,aArt,aRel,aIdeas]=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc')]);
-  const savedPage=sessionStorage.getItem('ap')||'home';
-  nav(savedPage);
-}
-
-function setG(){
-  const h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Laura.';
-  document.getElementById('gdate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-}
-
-function nav(p){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  document.getElementById('nav-'+p).classList.add('active');
-  sessionStorage.setItem('ap',p);
-  if(p==='home')renderHome();
-  if(p==='calendar')renderCal();
-  if(p==='roster'){showRL();renderRoster();}
-  if(p==='releases')renderReleases();
-  if(p==='library')renderLib();
-  if(p==='ideas')renderIdeas();
-  if(p==='news')loadNews();
-  if(p==='income'){loadPays();renderIncome();}
-  if(p==='templates')renderTemplates();
-  if(p==='brain')runBrain();
-}
-
-function wk(d){
-  if(d>42)return null;if(d>35)return'w6';if(d>28)return'w5';if(d>21)return'w4';if(d>14)return'w3';if(d>7)return'w2';if(d>0)return'w1';if(d>-7)return'rw';return'post';
-}
-
-function renderHome(){
-  const now=new Date(),we=new Date(now);we.setDate(now.getDate()+7);
-  // tasks
-  let tasks=[];
-  aRel.forEach(r=>{
-    if(r.status==='Released'&&wk(Math.ceil((new Date(r.release_date+'T12:00:00')-now)/86400000))==='post'){
-      const a=aArt.find(x=>x.id===r.artist_id);
-      const w=RW.find(x=>x.k==='post');
-      w.tasks.filter(t=>!r[t.k]).slice(0,2).forEach(t=>tasks.push({l:t.l,s:`${a?.name||''} · ${r.release_name}`,u:false}));
-    } else if(r.status!=='Released'){
-      const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
-      if(!rd)return;
-      const d=Math.ceil((rd-now)/86400000);
-      const wKey=wk(d);if(!wKey)return;
-      const w=RW.find(x=>x.k===wKey);if(!w)return;
-      const a=aArt.find(x=>x.id===r.artist_id);
-      w.tasks.filter(t=>!r[t.k]).slice(0,3).forEach(t=>tasks.push({l:t.l,s:`${a?.name||''} · ${r.release_name}`,u:d<14}));
-    }
-  });
-  const ht=document.getElementById('h-tasks');
-  ht.innerHTML=tasks.length?tasks.slice(0,5).map(t=>`<div class="bi"><div class="pd ${t.u?'dr':'da'}"></div><div class="bit"><div class="bit-t">${t.l}</div><div class="bit-s">${t.s}</div></div></div>`).join(''):'<div class="bem">No urgent release tasks</div>';
-  // followups
-  const fu=aArt.map(a=>{const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
-  document.getElementById('h-followups').innerHTML=fu.length?fu.slice(0,5).map(a=>`<div class="bi"><div class="pd ${a.ds>21?'dr':'da'}"></div><div class="bit"><div class="bit-t">${a.name}${a.ds>21?' · overdue':''}</div><div class="bit-s">${a.next_step||a.stage}${a.ds<999?' · '+a.ds+'d since contact':''}</div></div></div>`).join(''):'<div class="bem">All artists up to date</div>';
-  // posts
-  const wp=aLib.filter(p=>{if(!p.post_date)return false;const d=new Date(p.post_date+'T12:00:00');return d>=now&&d<=we;});
-  document.getElementById('h-posts').innerHTML=wp.length?wp.map(p=>{const d=new Date(p.post_date+'T12:00:00');return`<div class="bi"><div class="pd ${p.status==='posted'?'dg':p.status==='ready'?'da':'dd'}"></div><div class="bit"><div class="bit-t">${p.title}</div><div class="bit-s">${d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})} · ${p.series||'Post'} · ${p.status}</div></div></div>`;}).join(''):'<div class="bem">No posts scheduled this week</div>';
-  // ideas
-  const pi=aIdeas.filter(i=>i.status==='pending'||i.status==='yes').slice(0,4);
-  document.getElementById('h-ideas').innerHTML=pi.length?pi.map(i=>`<div class="bi"><div class="pd ${i.status==='yes'?'dg':'dd'}"></div><div class="bit"><div class="bit-t">${i.title}</div><div class="bit-s">${i.series||'No series'}</div></div></div>`).join(''):'<div class="bem">No ideas queued up</div>';
-}
-
-// CALENDAR
-function chM(d){cM+=d;if(cM>11){cM=0;cY++;}if(cM<0){cM=11;cY--;}renderCal();}
-function setCV(v,btn){cvMode=v;document.querySelectorAll('.vb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('cv').style.display=v==='cal'?'block':'none';document.getElementById('lv').style.display=v==='list'?'block':'none';if(v==='list')renderListV();}
-
-function pCls(s,st,type){
-  if(type==='meeting')return'pm'+(st==='posted'?' ppost':'');
-  if(type==='artist')return'pa'+(st==='posted'?' ppost':'');
-  const v=(s||'').toLowerCase().replace(/\s/g,'');
-  let c=v.includes('explain')?'pe':v.includes('hot')?'ph2':v.includes('video')?'pv':v.includes('recent')||v.includes('update')?'pu':'po';
-  if(st==='posted')c+=' ppost';
-  return c;
-}
-function pDot(s,type){
-  if(type==='meeting')return'dot-meeting';
-  if(type==='artist')return'dot-artist';
-  const v=(s||'').toLowerCase().replace(/\s/g,'');
-  return v.includes('explain')?'dot-explains':v.includes('hot')?'dot-hot':v.includes('video')?'dot-video':v.includes('recent')||v.includes('update')?'dot-recent':'dot-post';
-}
-function pLabel(s,type,title){
-  if(type==='meeting')return (s||'Meeting')+(title?' — '+title.slice(0,20):'');
-  if(type==='artist')return (s||'Artist')+(title?' — '+title.slice(0,20):'');
-  const cat=s||'Post';
-  return title?cat+': '+title.slice(0,22):cat;
-}
-
-function renderCal(){
-  const POST_DAYS={0:'7pm',2:'9am',4:'7pm',6:'10am'};
-  const ms=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('mlbl').textContent=`${ms[cM]} ${cY}`;
-  const g=document.getElementById('cgrid');
-  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  let h=days.map(d=>`<div class="ch">${d}</div>`).join('');
-  const f=new Date(cY,cM,1);let s=f.getDay()-1;if(s<0)s=6;
-  const tot=new Date(cY,cM+1,0).getDate(),today=new Date();
-  for(let i=0;i<s;i++)h+=`<div class="cd empty"></div>`;
-  for(let d=1;d<=tot;d++){
-    const ds=`${cY}-${String(cM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dt=new Date(cY,cM,d);
-    const dow=dt.getDay();
-    const bestTime=POST_DAYS[dow];
-    const it=today.getDate()===d&&today.getMonth()===cM&&today.getFullYear()===cY;
-    const dp=aLib.filter(p=>p.post_date===ds);
-    const pills=dp.map(p=>`<span class="cp ${pCls(p.series,p.status,p.type)}" draggable="true" data-id="${p.id}" onclick="openLM('${p.id}',event)" ondragstart="dragStart(event,'${p.id}')" ondragend="dragEnd(event)"><span class="cp-dot ${pDot(p.series,p.type)}"></span>${pLabel(p.series,p.type,p.title)}</span>`).join('');
-    h+=`<div class="cd${it?' today':''}${bestTime?' post-day':''}" data-date="${ds}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')""><div class="cdn">${d}</div>${pills}</div>`;
-  }
-  g.innerHTML=h;
-}
-
-// DRAG AND DROP
-let dragId=null;
-function dragStart(e,id){
-  dragId=id;
-  e.target.classList.add('dragging');
-  e.dataTransfer.effectAllowed='move';
-}
-function dragEnd(e){
-  e.target.classList.remove('dragging');
-  dragId=null;
-}
-function dragOver(e){
-  e.preventDefault();
-  e.dataTransfer.dropEffect='move';
-  e.currentTarget.classList.add('drag-over');
-}
-function dragLeave(e){
-  e.currentTarget.classList.remove('drag-over');
-}
-async function drop(e,ds){
-  e.preventDefault();
-  e.stopPropagation();
-  e.currentTarget.classList.remove('drag-over');
-  if(!dragId)return;
-  await db('content_library','PATCH',{post_date:ds},dragId);
-  aLib=aLib.map(p=>p.id===dragId?{...p,post_date:ds}:p);
-  aLib.sort((a,b)=>(a.post_date||'').localeCompare(b.post_date||''));
-  dragId=null;
-  renderCal();
-  renderHome();
-}
-function calCellClick(e,ds){
-  if(!e.target.closest('.cp'))openLM(null,null,ds);
-}
-
-function renderListV(){
-  const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const el=document.getElementById('litems');
-  if(!aLib.length){el.innerHTML='<div class="empty"><div class="ei">📅</div><div>No posts yet</div></div>';return;}
-  el.innerHTML=aLib.map(p=>{const d=p.post_date?new Date(p.post_date+'T12:00:00'):null;return`<div class="li"><div class="db" style="${!d?'opacity:0':''}">${d?`<div class="dbd">${d.getDate()}</div><div class="dbm">${ms[d.getMonth()]}</div>`:''}</div><div style="flex:1"><div style="font-size:13px;color:var(--cream)">${p.title}</div><div style="font-size:11px;color:var(--cdim);margin-top:3px">${p.series||''} ${p.format?'· '+p.format:''} · <span class="tag ${p.status==='posted'?'tg':'ta'}">${p.status}</span></div></div><button class="btn bg bsm" onclick="openLM('${p.id}',event)">Edit</button></div>`;}).join('');
-}
-
-// ROSTER
-function showRL(){document.getElementById('rlv').style.display='block';document.getElementById('adv').style.display='none';}
-function togArt(id){
-  const body=document.getElementById(`ab-${id}`);
-  const tog=document.getElementById(`at-${id}`);
-  if(!body)return;
-  const open=body.style.display!=='none';
-  body.style.display=open?'none':'block';
-  if(tog)tog.style.transform=open?'rotate(0deg)':'rotate(180deg)';
-}
-function renderRoster(){
-  const g=document.getElementById('rgrid');
-  if(!aArt.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">🎤</div><div>No artists yet</div><br><button class="btn bp" onclick="openAM()">Add your first artist</button></div>';return;}
-  const st={Spotted:'td','First Contact':'td','In Conversation':'ta',Active:'tg',Paused:'ta',Alumni:'tb'};
-  g.innerHTML=aArt.map(a=>{
-    const ini=a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
-    const ds=l?Math.floor((new Date()-l)/86400000):null;
-    const ov=ds&&ds>14;
-    return`<div class="ac">
-      <div class="act" onclick="togArt('${a.id}')" style="cursor:pointer">
-        <div class="ach">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="av">${ini}</div>
-            <div><div class="an">${a.name}</div><div class="al">${a.location||''}</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="tag ${st[a.stage]||'td'}">${a.stage}</span>
-            <span id="at-${a.id}" style="font-size:11px;color:var(--cdim);transition:transform .2s">▾</span>
-          </div>
-        </div>
-      </div>
-      <div id="ab-${a.id}" style="display:none">
-        <div class="acb">
-          <div class="amr"><span class="aml">Last contact</span><span class="amv">${l?l.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):' —'}${ov?`<span class="of"> · ${ds}d ago</span>`:''}</span></div>
-          ${a.next_step?`<div class="ans">${a.next_step}</div>`:''}
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn bp bsm" onclick="showAD('${a.id}')">View</button>
-            <button class="btn bg bsm" onclick="openAM('${a.id}')">Edit</button>
-            <button class="btn bg bsm" onclick="openLogM('${a.id}')">+ Note</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function showAD(id){
-  const a=aArt.find(x=>x.id===id);if(!a)return;
-  document.getElementById('rlv').style.display='none';
-  document.getElementById('adv').style.display='block';
-  const rels=aRel.filter(r=>r.artist_id===id);
-  const ini=a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const st={Spotted:'td','First Contact':'td','In Conversation':'ta',Active:'tg',Paused:'ta',Alumni:'tb'};
-  const l=a.last_contact?new Date(a.last_contact+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):' —';
-  const rHtml=rels.length?rels.map((r,i)=>buildRelCard(r,true,i===0)).join(''):`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No releases yet. <button class="btn bg bsm" onclick="openRMFA('${id}')">Add one</button></div>`;
-  document.getElementById('adcont').innerHTML=`
-    <div class="adh"><div class="ada">${ini}</div><div><h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream)">${a.name}</h2><div style="font-size:13px;color:var(--cdim);margin-top:2px">${a.location||''} ${a.stage?'· <span class="tag '+st[a.stage]+'">'+a.stage+'</span>':''}</div></div><button class="btn bg bsm" style="margin-left:auto" onclick="openAM('${a.id}')">Edit</button></div>
-    <div class="adg">
-      <div class="dc"><div class="dct">Contact details</div>
-        <div class="dr2"><span class="dk">Email</span><span class="dv">${a.email||' —'}</span></div>
-        <div class="dr2"><span class="dk">Instagram</span><span class="dv">${a.instagram||' —'}</span></div>
-        <div class="dr2"><span class="dk">Spotify</span><span class="dv">${a.spotify_url?`<a href="${a.spotify_url}" target="_blank">Open ↗</a>`:' —'}</span></div>
-        <div class="dr2"><span class="dk">How found</span><span class="dv">${a.how_found||' —'}</span></div>
-        <div class="dr2"><span class="dk">Last contact</span><span class="dv">${l}</span></div>
-      </div>
-      <div class="dc"><div class="dct">Status</div>
-        <div class="dr2"><span class="dk">Stage</span><span class="dv">${a.stage||' —'}</span></div>
-        <div class="dr2"><span class="dk">Priority</span><span class="dv">${a.priority||' —'}</span></div>
-        <div class="dr2"><span class="dk">Next step</span><span class="dv" style="max-width:200px">${a.next_step||' —'}</span></div>
-        ${a.notes?`<div style="margin-top:12px;font-size:12px;color:var(--cdim);line-height:1.6;padding:10px;background:var(--s2);border-radius:6px">${a.notes}</div>`:''}
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
-    <div id="logcont-${id}" style="margin-bottom:2rem"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Releases</h3><button class="btn bp bsm" onclick="openRMFA('${id}')">+ New release</button></div>
-    ${rHtml}`;
-  loadLog(id);
-}
-
-// CONTACT LOG
-let eLog=null,logArtId=null;
-
-async function loadLog(artId){
-  const logs=await db('contact_log','GET',null,null,`?artist_id=eq.${artId}&order=log_date.desc,created_at.desc`);
-  const el=document.getElementById(`logcont-${artId}`);
-  if(!el)return;
-  if(!logs.length){el.innerHTML='<div style="color:var(--cdim);font-size:13px;padding:0.5rem 0">No notes yet.</div>';return;}
-  el.innerHTML=logs.map(l=>{
-    const d=l.log_date?new Date(l.log_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):' —';
-    return`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--b1)">
-      <div style="font-size:11px;color:var(--cdim);flex-shrink:0;padding-top:2px;min-width:80px">${d}</div>
-      <div style="font-size:13px;color:var(--cmid);flex:1;line-height:1.5">${l.note}</div>
-      <button class="btn bg bsm" style="flex-shrink:0" onclick="delLog('${l.id}','${artId}')">×</button>
-    </div>`;
-  }).join('');
-}
-
-function openLogM(artId){
-  logArtId=artId;
-  document.getElementById('log-note').value='';
-  document.getElementById('log-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('logmod').classList.add('open');
-}
-
-async function saveLog(){
-  const note=document.getElementById('log-note').value.trim();
-  if(!note)return alert('Add a note');
-  const d={artist_id:logArtId,note,log_date:document.getElementById('log-date').value||new Date().toISOString().split('T')[0]};
-  await db('contact_log','POST',d);
-  // also update last_contact on the artist
-  await db('artists','PATCH',{last_contact:d.log_date},logArtId);
-  aArt=aArt.map(a=>a.id===logArtId?{...a,last_contact:d.log_date}:a);
-  closeM('logmod');
-  loadLog(logArtId);
-  renderRoster();
-  renderHome();
-}
-
-async function delLog(logId,artId){
-  if(!confirm('Delete this note?'))return;
-  await db('contact_log','DELETE',null,logId);
-  loadLog(artId);
-}
-
-function buildRelCard(r,inDetail,startOpen){
-  const now=new Date();
-  const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
-  const d=rd?Math.ceil((rd-now)/86400000):null;
-  const wKey=d!==null?wk(d):null;
-  const wObj=wKey?RW.find(x=>x.k===wKey):null;
-  const allT=RW.flatMap(w=>w.tasks);
-  const done=allT.filter(t=>r[t.k]).length;
-  const pct=Math.round(done/allT.length*100);
-  const a=aArt.find(x=>x.id===r.artist_id);
-  const isOpen=startOpen!==false;
-  return`<div class="rc" id="rc-${r.id}">
-    <div class="rch ${isOpen?'open':''}" onclick="togRel('${r.id}')">
-      <div>
-        <div class="rn">${r.release_name}<span class="rc-toggle">▾</span></div>
-        <div class="ran">${inDetail?'':(a?.name||'Unknown')+' · '}${rd?rd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''} ${r.status?'· '+r.status:''}</div>
-        ${wObj?`<div style="margin-top:6px"><span class="tag ta">${wObj.l}</span></div>`:''}
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0" onclick="event.stopPropagation()">
-        <span class="tag ${r.status==='Released'?'tg':'ta'}">${r.status}</span>
-        <button class="btn bg bsm" onclick="openRM('${r.id}')">Edit</button>
-      </div>
-    </div>
-    <div class="rc-body ${isOpen?'open':''}">
-      <div class="rp"><div class="rpl"><span>Campaign progress</span><span>${done}/${allT.length} · ${pct}%</span></div><div class="rpb"><div class="rpf" style="width:${pct}%"></div></div></div>
-      ${RW.map(w=>{
-        const isCur=w.k===wKey;
-        const wOpen=isCur||false;
-        return`<div class="rw ${wOpen?'':'wclosed'}" id="rw-${r.id}-${w.k}">
-          <div class="rwh" onclick="togWeek('${r.id}','${w.k}')">
-            <span class="wl">${w.l}</span>
-            ${isCur?'<span class="wc">You are here</span>':''}
-            <span class="w-tog">▾</span>
-          </div>
-          <div class="cl">${w.tasks.map(t=>`<div class="ci ${r[t.k]?'done':''}" onclick="togT('${r.id}','${t.k}',${!!r[t.k]},'${inDetail?r.artist_id:''}')"><div class="cc2">${r[t.k]?'✓':''}</div><span class="ct">${t.l}</span></div>`).join('')}</div>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
-}
-
-function togRel(rid){
-  const h=document.querySelector(`#rc-${rid} .rch`);
-  const b=document.querySelector(`#rc-${rid} .rc-body`);
-  h.classList.toggle('open');
-  b.classList.toggle('open');
-}
-
-function togWeek(rid,wk){
-  const el=document.getElementById(`rw-${rid}-${wk}`);
-  if(el)el.classList.toggle('wclosed');
-}
-
-function renderReleases(){
-  const el=document.getElementById('rcont');
-  if(!aRel.length){el.innerHTML='<div class="empty"><div class="ei">🚀</div><div>No releases yet. Add an artist first, then add their release.</div></div>';return;}
-  el.innerHTML=aRel.map((r,i)=>buildRelCard(r,false,false)).join('');
-}
-
-async function togT(rid,k,cur,artId){
-  await db('releases','PATCH',{[k]:!cur},rid);
-  aRel=aRel.map(r=>r.id===rid?{...r,[k]:!cur}:r);
-  if(artId&&document.getElementById('adv').style.display!=='none')showAD(artId);
-  else renderReleases();
-}
-
-// LIBRARY
-let libF='all';
-function renderLib(){
-  const f=[{k:'all',l:'All'},{k:'explains',l:'Ardito Explains'},{k:'hot',l:'Hot Take'},{k:'video',l:'Video'},{k:'recent',l:'Recent Updates'}];
-  document.getElementById('lfilt').innerHTML=f.map(x=>`<button class="fb ${libF===x.k?'active':''}" onclick="setLF('${x.k}')">${x.l}</button>`).join('');
-  let filtered=libF==='all'?[...aLib]:aLib.filter(p=>{const s=(p.series||'').toLowerCase().replace(' ','');return s.includes(libF)||s.includes(libF.replace('hot','hottake'));});
-  // sort: unposted first (by date), posted last (by date)
-  filtered.sort((a,b)=>{
-    const ap=a.status==='posted',bp=b.status==='posted';
-    if(ap!==bp)return ap?1:-1;
-    return (a.post_date||'').localeCompare(b.post_date||'');
-  });
-  document.getElementById('lcnt').textContent=`${filtered.length} posts`;
-  const sc=s=>{const v=(s||'').toLowerCase().replace(' ','');return v.includes('explain')?'se':v.includes('hot')?'sh':v.includes('video')?'sv':v.includes('recent')||v.includes('update')?'su':'';};
-  document.getElementById('litems2').innerHTML=filtered.length?filtered.map(p=>{
-    const posted=p.status==='posted';
-    return`<div class="li2 ${sc(p.series)}${posted?' ppost':''}" style="${posted?'opacity:0.5':''}">
-      <div style="flex-shrink:0;margin-right:4px">
-        <div onclick="togglePosted('${p.id}','${p.status}')" style="width:18px;height:18px;border-radius:50%;border:1.5px solid ${posted?'var(--gbright)':'var(--b3)'};background:${posted?'var(--gbright)':'transparent'};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:white;flex-shrink:0">${posted?'✓':''}</div>
-      </div>
-      <div style="flex:1" onclick="openLM('${p.id}',event)">
-        <div class="lit">${p.title}</div>
-        <div class="lim">${p.post_date?new Date(p.post_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''} ${p.series?'· '+p.series:''} ${p.format?'· '+p.format:''} · <span class="tag ${posted?'tg':'ta'}">${p.status}</span></div>
-      </div>
-    </div>`;
-  }).join(''):'<div class="empty"><div class="ei">📚</div><div>No posts yet</div></div>';
-}
-function setLF(f){libF=f;renderLib();}
-
-async function togglePosted(id,currentStatus){
-  const newStatus=currentStatus==='posted'?'planned':'posted';
-  await db('content_library','PATCH',{status:newStatus},id);
-  aLib=aLib.map(p=>p.id===id?{...p,status:newStatus}:p);
-  renderLib();renderCal();renderHome();
-}
-
-function renderIdeas(){
-  const el=document.getElementById('icont');
-  const tm={pending:'td',yes:'tg',maybe:'ta'};
-  el.innerHTML=aIdeas.length?aIdeas.map(i=>`<div class="ii"><div><div style="font-size:13px;color:var(--cream)">${i.title}</div><div style="font-size:11px;color:var(--cdim);margin-top:3px">${i.series||'No series'}${i.notes?' · '+i.notes:''}</div></div><div style="display:flex;gap:8px;align-items:center;flex-shrink:0"><span class="tag ${tm[i.status]||'td'}">${i.status}</span><button class="btn bg bsm" onclick="openIM('${i.id}')">Edit</button></div></div>`).join(''):'<div class="empty"><div class="ei">💡</div><div>No ideas yet</div></div>';
-}
-
-// INCOME
-async function loadPays(){
-  try{aPays=await db('payments','GET',null,null,'?order=pay_date.desc');}catch(e){aPays=[];}
-  renderIncome();
-}
-
-function renderIncome(){
-  const now=new Date();
-  const paid=aPays.filter(p=>p.status==='paid');
-  const thisMonth=paid.filter(p=>{if(!p.pay_date)return false;const d=new Date(p.pay_date+'T12:00:00');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
-  const thisYear=paid.filter(p=>{if(!p.pay_date)return false;return new Date(p.pay_date+'T12:00:00').getFullYear()===now.getFullYear();});
-  const pending=aPays.filter(p=>p.status==='pending'||p.status==='invoiced');
-  const fmt=n=>`£${Number(n).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
-  document.getElementById('inc-month').textContent=fmt(thisMonth.reduce((s,p)=>s+Number(p.amount),0));
-  document.getElementById('inc-year').textContent=fmt(thisYear.reduce((s,p)=>s+Number(p.amount),0));
-  document.getElementById('inc-pending').textContent=fmt(pending.reduce((s,p)=>s+Number(p.amount),0));
-  const el=document.getElementById('paycont');
-  if(!aPays.length){el.innerHTML='<div class="empty"><div class="ei">💷</div><div>No payments logged yet</div></div>';return;}
-  const stc={paid:'tg',pending:'ta',invoiced:'tb'};
-  el.innerHTML=aPays.map(p=>{
-    const d=p.pay_date?new Date(p.pay_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):' —';
-    return`<div class="li" style="cursor:pointer" onclick="openPayM('${p.id}')">
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-          <span style="font-size:14px;color:var(--cream);font-weight:500">${p.client||' —'}</span>
-          <span class="tag ${stc[p.status]||'td'}">${p.status}</span>
-        </div>
-        <div style="font-size:11px;color:var(--cdim)">${d}${p.type?' · '+p.type:''}${p.notes?' · '+p.notes:''}</div>
-      </div>
-      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream);flex-shrink:0">£${Number(p.amount).toFixed(2)}</div>
-    </div>`;
-  }).join('');
-}
-
-function openPayM(id){
-  ePay=id||null;
-  const p=id?aPays.find(x=>x.id===id):null;
-  document.getElementById('paymt').textContent=p?'Edit payment':'Log payment';
-  document.getElementById('paydel').style.display=p?'inline-flex':'none';
-  document.getElementById('pay-client').value=p?.client||'';
-  document.getElementById('pay-amount').value=p?.amount||'';
-  document.getElementById('pay-date').value=p?.pay_date||new Date().toISOString().split('T')[0];
-  document.getElementById('pay-type').value=p?.type||'';
-  document.getElementById('pay-status').value=p?.status||'paid';
-  document.getElementById('pay-notes').value=p?.notes||'';
-  document.getElementById('paymod').classList.add('open');
-}
-
-async function savePay(){
-  const d={client:document.getElementById('pay-client').value,amount:parseFloat(document.getElementById('pay-amount').value)||0,pay_date:document.getElementById('pay-date').value||null,type:document.getElementById('pay-type').value,status:document.getElementById('pay-status').value,notes:document.getElementById('pay-notes').value};
-  if(!d.client)return alert('Client name required');
-  if(!d.amount)return alert('Amount required');
-  if(ePay){await db('payments','PATCH',d,ePay);aPays=aPays.map(p=>p.id===ePay?{...p,...d}:p);}
-  else{const r=await db('payments','POST',d);if(r&&r[0])aPays.unshift(r[0]);}
-  closeM('paymod');renderIncome();
-}
-
-async function delPay(){
-  if(!confirm('Delete this payment?'))return;
-  await db('payments','DELETE',null,ePay);
-  aPays=aPays.filter(p=>p.id!==ePay);
-  closeM('paymod');renderIncome();
-}
-
-// TEMPLATES
-const TEMPLATES=[
-  {
-    title:'First Contact',
-    desc:'Cold outreach to a new artist — keep it warm and specific.',
-    body:`Hi [Name],
-
-I came across your music through [where/how] and wanted to reach out. I run Ardito, a release management agency for independent artists — we help early-stage artists go from finished track to properly released.
-
-I think what you're doing with [something specific about their sound or release] is really interesting, and I'd love to have a proper conversation about what a release could look like for you.
-
-No pressure at all — happy to just have a chat first and see if it makes sense.
-
-Laura
-ardito.ldn@gmail.com | @ardito.ldn`
-  },
-  {
-    title:'Follow-up',
-    desc:'Chasing a warm lead who hasn\'t responded.',
-    body:`Hi [Name],
-
-Just following up on my message from [timeframe] — I know things get busy.
-
-I'm still keen to chat about [their upcoming project or general release work] when you have a moment. Even a quick 20 minutes would be useful.
-
-Laura
-ardito.ldn@gmail.com | @ardito.ldn`
-  },
-  {
-    title:'Onboarding',
-    desc:'First message once an artist has agreed to work together.',
-    body:`Hi [Name],
-
-Really glad we're doing this. Here's what happens next:
-
-First, I'll send over a short intake form so I can get everything I need — your links, distributor login, any existing release materials, and your goals for the campaign.
-
-From there I'll put together a release timeline and we'll book a kick-off call to go through it together.
-
-In the meantime, if you have anything already in progress (mixes, artwork, social content) just send it over and I'll take a look.
-
-Speak soon,
-Laura
-ardito.ldn@gmail.com | @ardito.ldn`
-  },
-  {
-    title:'Playlist Submission — Omjine: Precious One',
-    desc:'Links and notes for post-release playlist submissions. Track must be live on Spotify first.',
-    body:`TRACK: Precious One — Omjine
-Spotify: https://open.spotify.com/artist/5sLym4ZG6UZ35kUeuQpKET
-Streaming link: https://distrokid.com/hyperfollow/omjine/precious-one
-
-INDIEMONO
-Submit at: https://indiemono.com/music-submit/
-Pick the indie/alternative category. Needs Spotify track URL (not artist URL). Free, no account needed. One submission only.
-
-SOUNDPLATE
-Browse playlists at: https://soundplate.com/new-spotify-playlists1/
-Find playlists that fit the sound (indie, alternative, melancholic, singer-songwriter). Click Submit Music on each relevant playlist. Free.
-
-AMAZING RADIO
-1. Create account at: https://amazingradio.com/connect/signup
-2. Upload track to their platform
-3. Email music@amazingradio.com with the link (no MP3 attachments)
-
-PITCH COPY:
-"I'm reaching out about Omjine's new single Precious One, which released on the 10th of April. She's a Seoul-based singer-songwriter, home recorded, minimal, vocally really strong. Precious One is written from the point of view of the person who never gets to tell their side of the story. Somewhere between Cat Power and The xx."`
-  }
-];
-
-function renderTemplates(){
-  document.getElementById('tmpl-list').innerHTML=TEMPLATES.map((t,i)=>`
-    <div class="dc">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
-        <div>
-          <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--cream);margin-bottom:4px">${t.title}</div>
-          <div style="font-size:11px;color:var(--cdim)">${t.desc}</div>
-        </div>
-        <button class="btn bg bsm" onclick="copyTmpl(${i})">Copy</button>
-      </div>
-      <pre id="tmpl-${i}" style="white-space:pre-wrap;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--cmid);line-height:1.7;background:var(--s2);border-radius:6px;padding:1rem">${t.body}</pre>
-    </div>
-  `).join('');
-}
-
-function copyTmpl(i){
-  navigator.clipboard.writeText(TEMPLATES[i].body).then(()=>{
-    const btn=document.querySelectorAll('#tmpl-list .btn')[i];
-    btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);
-  });
-}
-
-// ARDITO BRAIN
-async function runBrain(){
-  const btn=document.getElementById('brain-run-btn');
-  const out=document.getElementById('brain-output');
-  btn.textContent='Thinking...';
-  btn.disabled=true;
-  out.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--cdim)"><div style="font-size:1.5rem;margin-bottom:1rem">🧠</div><div style="font-size:13px">Reading the news and pulling your data...</div></div>`;
-
-  const now=new Date();
-
-  // Fetch RSS news
-  const feeds=[{n:'Music Ally',u:'https://musically.com/feed/'},{n:'MBW',u:'https://www.musicbusinessworldwide.com/feed/'},{n:'Pitchfork',u:'https://pitchfork.com/rss/news/feed.rnss'},{n:'Billboard',u:'https://www.billboard.com/feed/'},{n:'Stereogum',u:'https://www.stereogum.com/feed/'}];
-  const newsItems=[];
-  await Promise.all(feeds.map(async f=>{
-    try{
-      const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(f.u)}&count=4&api_key=igagflxn4ra1nw6xhhspvq4vv7knheabh4iqtuec`);
-      const d=await r.json();
-      if(d.items)d.items.forEach(i=>newsItems.push(`[${f.n}] ${i.title}`));
-    }catch(e){}
-  }));
-  newsItems.sort(()=>Math.random()-0.5);
-  const newsSummary=newsItems.slice(0,12).join('\n');
-
-  const artistSummary=aArt.map(a=>{
-    const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
-    const days=l?Math.floor((now-l)/86400000):null;
-    return `- ${a.name} (${a.location||'unknown location'}, stage: ${a.stage}, priority: ${a.priority}). Last contact: ${days!==null?days+'d ago':'never'}. Next step: ${a.next_step||'none set'}. Notes: ${a.notes||'none'}.`;
-  }).join('\n');
-
-  const relSummary=aRel.map(r=>{
-    const a=aArt.find(x=>x.id===r.artist_id);
-    const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
-    const days=rd?Math.ceil((rd-now)/86400000):null;
-    const allT=RW.flatMap(w=>w.tasks);
-    const done=allT.filter(t=>r[t.k]).length;
-    return `- "${r.release_name}" by ${a?.name||'unknown'} — status: ${r.status}. Release date: ${rd?rd.toLocaleDateString('en-GB'):'not set'}. ${days!==null?(days>0?days+'d until release':Math.abs(days)+'d since release'):''}. Progress: ${done}/${allT.length} tasks complete.`;
-  }).join('\n');
-
-  const upcomingContent=aLib.filter(p=>p.status==='planned').slice(0,6).map(p=>`- ${p.title} (${p.series||'no series'}, ${p.post_date||'no date set'})`).join('\n');
-  const pendingIdeas=aIdeas.filter(i=>i.status==='pending'||i.status==='yes').slice(0,5).map(i=>`- ${i.title} (${i.series||'no series'})`).join('\n');
-
-  const systemPrompt=`You are the strategic brain of Ardito, a release management and artist development agency run by Laura (solo founder, London-based, Music Business MA with Distinction from BIMM London).
-
-WHAT ARDITO DOES:
-Ardito works with early-stage independent artists (under 5k followers) who are serious about releasing music. The gap Ardito fills is between making music and people hearing it — strategy, outreach, pitching, campaign management.
-
-LAURA'S VOICE:
-Casual, direct, human. Never corporate. No em dashes. Warm but not salesy. Relationship-first approach to artists.
-
-ARDITO'S CONTENT SERIES:
-- Ardito Explains (educational, deep green)
-- Hot Take (opinionated, used sparingly)
-- Video (talking head or screen record)
-- Recent Updates (industry news, every Sunday)
-
-POSTING RHYTHM: Sunday, Tuesday, Thursday, Saturday on Instagram (@ardito.ldn)
-
-CURRENT TOOLS FOR SALE:
-- 28-Day Release Playbook (£14.99 on Gumroad)
-- Bundle with outreach tracker + budget calculator (£29)
-- Pitch Review (£59)
-- Strategy Call (£120)
-- Full Management (bespoke)
-
-ACTIVE CLIENT:
-Omjine — Seoul-based singer-songwriter, debut single "Precious One" released 10 April 2026. Cat Power / The xx sound refs. Running as learning exercise, not charging. Post-release campaign ongoing. Spotify artist ID: 5sLym4ZG6UZ35kUeuQpKET.
-
-OUTREACH RULES:
-- Playlist curators: SubmitHub or Groover only, never email
-- Blogs and radio: direct email or upload portal
-- Pitch emails go out Tuesday 9:27am
-- Always personalise, never template-blast
-- Relationship-first, question-led
-
-YOUR JOB TODAY:
-Give Laura a sharp, practical briefing. Be specific and proactive. Think like a chief of staff who knows everything about the business. Don't just summarise data — make recommendations, draft copy where useful, flag what's slipping, suggest what to do next.
-
-Structure your response in exactly these four sections with these exact headers:
-ROSTER PULSE
-CONTENT THIS WEEK
-RELEASE HEALTH
-ONE BIG MOVE
-
-Under CONTENT THIS WEEK, use the real news headlines provided to find one specific story or trend worth turning into an Ardito post. Name the story, say which series it fits, and give a one-line caption angle.
-
-Keep it tight. Be direct. Sound like a smart colleague, not a report. No em dashes anywhere.`;
-
-  const userMsg=`Today is ${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}.
-
-CURRENT ROSTER:
-${artistSummary||'No artists on roster'}
-
-ACTIVE RELEASES:
-${relSummary||'No releases'}
-
-UPCOMING CONTENT (planned posts):
-${upcomingContent||'Nothing planned'}
-
-PENDING IDEAS:
-${pendingIdeas||'No ideas queued'}
-
-MUSIC INDUSTRY NEWS (from today's feeds):
-${newsSummary||'Could not load news feeds'}
-
-Give me today's briefing.`;
-
-  try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:systemPrompt,
-        messages:[{role:'user',content:userMsg}]
-      })
-    });
-    const data=await response.json();
-    const text=data.content?.[0]?.text||'No response received.';
-
-    // Parse into sections for nicer rendering
-    const sectionDefs=['ROSTER PULSE','CONTENT THIS WEEK','RELEASE HEALTH','ONE BIG MOVE'];
-    const icons={'ROSTER PULSE':'🎤','CONTENT THIS WEEK':'📲','RELEASE HEALTH':'🚀','ONE BIG MOVE':'⚡'};
-    let html=`<div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim);margin-bottom:1.5rem">Briefing — ${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div>`;
-
-    let remaining=text;
-    sectionDefs.forEach((sec,i)=>{
-      const nextSec=sectionDefs[i+1];
-      const start=remaining.indexOf(sec);
-      if(start===-1)return;
-      const end=nextSec?remaining.indexOf(nextSec):remaining.length;
-      const content=remaining.slice(start+sec.length,end>-1?end:undefined).trim();
-      html+=`<div style="background:var(--s2);border-radius:8px;padding:1.25rem;margin-bottom:1rem;border-left:3px solid var(--gbright)">
-        <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gtext);margin-bottom:10px">${icons[sec]||''} ${sec}</div>
-        <div style="font-size:13px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${content}</div>
-      </div>`;
-    });
-
-    // Fallback if sections not found
-    if(!html.includes('border-left')){
-      html+=`<div style="background:var(--s2);border-radius:8px;padding:1.25rem;font-size:13px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${text}</div>`;
-    }
-
-    html+=`<button class="btn bg" style="font-size:11px;margin-top:1rem" onclick="runBrain()">Refresh briefing</button>`;
-    out.innerHTML=html;
-
-  }catch(e){
-    out.innerHTML=`<div style="color:var(--rtext);font-size:13px;padding:1rem">Something went wrong: ${e.message}</div>`;
-  }
-
-  btn.textContent='Run briefing';
-  btn.disabled=false;
-  runAutoScout();
-}
-
-async function runAutoScout(){
-  const out=document.getElementById('auto-scout-output');
-  if(!out)return;
-  out.innerHTML=`<div style="color:var(--cdim);font-size:12px;padding:.5rem 0">Scanning roster for outreach opportunities...</div>`;
-
-  const now=new Date();
-  const rosterContext=aArt.map(a=>{
-    const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
-    const days=l?Math.floor((now-l)/86400000):null;
-    return`${a.name} (${a.location||'unknown'}, ${a.stage}, last contact: ${days!==null?days+'d ago':'never'}, next step: ${a.next_step||'none'})`;
-  }).join('\n');
-
-  const prompt=`You are helping Laura at Ardito, a release management agency for early-stage independent artists (under 5k followers).
-
-Current roster:
-${rosterContext}
-
-Do two things:
-
-1. ROSTER GAPS — Look at the roster above. Who has gone cold (no contact in 14+ days)? Who is stuck at a stage they should have moved past? Give 1-2 specific, actionable suggestions with a one-line message Laura could send today. Be direct, no fluff.
-
-2. NEW LEADS — Based on the artists already on the roster (their locations, sounds, stages), suggest 2-3 real Instagram handles of similar early-stage artists Laura should look at. Focus on UK/EU indie, alternative, singer-songwriter, or experimental artists with under 5k followers who are actively releasing music. Give a one-sentence reason for each suggestion.
-
-Format:
-ROSTER GAPS
-[your suggestions]
-
-NEW LEADS
-@handle — reason
-@handle — reason
-@handle — reason`;
-
-  try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:500,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await response.json();
-    const text=data.content?.[0]?.text||'';
-    const parts=text.split(/\n(?=NEW LEADS)/);
-    const gaps=parts[0]?.replace('ROSTER GAPS','').trim();
-    const leads=parts[1]?.replace('NEW LEADS','').trim();
-
-    out.innerHTML=`
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div style="background:var(--s2);border-radius:8px;padding:1.25rem;border-left:3px solid var(--atext)">
-          <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--atext);margin-bottom:10px">🎤 Roster gaps</div>
-          <div style="font-size:12px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${gaps||'All good'}</div>
-        </div>
-        <div style="background:var(--s2);border-radius:8px;padding:1.25rem;border-left:3px solid var(--gbright)">
-          <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gtext);margin-bottom:10px">🔍 New leads to check out</div>
-          <div style="font-size:12px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${leads||'None suggested'}</div>
-        </div>
-      </div>`;
-  }catch(e){
-    out.innerHTML='';
-  }
-}
-
-async function runScout(){
-  const input=document.getElementById('scout-input').value.trim();
-  if(!input)return alert('Paste some handles first');
-  const out=document.getElementById('scout-output');
-  const handles=input.split('\n').map(h=>h.trim().replace(/^@/,'')).filter(Boolean);
-  out.innerHTML=`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">Researching ${handles.length} artist${handles.length>1?'s':''}...</div>`;
-
-  const prompt=`You are helping Laura at Ardito, a release management agency for early-stage independent artists (under 5k followers, UK/EU focus, any genre but especially indie, alternative, singer-songwriter, electronic).
-
-For each Instagram handle below, based on what you know about these accounts (or making a reasonable assessment if you don't know them specifically), give a quick verdict on whether they're worth Ardito reaching out to.
-
-For each handle give:
-- Follower estimate or range (if known)
-- Sound/genre (if known, or "unknown")
-- Ardito fit: Yes / Maybe / No — with one sentence why
-- Suggested first message angle (one line, casual, warm, specific)
-
-Format each as:
-@handle
-Followers: X
-Sound: X
-Fit: Yes/Maybe/No — reason
-Angle: X
-
-Handles to research:
-${handles.map(h=>'@'+h).join('\n')}`;
-
-  try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:800,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data=await response.json();
-    const text=data.content?.[0]?.text||'No response.';
-    const cards=text.split('\n@').map((block,i)=>{
-      const t=i===0?block:'@'+block;
-      const lines=t.trim().split('\n');
-      const handle=lines[0].replace('@','').trim();
-      const fit=lines.find(l=>l.startsWith('Fit:'))||'';
-      const isYes=fit.includes('Yes');
-      const isMaybe=fit.includes('Maybe');
-      const col=isYes?'var(--gtext)':isMaybe?'var(--atext)':'var(--rtext)';
-      return`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:1rem 1.25rem;margin-bottom:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:14px;color:var(--cream);font-weight:500">@${handle}</div>
-          <span style="font-size:11px;color:${col}">${isYes?'✓ Yes':isMaybe?'~ Maybe':'✕ No'}</span>
-        </div>
-        <div style="font-size:12px;color:var(--cdim);line-height:1.7">${lines.slice(1).join('<br>')}</div>
-      </div>`;
-    });
-    out.innerHTML=cards.join('');
-  }catch(e){
-    out.innerHTML=`<div style="color:var(--rtext);font-size:13px">Something went wrong: ${e.message}</div>`;
-  }
-}
-
-async function loadNews(){
-  const g=document.getElementById('ngrid');g.innerHTML='<div style="color:var(--cdim);font-size:13px">Loading...</div>';
-  const feeds=[{n:'Music Ally',u:'https://musically.com/feed/'},{n:'MBW',u:'https://www.musicbusinessworldwide.com/feed/'},{n:'Pitchfork',u:'https://pitchfork.com/rss/news/feed.rnss'},{n:'Billboard',u:'https://www.billboard.com/feed/'},{n:'Stereogum',u:'https://www.stereogum.com/feed/'}];
-  const res=[];
-  await Promise.all(feeds.map(async f=>{try{const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(f.u)}&count=5&api_key=igagflxn4ra1nw6xhhspvq4vv7knheabh4iqtuec`);const d=await r.json();if(d.items)d.items.forEach(i=>res.push({s:f.n,t:i.title,l:i.link,d:new Date(i.pubDate)}));}catch(e){}}));
-  res.sort((a,b)=>b.d-a.d);
-  g.innerHTML=res.length?res.slice(0,24).map(r=>`<div class="nc" onclick="window.open('${r.l}','_blank')"><div class="ns2">${r.s}</div><div class="nt">${r.t}</div><div class="nd">${r.d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div></div>`).join(''):'<div style="color:var(--cdim);font-size:13px">Could not load feeds.</div>';
-}
-
-// MODALS
-function closeM(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
-
-function updateSeriesOptions(){
-  const type=document.getElementById('l-type').value;
-  const sw=document.getElementById('l-series-wrap');
-  const fw=document.getElementById('l-format-wrap');
-  sw.style.display=type==='post'?'block':'none';
-  fw.style.display=type==='post'?'block':'none';
-}
-function checkPostDay(){
-  const POST_DAYS={0:'Sunday — post at 7pm',2:'Tuesday — post at 9am',4:'Thursday — post at 7pm',6:'Saturday — post at 10am'};
-  const val=document.getElementById('l-date').value;
-  const hint=document.getElementById('l-day-hint');
-  if(!hint)return;
-  if(!val){hint.textContent='';return;}
-  const dt=new Date(val+'T12:00:00');
-  const dow=dt.getDay();
-  const best=POST_DAYS[dow];
-  if(best){
-    hint.textContent=best;
-    hint.style.color='var(--gtext)';
-  }else{
-    const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    hint.textContent=`${days[dow]} is not a posting day. Best days: Sun, Tue, Thu, Sat.`;
-    hint.style.color='var(--atext)';
-  }
-}
-function openLM(id,e,ds){
-  if(e)e.stopPropagation();
-  eLib=id||null;
-  const it=id?aLib.find(x=>x.id===id):null;
-  const type=it?.type||'post';
-  document.getElementById('lmt').textContent=it?`Edit ${type}`:'New post';
-  document.getElementById('ldel').style.display=it?'inline-flex':'none';
-  document.getElementById('l-title').value=it?.title||'';
-  document.getElementById('l-type').value=type;
-  document.getElementById('l-series').value=it?.series||'';
-  document.getElementById('l-format').value=it?.format||'';
-  document.getElementById('l-topic').value=it?.topic||'';
-  document.getElementById('l-date').value=it?.post_date||ds||'';
-  document.getElementById('l-status').value=it?.status||'planned';
-  document.getElementById('l-cap').value=it?.caption||'';
-  updateSeriesOptions();
-  checkPostDay();
-  document.getElementById('lmod').classList.add('open');
-}
-async function saveLib(){
-  const d={title:document.getElementById('l-title').value,type:document.getElementById('l-type').value||'post',series:document.getElementById('l-series').value,format:document.getElementById('l-format').value,topic:document.getElementById('l-topic').value,post_date:document.getElementById('l-date').value||null,status:document.getElementById('l-status').value,caption:document.getElementById('l-cap').value};
-  if(!d.title)return alert('Title required');
-  if(eLib){await db('content_library','PATCH',d,eLib);aLib=aLib.map(l=>l.id===eLib?{...l,...d}:l);}
-  else{const r=await db('content_library','POST',d);if(r&&r[0])aLib.push(r[0]);}
-  aLib.sort((a,b)=>(a.post_date||'').localeCompare(b.post_date||''));
-  closeM('lmod');renderLib();renderCal();renderHome();
-}
-async function delLib(){if(!confirm('Delete?'))return;await db('content_library','DELETE',null,eLib);aLib=aLib.filter(l=>l.id!==eLib);closeM('lmod');renderLib();renderCal();}
-
-function openAM(id){
-  eArt=id||null;const a=id?aArt.find(x=>x.id===id):null;
-  document.getElementById('amt').textContent=a?'Edit artist':'Add artist';
-  document.getElementById('adel').style.display=a?'inline-flex':'none';
-  document.getElementById('a-name').value=a?.name||'';document.getElementById('a-loc').value=a?.location||'';
-  document.getElementById('a-stage').value=a?.stage||'First Contact';document.getElementById('a-pri').value=a?.priority||'Watching';
-  document.getElementById('a-email').value=a?.email||'';document.getElementById('a-ig').value=a?.instagram||'';
-  document.getElementById('a-spot').value=a?.spotify_url||'';document.getElementById('a-lc').value=a?.last_contact||'';
-  document.getElementById('a-hf').value=a?.how_found||'';document.getElementById('a-ns').value=a?.next_step||'';
-  document.getElementById('a-notes').value=a?.notes||'';
-  document.getElementById('amod').classList.add('open');
-}
-async function saveArtist(){
-  const d={name:document.getElementById('a-name').value,location:document.getElementById('a-loc').value,stage:document.getElementById('a-stage').value,priority:document.getElementById('a-pri').value,email:document.getElementById('a-email').value,instagram:document.getElementById('a-ig').value,spotify_url:document.getElementById('a-spot').value,last_contact:document.getElementById('a-lc').value||null,how_found:document.getElementById('a-hf').value,next_step:document.getElementById('a-ns').value,notes:document.getElementById('a-notes').value};
-  if(!d.name)return alert('Name required');
-  if(eArt){await db('artists','PATCH',d,eArt);aArt=aArt.map(a=>a.id===eArt?{...a,...d}:a);}
-  else{const r=await db('artists','POST',d);if(r&&r[0])aArt.push(r[0]);}
-  closeM('amod');renderRoster();renderHome();
-  if(document.getElementById('adv').style.display!=='none'&&eArt)showAD(eArt);
-}
-async function delArtist(){if(!confirm('Delete artist and all their releases?'))return;await db('artists','DELETE',null,eArt);aArt=aArt.filter(a=>a.id!==eArt);closeM('amod');showRL();renderRoster();}
-
-function openRM(id){
-  eRel=id||null;const r=id?aRel.find(x=>x.id===id):null;
-  document.getElementById('rmt').textContent=r?'Edit release':'New release';
-  document.getElementById('rdel').style.display=r?'inline-flex':'none';
-  document.getElementById('r-name').value=r?.release_name||'';document.getElementById('r-date').value=r?.release_date||'';
-  document.getElementById('r-cs').value=r?.campaign_start||'';document.getElementById('r-dist').value=r?.distributor||'';
-  document.getElementById('r-isrc').value=r?.isrc||'';document.getElementById('r-stat').value=r?.status||'In Progress';
-  document.getElementById('r-pre').value=r?.presave_link||'';document.getElementById('r-str').value=r?.streaming_link||'';
-  document.getElementById('r-notes').value=r?.notes||'';
-  document.getElementById('r-art').innerHTML=aArt.map(a=>`<option value="${a.id}" ${r?.artist_id===a.id?'selected':''}>${a.name}</option>`).join('');
-  document.getElementById('rmod').classList.add('open');
-}
-function openRMFA(aid){openRM(null);document.getElementById('r-art').value=aid;}
-async function saveRelease(){
-  const d={release_name:document.getElementById('r-name').value,artist_id:document.getElementById('r-art').value,release_date:document.getElementById('r-date').value||null,campaign_start:document.getElementById('r-cs').value||null,distributor:document.getElementById('r-dist').value,isrc:document.getElementById('r-isrc').value,status:document.getElementById('r-stat').value,presave_link:document.getElementById('r-pre').value,streaming_link:document.getElementById('r-str').value,notes:document.getElementById('r-notes').value};
-  if(!d.release_name)return alert('Release name required');
-  let artId=d.artist_id;
-  if(eRel){await db('releases','PATCH',d,eRel);aRel=aRel.map(r=>r.id===eRel?{...r,...d}:r);}
-  else{const r=await db('releases','POST',d);if(r&&r[0]){aRel.unshift(r[0]);artId=r[0].artist_id;}}
-  closeM('rmod');
-  if(document.getElementById('adv').style.display!=='none')showAD(artId);
-  else renderReleases();
-}
-async function delRelease(){if(!confirm('Delete release?'))return;const r=aRel.find(x=>x.id===eRel);await db('releases','DELETE',null,eRel);aRel=aRel.filter(x=>x.id!==eRel);closeM('rmod');if(r&&document.getElementById('adv').style.display!=='none')showAD(r.artist_id);else renderReleases();}
-
-function openIM(id){
-  eIdea=id||null;const i=id?aIdeas.find(x=>x.id===id):null;
-  document.getElementById('idel').style.display=i?'inline-flex':'none';
-  document.getElementById('i-title').value=i?.title||'';document.getElementById('i-ser').value=i?.series||'';
-  document.getElementById('i-stat').value=i?.status||'pending';document.getElementById('i-notes').value=i?.notes||'';
-  document.getElementById('imod').classList.add('open');
-}
-async function saveIdea(){
-  const d={title:document.getElementById('i-title').value,series:document.getElementById('i-ser').value,status:document.getElementById('i-stat').value,notes:document.getElementById('i-notes').value};
-  if(!d.title)return alert('Add a title');
-  if(eIdea){await db('post_ideas','PATCH',d,eIdea);aIdeas=aIdeas.map(i=>i.id===eIdea?{...i,...d}:i);}
-  else{const r=await db('post_ideas','POST',d);if(r&&r[0])aIdeas.unshift(r[0]);}
-  closeM('imod');renderIdeas();renderHome();
-}
-async function delIdea(){if(!confirm('Delete?'))return;await db('post_ideas','DELETE',null,eIdea);aIdeas=aIdeas.filter(i=>i.id!==eIdea);closeM('imod');renderIdeas();}
-
-if(sessionStorage.getItem('aa')){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';init();}
+document.getElementById('mobile-menu').addEventListener('click',function(e){
+  if(e.target===this) toggleMenu();
+});
+window.addEventListener('scroll',function(){
+  const nav=document.querySelector('nav');
+  nav.style.borderBottomColor=window.scrollY>20?'rgba(232,224,208,0.08)':'transparent';
+});
 </script>
 </body>
 </html>
