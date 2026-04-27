@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ardito — Artist Development & Release Management</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>:opsz,wght@9..40,400;9..40,500&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0d0d0d;
+  --cream:#e8e0d0;
+  --green-dark:#1a2e1a;
+  --green-mid:#2d4a2d;
+  --slate:#1e2a38;
+  --off-white:#f0ece4;
+  --warm-dark:#1c1a14;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(232,224,208,0.1);padding:0 40px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-logo-svg{width:40px;height:40px}
+.nav-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:18px;color:#e8e0d0;letter-spacing:2px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{color:rgba(232,224,208,0.75);font-size:13px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;font-family:'DM Sans',sans-serif}
+.nav-links a:hover{color:#e8e0d0}
+.nav-cta{background:#2d4a2d;color:#e8e0d0 !important;padding:9px 20px;border-radius:4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:#3a5e3a !important}
+.nav-team{color:rgba(232,224,208,0.35) !important;font-size:11px;letter-spacing:1px;text-decoration:none}
+.nav-team:hover{color:rgba(232,224,208,0.55) !important}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 40px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%, rgba(45,74,45,0.15) 0%, transparent 60%),radial-gradient(ellipse at 70% 20%, rgba(30,42,56,0.1) 0%, transparent 50%)}
+.hero-inner{max-width:900px;width:100%;position:relative;z-index:1}
+.hero-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.55);margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.hero-headline{font-family:'Playfair Display',Georgia,serif;font-size:clamp(48px,7vw,84px);font-weight:700;line-height:1.05;margin-bottom:28px;color:#e8e0d0}
+.hero-headline em{font-style:italic;color:rgba(232,224,208,0.8)}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:rgba(232,224,208,0.8);max-width:560px;line-height:1.75;margin-bottom:48px;font-family:'DM Sans',sans-serif}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-primary{background:var(--cream);color:var(--black);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;font-weight:700;transition:all .2s}
+.btn-primary:hover{background:var(--off-white)}
+.btn-secondary{background:transparent;color:var(--cream);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.25);transition:all .2s}
+.btn-secondary:hover{border-color:rgba(232,224,208,0.5)}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(232,224,208,0.3);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom, rgba(232,224,208,0.3), transparent)}
+
+/* SECTIONS */
+section{padding:100px 40px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.5);margin-bottom:16px;font-family:'DM Sans',sans-serif}
+.section-heading{font-family:'Playfair Display',Georgia,serif;font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.15;margin-bottom:20px;color:#e8e0d0}
+.section-sub{font-size:16px;color:rgba(232,224,208,0.75);max-width:560px;line-height:1.75;margin-bottom:60px;font-family:'DM Sans',sans-serif}
+.divider{width:100%;height:1px;background:rgba(232,224,208,0.06)}
+
+/* WHAT WE DO */
+#services{background:var(--warm-dark)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px}
+.service-card{background:rgba(232,224,208,0.03);border:1px solid rgba(232,224,208,0.06);padding:40px 36px;transition:background .2s}
+.service-card:hover{background:rgba(232,224,208,0.05)}
+.service-num{font-family:'Playfair Display',Georgia,serif;font-size:48px;color:rgba(232,224,208,0.08);font-weight:700;line-height:1;margin-bottom:16px}
+.service-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:12px;color:#e8e0d0}
+.service-desc{font-size:14px;color:rgba(232,224,208,0.75);line-height:1.75;font-family:'DM Sans',sans-serif}
+
+/* TOOLS */
+#tools{background:var(--black)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.tool-card{background:var(--green-dark);border:1px solid rgba(45,74,45,0.4);border-radius:8px;padding:36px 32px;position:relative;overflow:hidden;transition:border-color .2s}
+.tool-card:hover{border-color:rgba(45,74,45,0.8)}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-mid),transparent)}
+.tool-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:12px}
+.tool-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:10px;color:var(--cream)}
+.tool-desc{font-size:14px;color:rgba(232,224,208,0.6);line-height:1.7;margin-bottom:24px}
+.tool-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:var(--cream);margin-bottom:20px}
+.tool-price span{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;color:rgba(232,224,208,0.4)}
+.tool-features{list-style:none;margin-bottom:28px}
+.tool-features li{font-size:13px;color:rgba(232,224,208,0.6);padding:7px 0;border-bottom:1px solid rgba(232,224,208,0.06);display:flex;gap:10px;align-items:flex-start}
+.tool-features li::before{content:'—';color:var(--green-mid);flex-shrink:0}
+.tool-btn{display:block;background:rgba(232,224,208,0.08);color:var(--cream);text-align:center;padding:12px;border-radius:4px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.12);transition:all .2s}
+.tool-btn:hover{background:rgba(232,224,208,0.12)}
+.tool-card.featured{background:var(--green-mid);border-color:rgba(45,74,45,0.8)}
+.tool-card.featured .tool-btn{background:var(--cream);color:var(--black);border-color:var(--cream)}
+.tool-card.featured .tool-btn:hover{background:var(--off-white)}
+
+/* PRICING */
+#pricing{background:var(--warm-dark)}
+.pricing-table{width:100%;border-collapse:collapse}
+.pricing-table th{text-align:left;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.35);padding:12px 20px;border-bottom:1px solid rgba(232,224,208,0.08)}
+.pricing-table td{padding:20px;border-bottom:1px solid rgba(232,224,208,0.05);font-size:14px;color:rgba(232,224,208,0.7);vertical-align:top}
+.pricing-table tr.clickable{cursor:pointer}
+.pricing-table tr.clickable:hover td{background:rgba(232,224,208,0.04)}
+.tier-name{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);font-weight:700}
+.tier-price{font-family:'Playfair Display',Georgia,serif;font-size:24px;color:var(--cream);font-weight:700}
+.tier-badge{display:inline-block;background:var(--green-mid);color:var(--cream);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-left:8px;vertical-align:middle}
+
+/* ABOUT */
+#about{background:var(--black)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-logo{width:200px;height:200px;border-radius:50%;border:1px solid rgba(232,224,208,0.15);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:32px}
+.about-logo-inner{width:160px;height:160px;border-radius:50%;border:0.5px solid rgba(232,224,208,0.08);display:flex;align-items:center;justify-content:center}
+.about-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:28px;color:var(--cream);letter-spacing:3px}
+.about-text p{font-size:16px;color:rgba(232,224,208,0.65);line-height:1.8;margin-bottom:20px}
+.about-text p strong{color:var(--cream);font-weight:500}
+.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;padding-top:48px;border-top:1px solid rgba(232,224,208,0.08)}
+.stat-num{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;color:var(--cream)}
+.stat-label{font-size:12px;color:rgba(232,224,208,0.4);letter-spacing:0.5px;margin-top:4px}
+@media(max-width:768px){.about-grid{grid-template-columns:1fr}}
+
+/* CONTACT */
+#contact{background:var(--green-dark)}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center}
+.contact-inner .section-heading{font-size:clamp(36px,5vw,60px)}
+.contact-inner .section-sub{margin:0 auto 48px;max-width:480px}
+.contact-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+.contact-card{background:rgba(232,224,208,0.05);border:1px solid rgba(232,224,208,0.1);border-radius:6px;padding:28px 24px;text-align:left}
+.contact-card-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:8px}
+.contact-card-title{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);margin-bottom:8px}
+.contact-card-desc{font-size:13px;color:rgba(232,224,208,0.5);line-height:1.6;margin-bottom:16px}
+.contact-card-link{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream);text-decoration:none;border-bottom:1px solid rgba(232,224,208,0.2);padding-bottom:2px;transition:border-color .2s}
+.contact-card-link:hover{border-color:var(--cream)}
+@media(max-width:600px){.contact-options{grid-template-columns:1fr}}
+
+/* FOOTER */
+footer{background:var(--black);padding:40px;border-top:1px solid rgba(232,224,208,0.06)}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:16px;letter-spacing:1px;color:rgba(232,224,208,0.4)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:rgba(232,224,208,0.3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:rgba(232,224,208,0.6)}
+.footer-copy{font-size:11px;color:rgba(232,224,208,0.2)}
+
+/* MOBILE NAV */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:1.5px;background:var(--cream);transition:all .3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Playfair Display',Georgia,serif;font-size:32px;color:var(--cream);text-decoration:none}
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-links{display:none}
+  section{padding:70px 24px}
+  nav{padding:0 24px}
+  .hero{padding:100px 24px 60px}
+  .pricing-table{display:block;overflow-x:auto}
+  .tools-grid{grid-template-columns:1fr}
+  .about-grid{grid-template-columns:1fr}
+  .about-grid>div:last-child{order:-1}
+  .about-grid img{width:140px;height:140px}
+  .services-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column}
+  .btn-primary,.btn-secondary{text-align:center}
+  .contact-options{grid-template-columns:1fr}
+  .about-stats{grid-template-columns:repeat(3,1fr)}
+  .footer-inner{flex-direction:column;text-align:center}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <img src="logo.png" alt="Ardito" style="width:44px;height:44px;object-fit:contain"/>
+    </a>
+    <div class="nav-links">
+      <a href="#services">What we do</a>
+      <a href="#tools">Tools</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="#contact">Work with us</a>
+      <a href="#contact" class="nav-cta">Get in touch</a>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#services" onclick="toggleMenu()">What we do</a>
+  <a href="#tools" onclick="toggleMenu()">Tools</a>
+  <a href="#pricing" onclick="toggleMenu()">Pricing</a>
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#contact" onclick="toggleMenu()">Work with us</a>
+  <a href="/dashboard" style="font-size:16px;opacity:0.4">Team login →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-label">Artist Development & Release Management</div>
+    <h1 class="hero-headline">
+      Your music deserves<br/>
+      <em>to be heard.</em>
+    </h1>
+    <p class="hero-sub">Ardito works with independent artists who are serious about their releases. We handle the strategy, the outreach, and the parts most artists never get to.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Work with us</a>
+      <a href="#tools" class="btn-secondary">Browse the tools</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHAT WE DO -->
+<section id="services">
+  <div class="section-inner">
+    <div class="section-label">What we do</div>
+    <h2 class="section-heading">Release management<br/>done right.</h2>
+    <p class="section-sub">From distribution setup to post-release follow-up. We handle the campaign so you can focus on the music.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-title">Release Management</div>
+        <p class="service-desc">Full campaign management for single releases. Distribution, editorial pitching, blog and radio outreach, playlist pitching, social strategy, and post-release analysis.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <div class="service-title">Artist Development</div>
+        <p class="service-desc">For artists at the start. Brand identity, release readiness, audience building, and a plan that makes sense for where you actually are.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <div class="service-title">Strategy Sessions</div>
+        <p class="service-desc">A focused 60-minute session to map your next release, fix what's not working, and leave with a clear plan. Pre-call audit included.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">04</div>
+        <div class="service-title">DIY Tools</div>
+        <p class="service-desc">Not ready to work with us yet? Our playbooks, outreach tracker, and budget calculator give you the system to run your own campaign properly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="section-inner">
+    <div class="section-label">The Tools</div>
+    <h2 class="section-heading">Do it yourself.<br/><em>Do it well.</em></h2>
+    <p class="section-sub">Built by a release manager for artists who want to run their own campaigns without guessing what comes next.</p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-tag">Playbook</div>
+        <div class="tool-title">Release Management Playbook</div>
+        <p class="tool-desc">28 days. Every action mapped to your real release date. Day-by-day briefs, tasks, and example copy - from distribution setup to post-release.</p>
+        <div class="tool-price">£14.99 <span>one-off</span></div>
+        <ul class="tool-features">
+          <li>28-day interactive checklist</li>
+          <li>Date-aware calendar</li>
+          <li>Example pitch copy included</li>
+          <li>Pre-save and distribution guides</li>
+          <li>Works for any genre or budget</li>
+        </ul>
+        <a href="https://arditox.gumroad.com/l/suiwnp" target="_blank" class="tool-btn">Get the Playbook</a>
+      </div>
+      <div class="tool-card featured">
+        <div class="tool-tag">Bundle</div>
+        <div class="tool-title">Playbook + Outreach Tracker + Budget Calculator</div>
+        <p class="tool-desc">The full DIY release toolkit. Playbook, 93+ pre-loaded curator and blog contacts filtered by genre, and a budget calculator that tells you where every pound should go.</p>
+        <div class="tool-price">£29 <span>one-off</span></div>
+        <ul class="tool-features">
+          <li>Everything in the Playbook</li>
+          <li>93+ vetted contacts across 6 genres</li>
+          <li>Blogs, playlists, radio - UK and EU</li>
+          <li>Status tracking and CSV export</li>
+          <li>Budget calculator with spend breakdown</li>
+        </ul>
+        <a href="https://arditox.gumroad.com/l/jzhenz" target="_blank" class="tool-btn">Get the Bundle</a>
+      </div>
+      <div class="tool-card">
+        <div class="tool-tag">Coming Soon</div>
+        <div class="tool-title">Gig Promo Playbook</div>
+        <p class="tool-desc">21 days to a full room. The same system as the release playbook, built for promoting live shows. Join the waitlist to be notified first.</p>
+        <div class="tool-price">£15 <span>at launch</span></div>
+        <ul class="tool-features">
+          <li>21-day gig promo system</li>
+          <li>Date-aware posting calendar</li>
+          <li>Venue and ticket link guides</li>
+          <li>Works for solo artists and bands</li>
+          <li>Reusable for every show</li>
+        </ul>
+        <a href="mailto:ardito.ldn@gmail.com?subject=Gig Playbook Waitlist" class="tool-btn">Join the Waitlist</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-heading">Start where you are.</h2>
+    <p class="section-sub">From the tools to the full managed service. Every tier includes everything in the one below it.</p>
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Price</th>
+          <th>What's included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/suiwnp','_blank')">
+          <td><div class="tier-name">The Playbook</div></td>
+          <td><div class="tier-price">£14.99</div></td>
+          <td>28-day release management checklist. Day-by-day briefs, tasks, and example copy. Self-serve, no support. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jzhenz','_blank')">
+          <td><div class="tier-name">Bundle</div><span class="tier-badge">Best value</span></td>
+          <td><div class="tier-price">£29</div></td>
+          <td>Playbook + 93+ contact outreach tracker (genre-filtered, UK and EU) + budget calculator. Everything you need to run a release yourself. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jtrli','_blank')">
+          <td><div class="tier-name">Pitch Review</div></td>
+          <td><div class="tier-price">£35 <span style="font-size:12px;color:rgba(232,224,208,0.4)">intro</span></div></td>
+          <td>Everything in the Bundle, plus a written review of your pitch copy, bio, and artwork from Laura. One round of feedback, 48-hour turnaround. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('mailto:ardito.ldn@gmail.com?subject=Strategy Call','_blank')">
+          <td><div class="tier-name">Strategy Call</div></td>
+          <td><div class="tier-price">£120</div></td>
+          <td>Everything above, plus a 60-minute call. Pre-call intake form, tailored campaign plan, three actions to leave with. The playbook customised for your release. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.location='mailto:ardito.ldn@gmail.com?subject=Full Management Enquiry'">
+          <td><div class="tier-name">Full Management</div></td>
+          <td><div class="tier-price">Bespoke</div></td>
+          <td>Ardito runs the campaign with you. Distribution, pitching, blog and radio outreach, social strategy, post-release follow-up. Enquire for a quote. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div>
+        <div class="section-label">About</div>
+        <h2 class="section-heading">Artist-first.<br/><em>Always.</em></h2>
+        <div class="about-text">
+          <p>Ardito is a release management and artist development agency for <strong>early-stage independent artists</strong>. We work with artists who are serious about their music and ready to put it out - not artists who already have a team.</p>
+          <p>Founded by <strong>Laura</strong>, a Music Business MA graduate (Distinction) from BIMM London with a background spanning live events co-production, touring administration, distribution, and artist management. Laura built Ardito because she kept seeing the same pattern: artists making genuinely good music who had no idea what to do with it once it was finished.</p>
+          <p>We work with artists under 5,000 followers. That's not a limitation - it's the point. Before the wave is where the work matters most.</p>
+        </div>
+        <div class="about-stats">
+          <div>
+            <div class="stat-num">28</div>
+            <div class="stat-label">Days in a full campaign</div>
+          </div>
+          <div>
+            <div class="stat-num">93+</div>
+            <div class="stat-label">Vetted contacts in the tracker</div>
+          </div>
+          <div>
+            <div class="stat-num">6</div>
+            <div class="stat-label">Genres covered</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <img src="logo.png" alt="Ardito" style="width:220px;height:220px;object-fit:contain;opacity:0.85;margin-bottom:32px"/>
+        <p style="font-size:13px;color:rgba(232,224,208,0.35);text-align:center;max-width:260px;line-height:1.6">London-based. Working with independent artists across the UK and internationally.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section id="contact" style="background:var(--green-dark)">
+  <div class="section-inner">
+    <div class="contact-inner">
+      <div class="section-label">Work with us</div>
+      <h2 class="section-heading">Ready when you are.</h2>
+      <p class="section-sub">Whether you want to run your own release or want Ardito to run it with you - start here and we'll figure out the right fit.</p>
+      <div class="contact-options">
+        <div class="contact-card">
+          <div class="contact-card-label">For artists</div>
+          <div class="contact-card-title">Start a conversation</div>
+          <p class="contact-card-desc">Tell us about your release, where you are, and what you're trying to achieve. No hard sell, no obligations.</p>
+          <a href="mailto:ardito.ldn@gmail.com?subject=I'd like to work with Ardito" class="contact-card-link">Email us</a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-label">Strategy call</div>
+          <div class="contact-card-title">Book a session</div>
+          <p class="contact-card-desc">60 minutes, £120. Fill in the pre-call intake form and we'll come prepared. Three actions to leave with.</p>
+          <a href="/intake.html" class="contact-card-link">Fill in the form</a>
+        </div>
+      </div>
+      <p style="font-size:13px;color:rgba(232,224,208,0.35)">Or find us on Instagram: <a href="https://instagram.com/ardito.ldn" style="color:rgba(232,224,208,0.5);text-decoration:none">@ardito.ldn</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo"><img src="logo.png" alt="Ardito" style="height:32px;object-fit:contain;opacity:0.5"/></div>
+    <div class="footer-links">
+      <a href="#services">What we do</a>
+      <a href="#tools">Tools</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://instagram.com/ardito.ldn">Instagram</a>
+      <a href="/dashboard" style="opacity:0.4">Team</a>
+    </div>
+    <div class="footer-copy">© 2026 Ardito. London.</div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu(){
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+document.getElementById('mobile-menu').addEventListener('click',function(e){
+  if(e.target===this) toggleMenu();
+});
+window.addEventListener('scroll',function(){
+  const nav=document.querySelector('nav');
+  nav.style.borderBottomColor=window.scrollY>20?'rgba(232,224,208,0.08)':'transparent';
+});
+</script>
+</body>
+</html>

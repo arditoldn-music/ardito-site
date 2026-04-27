@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ardito — 28-Day Release Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0d0;font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:80px}
+input,select,button,textarea{font-family:'DM Sans',sans-serif}
+input[type=text],input[type=date],input[type=email]{width:100%;background:#111;border:1px solid #222;border-radius:6px;padding:11px 13px;color:#e8e0d0;font-size:14px;outline:none;box-sizing:border-box;color-scheme:dark}
+#setup{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.setup-inner{max-width:480px;width:100%}
+.gold{color:#b8933f}
+.label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#b8933f;margin-bottom:10px}
+.field{margin-bottom:14px}
+.field label{display:block;color:#777;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+.field label span{color:#444;text-transform:none;letter-spacing:0;margin-left:4px}
+#playbook{display:none}
+.header{background:#0d0d0d;border-bottom:1px solid #1a1a1a;padding:14px 20px;position:sticky;top:0;z-index:10}
+.header-inner{max-width:700px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.days{max-width:700px;margin:0 auto;padding:20px 16px}
+.phase-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;margin-top:14px;padding-left:4px}
+.day-wrap{margin-bottom:5px}
+.day-btn{width:100%;background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;text-align:left;transition:background .1s}
+.day-btn.open{background:#141414;border-radius:8px 8px 0 0}
+.day-btn.done-all{border-color:#2d4a2d}
+.day-num{width:26px;height:26px;border-radius:50%;background:#1a1a1a;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;color:#555}
+.day-num.done{background:#2d4a2d;border-color:#2d4a2d;color:#e8e0d0;font-size:11px}
+.day-body{display:none;background:#0f0f0f;border:1px solid #1a1a1a;border-top:none;border-radius:0 0 8px 8px;padding:20px 18px}
+.day-body.open{display:block}
+.brief{color:#aaa;font-size:13px;line-height:1.75;margin-bottom:16px}
+.flag{background:rgba(139,26,26,.15);border:1px solid rgba(139,26,26,.3);border-radius:6px;padding:10px 14px;margin-bottom:16px;color:#c8756d;font-size:12px;line-height:1.6}
+.why-btn{background:none;border:1px solid #222;border-radius:5px;padding:6px 12px;color:#555;font-size:11px;cursor:pointer;margin-bottom:16px;letter-spacing:.5px}
+.why-box{background:#141414;border-radius:6px;padding:14px 16px;margin-bottom:16px;border-left:2px solid #555;color:#888;font-size:13px;line-height:1.75}
+.tasks-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#444;margin-bottom:10px}
+.task{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #151515;cursor:pointer}
+.task:last-of-type{border-bottom:none}
+.task-check{width:18px;height:18px;border-radius:4px;border:1px solid #2a2a2a;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .1s;font-size:10px;color:#e8e0d0}
+.task-check.done{background:#2d4a2d;border-color:#2d4a2d}
+.task-text{color:#ccc;font-size:13px;line-height:1.5}
+.task-text.done{color:#444;text-decoration:line-through}
+.copy-box{background:#141414;border-radius:6px;padding:14px 16px;border:1px solid #1f1f1f;margin-top:18px}
+.copy-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#555}
+.copy-btn{background:none;border:1px solid #222;border-radius:4px;padding:3px 10px;color:#444;font-size:10px;cursor:pointer;letter-spacing:1px}
+.copy-btn.copied{color:#2d4a2d}
+.copy-pre{margin:10px 0 0;color:#888;font-size:12px;line-height:1.8;font-family:'DM Sans',sans-serif;white-space:pre-wrap}
+.start-btn{width:100%;background:#1a1a1a;color:#333;border:none;border-radius:6px;padding:14px;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:not-allowed;margin-top:4px;transition:all .2s}
+.start-btn.ready{background:#2d4a2d;color:#e8e0d0;cursor:pointer}
+.hint{color:#333;font-size:12px;text-align:center;margin-top:8px}
+.edit-btn{background:none;border:1px solid #222;border-radius:4px;padding:4px 10px;color:#555;font-size:10px;cursor:pointer;letter-spacing:1px}
+.ring{position:relative;width:38px;height:38px}
+.ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.cta-box{background:#0f1a0f;border:1px solid #1a2e1a;border-radius:10px;padding:28px;margin-top:32px;text-align:center}
+.reset-btn{display:block;margin:20px auto 0;background:none;border:none;color:#2a2a2a;font-size:11px;cursor:pointer;letter-spacing:1px;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div id="setup">
+<div class="setup-inner">
+  <div class="label">Ardito</div>
+  <h1 style="color:#e8e0d0;font-size:32px;font-family:'Playfair Display',Georgia,serif;margin:0 0 6px;line-height:1.2">28-Day Release<br>Playbook</h1>
+  <p style="color:#666;font-size:14px;line-height:1.7;margin:0 0 32px">A complete release campaign, day by day. Built for artists who want to do this properly — not just put something out and hope.</p>
+  <div class="field"><label>Artist name</label><input type="text" id="artistName" placeholder="e.g. Omjine" oninput="checkReady()"/></div>
+  <div class="field"><label>Track name</label><input type="text" id="trackName" placeholder="e.g. Precious One" oninput="checkReady()"/></div>
+  <div class="field"><label>Release date</label><input type="date" id="releaseDate" oninput="checkReady()"/></div>
+  <div class="field"><label>Pre-save or streaming link <span>add later if not set</span></label><input type="text" id="releaseLink" placeholder="https://..."/></div>
+  <button class="start-btn" id="startBtn" onclick="startPlaybook()">Start the playbook</button>
+  <p class="hint" id="startHint">Add at least your artist name to get started.</p>
+</div>
+</div>
+
+<div id="playbook">
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <div style="color:#b8933f;font-size:10px;letter-spacing:3px;text-transform:uppercase">Ardito</div>
+        <div style="color:#e8e0d0;font-size:13px;font-weight:500;margin-top:1px" id="headerTitle">Your release</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="text-align:right">
+          <div style="color:#e8e0d0;font-size:14px;font-weight:600" id="pctNum">0%</div>
+          <div style="color:#444;font-size:10px" id="pctSub">0/0</div>
+        </div>
+        <div class="ring">
+          <svg width="38" height="38">
+            <circle cx="19" cy="19" r="16" fill="none" stroke="#222" stroke-width="2.5"/>
+            <circle id="ringCircle" cx="19" cy="19" r="16" fill="none" stroke="#2d4a2d" stroke-width="2.5"
+              stroke-dasharray="100.53" stroke-dashoffset="100.53" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <button class="edit-btn" onclick="goSetup()">Edit</button>
+      </div>
+    </div>
+  </div>
+  <div class="days" id="daysList"></div>
+</div>
+
+<script>
+const PHASES = {
+  foundation:{label:"Foundation",color:"#2d4a2d"},
+  presave:{label:"Pre-save",color:"#1a3a5c"},
+  outreach:{label:"Outreach",color:"#5c3a1a"},
+  content:{label:"Content",color:"#3a1a5c"},
+  review:{label:"Review",color:"#444"},
+  release:{label:"Release",color:"#8b1a1a"},
+  postrelease:{label:"Post-release",color:"#2d4a2d"}
+};
+
+const DAYS=[
+  {day:1,phase:"foundation",title:"Lock your release date",brief:"Everything else in this playbook is built around a fixed date. Without it, every other task floats. Pick a date at least 6 weeks from now and treat it like a gig — non-negotiable.",why:"Distributors need 3-4 weeks minimum. Spotify editorial closes 7 days before release. Blog and radio pitching needs 4-6 weeks of lead time. If you set a date less than 6 weeks out, some of these doors are already closed.",tasks:["Set your release date — minimum 6 weeks from today","Confirm with your distributor that the date is achievable","Write it somewhere physical. Calendar, whiteboard, wall.","Tell at least one other person. Accountability starts now."],copy:null,flag:null},
+  {day:2,phase:"foundation",title:"Upload to your distributor",brief:"Get your track, artwork and metadata into DistroKid (or equivalent) today. Processing takes longer than you think, and Spotify for Artists won't let you pitch editorially until the track is in the system.",why:"Spotify editorial pitch requires the track to be submitted via your distributor dashboard. You can't pitch until it's uploaded. Don't leave this until week 3.",tasks:["Upload final WAV — mixed and mastered, not a demo","Upload artwork — 3000x3000px minimum, no pixellation","Set release date, genre, language, and mood tags carefully","Note your ISRC and UPC — you'll need both for radio and sync pitching","Create a private SoundCloud link for pre-release sharing"],copy:null,flag:"Track must be mixed and mastered before this step. A demo-quality recording will undermine every pitch you make."},
+  {day:3,phase:"foundation",title:"Write your pitch",brief:"One paragraph. That's all you need. Clear, specific, written like a human — not a press release. This paragraph becomes the foundation for every email, form field, and caption in the campaign.",why:"Curators and journalists receive hundreds of pitches. The ones that get listened to are specific. 'Indie artist from London' tells them nothing. 'Seoul-based singer-songwriter, home recorded, somewhere between Cat Power and The xx — written from the point of view of the person who never gets to tell their side of the story' tells them everything.",tasks:["Write a 80-100 word pitch in your own voice","Include: where you're from, what the song sounds like, what makes it specific","Name two artists you genuinely sound like — not who you wish you sounded like","Write a one-line concept hook: what is this song actually about?","Get the artist to approve the copy before you use it anywhere"],copy:"[ARTIST] is a [LOCATION]-based [genre] artist. [TRACK] is out [DATE]. [One sentence concept: what the song is about, from whose perspective, what feeling it carries.] Home recorded / studio-made. Fans of [REFERENCE 1] and [REFERENCE 2] will connect with it. Pre-save: [LINK]",flag:null},
+  {day:4,phase:"foundation",title:"Spotify editorial pitch",brief:"Submit your Spotify editorial pitch today. This is the only pitch in the whole campaign you can only do once. You cannot edit it after submitting. Take it seriously.",why:"Spotify editorial is free. If it lands, it can generate more streams than everything else in your campaign combined. Most artists either skip it or submit a lazy pitch because they don't know it exists. Now you do.",tasks:["Log into Spotify for Artists and navigate to your upcoming release","Fill in mood, genre, and instrument fields — be specific, not aspirational","Write your pitch in the description field (500 chars max)","Include the story behind the song, not just what it sounds like","Submit — you only get one shot at this per release"],copy:"[TRACK] is written from the perspective of [concept]. [LOCATION]-based artist, [production style]. For fans of [REFERENCE 1] and [REFERENCE 2]. [One honest line about where the song came from.]",flag:"One submission per release. Cannot be edited after submitting. Do not rush this."},
+  {day:5,phase:"foundation",title:"Press shot check",brief:"Before you pitch to anyone, confirm you have a professional press photo. Not an iPhone selfie. Not a screenshot from a video. A properly lit, hi-res image that represents the artist at the level you're presenting them.",why:"Radio stations including BBC Introducing, Amazing Radio, and Radio Fandango all ask for a press shot alongside the track. Blogs expect one. Without it, you look amateur before anyone's listened to a note.",tasks:["Do you have a professional press shot? (Check: is it well-lit, hi-res, on-brand?)","If yes: save it to Google Drive and get a shareable link ready","If no: book a photographer before you start outreach — even a friend with a good camera and natural light beats nothing","Ideal: two or three options, portrait and landscape crops both available","Note: this is a non-negotiable for every release going forward. Plan it into the budget."],copy:null,flag:"If you don't have a press shot, pause outreach until you do. Sending a pitch without one signals inexperience to everyone who receives it."},
+  {day:6,phase:"presave",title:"Set up your pre-save",brief:"Create your pre-save link and get it live today. Every pre-save tells Spotify's algorithm that demand exists before the track is out. The algorithm watches the first 24-48 hours after release — pre-saves are how you stack that number in advance.",why:"Pre-saves convert directly into saves on release day. Saves feed the algorithm. The algorithm feeds discovery playlists like Discover Weekly and Release Radar. This is the free version of paid playlist pitching — don't skip it.",tasks:["DistroKid: use HyperFollow (built in, free)","Other distributors: create a pre-save via feature.fm or Hypeddit","Test the link yourself before sharing it anywhere","Add it to the artist's Instagram bio immediately","Post your first pre-save ask today — don't wait"],copy:"[TRACK] is out [DATE]. Pre-save it now so it lands straight in your library the moment it drops: [LINK]",flag:null},
+  {day:7,phase:"presave",title:"Pre-save push: round one",brief:"Don't just post the link — tell people what the song actually is. The strongest pre-save posts include something that makes people feel something about the music before they've heard it.",why:"Most artists post 'my new single is out [date]' and get 3 saves. The artists who post the concept, the feeling, the story behind the song — they get 30. The link alone isn't the hook.",tasks:["Post with a clip, a lyric, or a snippet — not just the artwork","Stories: use the link sticker directly, not just 'link in bio'","Ask 5-10 people personally to pre-save it — text them, don't just post","If the artist has a mailing list, send a short email today"],copy:"New music coming [DATE]. [One sentence about what the song is.] Pre-save [TRACK]: [LINK]",flag:null},
+  {day:8,phase:"outreach",title:"SubmitHub: playlist outreach",brief:"Start pitching to independent playlist curators via SubmitHub. Use Advanced Mode — the default view surfaces very few relevant curators. Filter carefully by genre and remove any suggested genres that don't fit.",why:"Independent playlists are often more valuable than editorial for emerging artists. A playlist with 5,000 loyal followers in the right niche converts better than a generic editorial playlist with 100,000 passive ones. SubmitHub Advanced Mode gives you access to that niche.",tasks:["Log in and switch to Advanced Mode (top of the page)","Filter by your specific genre — remove anything incorrectly suggested","Read each curator's description before submitting — personalise where possible","Submit to 8-12 curators using your pitch paragraph (200 char limit)","Log every submission: curator name, date, status"],copy:"[TRACK] by [ARTIST], out [DATE]. [50-word version of your pitch]. Instrumental available. 100% cleared.",flag:null},
+  {day:9,phase:"outreach",title:"Blog outreach: round one",brief:"Find 3-5 music blogs that have covered artists similar to yours and send a short, direct pitch. No attachments. Use your private SoundCloud link, not the pre-save. One personal line at the top — show you've actually read their publication.",why:"Blog coverage provides two things: a quote you can use in future pitches, and a backlink that improves your discoverability. One genuine feature from a credible blog is worth more than 20 generic playlist adds.",tasks:["Find 3-5 blogs that have covered artists in your genre","Write a personalised opening line for each: reference a specific artist or track they've covered","Use your base pitch. Keep the whole email under 200 words.","Include: private SoundCloud link, release date, press photo link","Send on a Tuesday or Wednesday morning — never Friday"],copy:"Subject: [ARTIST] — [TRACK] | out [DATE]\n\nHi [NAME],\n\n[One line referencing something specific they've covered recently.]\n\n[Your pitch paragraph.]\n\nPre-save: [LINK]\nPress photo available on request.\n\nBest,\n[YOUR NAME]\nArdito | ardito.ldn@gmail.com",flag:null},
+  {day:10,phase:"content",title:"Announce the single",brief:"Today you go public. The first official announcement. Keep it simple — the artwork, the date, the pre-save link, and one sentence that makes people feel something. Don't oversell it.",why:"The announcement post sets the tone for the whole campaign. If it's generic ('excited to announce my new single!') people will scroll past. If it's specific and honest, they'll stop. Write it like you're telling a friend, not a marketing team.",tasks:["Post the single announcement with artwork across all platforms","Include the pre-save link in the caption","Share to stories with a link sticker","Pin the post or save to highlights","If you have a mailing list: send the announcement today"],copy:"[TRACK] is out [DATE]. [One sentence about what the song is — the concept, the feeling, the perspective it's written from.] Pre-save: [LINK]",flag:null},
+  {day:11,phase:"content",title:"The story behind the song",brief:"Write a longer post — 5-8 lines — about where this song came from. The specific moment, person, or feeling that started it. No pre-save link needed here. Just the story.",why:"This is your editorial hook. It's the content that blogs quote in features, that journalists pull for reviews, that new listeners screenshot and share. The story behind the song is often more interesting than the song itself at this stage.",tasks:["Write the story in your own voice — not marketing language","Be specific: name the feeling, the place, the moment if you can","Post without a link — this post is for connection, not conversion","Save this text: it becomes part of your EPK and press release"],copy:"[TRACK] started as [one honest sentence about where it came from]. [Two or three more lines about the feeling, the process, what it means to the artist.] Out [DATE].",flag:null},
+  {day:12,phase:"outreach",title:"Radio outreach",brief:"Pitch to community and independent radio stations. They need music before it's released — do this now, not on release day. Check each station's submission requirements before sending.",why:"Radio still matters more than most artists realise. A community radio add builds credibility, generates a quote for future pitches, and reaches listeners who are actively discovering music rather than passively scrolling.",tasks:["Denmark Street Radio: email with MP3, artwork, press shot","Radio Fandango: email with MP3, artwork, press shot (required)","Soho Radio: email with MP3, artwork","BBC Introducing: upload via bbcintroducing.com — needs UK postcode","Amazing Radio: upload AFTER release, once track is live on Spotify","Log every submission in your outreach tracker"],copy:"Subject: [ARTIST] — [TRACK] | Release [DATE]\n\nHi [NAME],\n\n[TRACK] by [ARTIST] is out [DATE]. [One-line pitch.]\n\nStream: [LINK]\nMP3 and press shot available on request.\n\nBest,\n[YOUR NAME]",flag:"Amazing Radio requires the track to be live on Spotify first. Do not submit before release day."},
+  {day:13,phase:"content",title:"Clip day",brief:"Post a video. Not a music video — something real. A 30-60 second Reel or TikTok using a clip from the track. The audio is the hook. Add text overlay if there's a lyric worth showing.",why:"Short video is the highest-reach format on every platform right now. One Reel with the right audio can reach people who have never heard of the artist. You don't need production — you need something that makes someone stop scrolling.",tasks:["Post a Reel or TikTok using a clip from the track as the audio","Add text overlay — either a lyric, the release date, or a single sentence about the song","Keep it under 60 seconds","Include the pre-save link in the caption","Post to both Instagram and TikTok if possible"],copy:"[One lyric or sentence from the song.]\n\n[TRACK] / out [DATE] / pre-save: [LINK]",flag:null},
+  {day:14,phase:"outreach",title:"Groover: paid curator outreach",brief:"Groover guarantees feedback from curators within 7 days — even if it's a pass, you get a response. Strong European reach and niche genre coverage. Use it alongside SubmitHub, not instead of it.",why:"At around £1.50-2 per curator, Groover is affordable at small scale and compounds well. Curators who add you once are more likely to take your next pitch. Every response gives you data on what's landing.",tasks:["Create a Groover account at groover.co","Browse curators filtered by your genre","Target 10-15 curators who have covered similar artists","Submit with your pitch paragraph","Log every submission — curator name, platform, date, response"],copy:null,flag:null},
+  {day:15,phase:"review",title:"Mid-campaign review",brief:"Pause. Assess. You're halfway through. What's working? What isn't? The second half of the campaign should be shaped by what you've learned in the first.",why:"Most artists run the same playbook regardless of what's happening. If a certain type of content is converting and another isn't — adjust. Use the data you have.",tasks:["Check pre-save numbers — are they growing? Is there a pattern to when they spike?","Review SubmitHub and Groover responses so far — note any positive signals","Look at which content got the most engagement — video? Story? Personal post?","Decide: do you need to post more, post differently, or push harder on outreach?","Write three lines summarising what's working and what to change"],copy:null,flag:null},
+  {day:16,phase:"presave",title:"Pre-save push: round two",brief:"Two weeks from release. Pre-saves matter more now. Come at this from a different angle to the first push — a lyric, a clip, something personal.",why:"People who saw your first push and didn't act need a second touchpoint with a different hook. Don't just repost the same content. Give them a new reason.",tasks:["Post a second pre-save push — different angle to the first","Try: a lyric clip, a voice note, a personal message from the artist","Add a countdown sticker to stories","Check the pre-save link is still working"],copy:"[TRACK] is out in [X] days. If you haven't pre-saved it yet — here's why it matters: [one sentence about the song]. [LINK]",flag:null},
+  {day:17,phase:"content",title:"Talking head video",brief:"Film the artist talking about the single. One take. Natural light. No script. Just them and the song. 30-60 seconds. This is the most converting content type in the whole campaign — don't skip it.",why:"Talking head video builds trust faster than any other format. People want to see the person behind the music. A short, honest clip consistently outperforms polished promotional content.",tasks:["Find natural light — window light is fine, ring lights look cheap","Film 2-3 takes with no script: just talk about the song","Pick the most natural take, not the most polished one","Add captions (CapCut does this automatically)","Post to Reels and TikTok — just the release date, no pre-save link needed"],copy:"[Release date] / [TRACK] / [ARTIST]\n\n[The story in one sentence.]",flag:null},
+  {day:18,phase:"outreach",title:"Follow up on outreach",brief:"One polite follow-up to blogs and radio contacts you pitched in weeks 1-2 who haven't responded. One email. Don't send a second chase.",why:"Inboxes are noisy. A short, warm follow-up often gets a response when the original pitch didn't. But only once. Anyone who's received two chasers from an artist will remember it.",tasks:["Check SubmitHub — reply to all feedback, even passes","Review Groover responses — save contacts who responded positively","Send one follow-up to blogs pitched 10+ days ago with no response","Do not follow up more than once","Update your outreach tracker"],copy:"Following up on [TRACK] — just making sure it didn't get buried. Release is [DATE]. Happy to send anything else you need.",flag:"One follow-up only. Ever. Following up twice marks you as someone curators and journalists will avoid in future."},
+  {day:19,phase:"release",title:"Release week begins",brief:"Seven days out. Increase posting frequency to every other day minimum. You should not be creating anything new this week — everything you need should already be filmed, written, and ready to go.",why:"Release week is execution, not creation. If you're staring at your camera roll at 11pm wondering what to post, the campaign has already gone wrong. By day 19, your content should be scheduled or queued.",tasks:["Post '1 week to go' content","Add a countdown sticker to stories","Email your mailing list — one week notice","Confirm streaming link is working","Schedule release day posts if possible"],copy:"One week. [TRACK] is out [DATE]. [One sentence about the song.] Pre-save: [LINK]",flag:null},
+  {day:20,phase:"release",title:"The night before",brief:"One post. Tonight. Personal, honest, and short. No marketing language. The campaign has been doing the selling — this post is just the artist being human about tomorrow.",why:"The eve-of-release post is one of the most-engaged posts in any campaign if it's genuine. People respond to vulnerability and honesty. They do not respond to 'so excited to share this with you all!!!'",tasks:["Post a short personal message — 2-4 lines maximum","No promotional language. No exclamation marks.","Stories: a quiet clip or a simple card with tomorrow's date","Text the people you want to tell personally"],copy:"Tomorrow, [TRACK] is out.\n\n[One honest line about what it means to put this out.]",flag:null},
+  {day:21,phase:"release",title:"Release day",brief:"It's out. Post at midnight or early morning. Post again at midday. The first 24 hours matter more than any other day in the campaign — be present.",why:"Spotify's algorithm measures saves and streams in the first 24-48 hours. The more activity in that window, the more likely it is to land in Discover Weekly and Release Radar. Reply to every comment. Share every repost. Today is not a day to be passive.",tasks:["Morning: confirm track is live on all DSPs","Post release announcement with streaming links","Release day email to your mailing list","Playlist submissions: Indiemono, Soundplate, BIRP, Pitchplaylists","Amazing Radio: upload to amazingradio.com then email music@amazingradio.com","SubmitHub: use remaining free credits","Reply to every comment and message today — every single one"],copy:"[TRACK] IS OUT NOW.\n\n[One sentence about the song.]\n\nListen: [LINK]",flag:null},
+  {day:22,phase:"postrelease",title:"Post-release push",brief:"Most artists go quiet after release day. Don't. The algorithm picks up momentum over the next two weeks — sustained activity matters.",why:"Spotify's editorial team monitors tracks that are gaining momentum post-release. A track that suddenly spikes two weeks after release can still land a playlist. Don't treat release day as the finish line.",tasks:["Post a thank you to everyone who's listened — genuine, not corporate","Share any early playlist adds or curator feedback as social proof","Post a clip with the streaming link — not the pre-save this time","Update Linktree with the live streaming link"],copy:"[TRACK] is out now. Thank you to everyone who's listened.\n\n[If there's been any early coverage or playlist adds, mention it here.]\n\nListen: [LINK]",flag:null},
+  {day:23,phase:"postrelease",title:"Check your analytics",brief:"Log into Spotify for Artists and look at your numbers. Where are your streams coming from? Which playlists have added the track? What's your save rate? This data shapes the next campaign.",why:"Save rate is the most important metric in the first week. A high save rate tells Spotify the song is resonating and triggers algorithmic playlisting. Anything above 20% is strong. Below 10% suggests the pitch or audience targeting isn't landing.",tasks:["Spotify for Artists: check streams, saves, and playlist adds","Note your save rate — saves divided by streams as a percentage","Screenshot any playlist adds — share as social proof","Apple Music for Artists: check if data is available","Log everything in your outreach tracker"],copy:null,flag:null},
+  {day:24,phase:"postrelease",title:"Sync pitch: the instrumental",brief:"If you have an instrumental version, pitch it for sync licensing. Film, TV, and ad placements generate income and discovery. Now the track is released and cleared, the door is open.",why:"Sync licensing is underused by independent artists. The barrier to entry is lower than most think — particularly for introspective, lyrically-driven tracks that suit drama and documentary. One sync placement can generate more income than months of streaming.",tasks:["Confirm you have a clean, broadcast-ready instrumental mix","Check: 100% master and publishing ownership confirmed","Research 3 sync licensing platforms: Musicbed, Artlist, Songtradr","Write a one-line sync pitch — what does it sound like, what scenes would it suit?","Submit to at least one platform today"],copy:"Instrumental available for [TRACK]. Would suit drama, introspective scene work, or documentary. 100% master and publishing cleared. Stream: [LINK]",flag:null},
+  {day:25,phase:"postrelease",title:"Behind the song video",brief:"One week after release: film a longer piece about the story behind the song. 60-90 seconds. This keeps the single alive in the algorithm and gives late-arriving listeners a reason to care.",why:"New listeners who discover the track via playlist or recommendation want to know who made it and why. A 'behind the song' video answers that question and converts passive listeners into genuine followers.",tasks:["Film a 60-90 second piece: where did this song come from?","Talk about the concept, the recording, what it means to the artist","Post to Reels and TikTok with streaming link","Pin to your profile highlights"],copy:"A week on from release. Here's what [TRACK] is really about.\n\nListen: [LINK]",flag:null},
+  {day:26,phase:"postrelease",title:"Blog outreach: round two",brief:"Some blogs only review released music. Now the track is live, pitch to a second wave — update your copy to show it's out, and include any early traction as social proof.",why:"A blog feature on a released track still carries full value. It generates links, quotes, and credibility. Don't assume the window is closed because release day has passed.",tasks:["Find 3 blogs that prefer to review released music","Update your pitch: 'out now' rather than 'out [date]'","Include any early playlist adds or coverage as proof points","Send on a Tuesday or Wednesday — same rules apply"],copy:"Subject: [ARTIST] — [TRACK] | out now\n\nHi [NAME],\n\n[TRACK] by [ARTIST] is out now: [LINK]\n\n[Your pitch paragraph.]\n\n[Any early coverage or playlist adds.]\n\nPress photo available on request.",flag:null},
+  {day:27,phase:"postrelease",title:"Fan engagement post",brief:"Ask your audience something about the song. Not 'stream it' — something that invites a real conversation. The comments section is data about whether the song is landing.",why:"Comments and saves are the two signals the algorithm values most after release. A genuine question generates genuine responses. Genuine responses generate reach.",tasks:["Post a question about the song — what does it remind them of?","Reply to every comment","Screenshot the best responses and share to stories","DM anyone who left a particularly resonant comment"],copy:"What does [TRACK] remind you of?\n\nGenuinely curious. [LINK]",flag:null},
+  {day:28,phase:"postrelease",title:"Wrap and learn",brief:"Your campaign is done. Close it properly so the next one is better. The value of this release isn't just in the streams — it's in the contacts, the data, and the things you'd do differently.",why:"Artists who treat every release as a learning exercise grow faster than those who move on without looking back. A 30-minute debrief now will save you significant time on the next campaign.",tasks:["Pull your final stream count and compare to your pre-save number","List: what worked, what didn't, what you'd do differently","Note every curator, blog, or radio contact who responded positively — save them","Write one paragraph summarising this campaign for your records","Book a debrief call with Ardito if you want to talk through the next one"],copy:null,flag:null}
+];
+
+const KEY="ardito-playbook-v3";
+let S={};
+try{const r=localStorage.getItem(KEY);if(r)S=JSON.parse(r);}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+function checkReady(){
+  S.artistName=document.getElementById('artistName').value;
+  S.trackName=document.getElementById('trackName').value;
+  S.releaseDate=document.getElementById('releaseDate').value;
+  S.releaseLink=document.getElementById('releaseLink').value;
+  save();
+  const ok=S.artistName||S.trackName;
+  document.getElementById('startBtn').className='start-btn'+(ok?' ready':'');
+  document.getElementById('startHint').textContent=ok?'You can edit these details at any time.':'Add at least your artist name to get started.';
+}
+
+function fmtDate(d){
+  if(!d)return'[DATE]';
+  return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'long'});
+}
+
+function fillCopy(t){
+  if(!t)return null;
+  return t.replace(/\[DATE\]/g,fmtDate(S.releaseDate))
+    .replace(/\[LINK\]/g,S.releaseLink||'[LINK]')
+    .replace(/\[ARTIST\]/g,S.artistName||'[ARTIST]')
+    .replace(/\[TRACK\]/g,S.trackName||'[TRACK]');
+}
+
+function getPostDate(idx){
+  if(!S.releaseDate)return'Day '+(idx+1);
+  const a=new Date(S.releaseDate),p=new Date(a);
+  p.setDate(a.getDate()-(DAYS.length-idx));
+  return p.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+}
+
+const totalTasks=DAYS.reduce((a,d)=>a+d.tasks.length,0);
+
+function updateProgress(){
+  const done=Object.values(S.checked||{}).filter(Boolean).length;
+  const pct=Math.round((done/totalTasks)*100);
+  document.getElementById('pctNum').textContent=pct+'%';
+  document.getElementById('pctSub').textContent=done+'/'+totalTasks;
+  const c=2*Math.PI*16;
+  document.getElementById('ringCircle').setAttribute('stroke-dashoffset',c*(1-pct/100));
+}
+
+function toggleTask(day,i){
+  if(!S.checked)S.checked={};
+  const k=day+'-'+i;
+  S.checked[k]=!S.checked[k];
+  save();
+  const chk=document.getElementById('chk-'+k);
+  const txt=document.getElementById('txt-'+k);
+  if(chk){chk.className='task-check'+(S.checked[k]?' done':'');chk.textContent=S.checked[k]?'✓':'';}
+  if(txt){txt.className='task-text'+(S.checked[k]?' done':'');}
+  updateProgress();
+  refreshDayBtn(day);
+}
+
+function refreshDayBtn(day){
+  const d=DAYS[day-1];
+  const done=d.tasks.filter((_,i)=>S.checked&&S.checked[day+'-'+i]).length;
+  const all=done===d.tasks.length;
+  const btn=document.getElementById('daybtn-'+day);
+  const num=document.getElementById('daynum-'+day);
+  const cnt=document.getElementById('daycnt-'+day);
+  if(btn)btn.className='day-btn'+(btn.className.includes('open')?' open':'')+(all?' done-all':'');
+  if(num){num.className='day-num'+(all?' done':'');num.textContent=all?'✓':day;}
+  if(cnt){cnt.style.color=all?'#2d4a2d':'#333';cnt.textContent=done+'/'+d.tasks.length;}
+}
+
+function toggleDay(day){
+  const body=document.getElementById('daybody-'+day);
+  const btn=document.getElementById('daybtn-'+day);
+  const tog=document.getElementById('daytog-'+day);
+  const isOpen=body.className.includes('open');
+  document.querySelectorAll('.day-body').forEach(el=>el.className='day-body');
+  document.querySelectorAll('.day-btn').forEach(el=>{if(el.className.includes(' open'))el.className=el.className.replace(' open','');});
+  document.querySelectorAll('[id^=daytog-]').forEach(el=>el.textContent='+');
+  if(!isOpen){
+    body.className='day-body open';
+    btn.className=btn.className+' open';
+    tog.textContent='−';
+  }
+  DAYS.forEach(d=>refreshDayBtn(d.day));
+}
+
+function toggleWhy(day){
+  const box=document.getElementById('why-'+day);
+  const btn=document.getElementById('whybtn-'+day);
+  const open=box.style.display==='block';
+  box.style.display=open?'none':'block';
+  btn.textContent=open?'Why does this matter?':'Hide explanation';
+}
+
+function copyText(day){
+  const d=DAYS[day-1];
+  const text=fillCopy(d.copy);
+  if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('copybtn-'+day);
+    btn.textContent='Copied';btn.className='copy-btn copied';
+    setTimeout(()=>{btn.textContent='Copy';btn.className='copy-btn';},2000);
+  });
+}
+
+function buildDays(){
+  const list=document.getElementById('daysList');
+  list.innerHTML='';
+  let lastPhase=null;
+  DAYS.forEach(d=>{
+    if(d.phase!==lastPhase){
+      lastPhase=d.phase;
+      const ph=PHASES[d.phase];
+      const pl=document.createElement('div');
+      pl.className='phase-label';
+      pl.style.color=ph.color;
+      pl.textContent=ph.label;
+      list.appendChild(pl);
+    }
+    const done=d.tasks.filter((_,i)=>S.checked&&S.checked[d.day+'-'+i]).length;
+    const all=done===d.tasks.length;
+    const wrap=document.createElement('div');
+    wrap.className='day-wrap';
+    const filled=fillCopy(d.copy);
+    wrap.innerHTML=`
+      <button class="day-btn${all?' done-all':''}" id="daybtn-${d.day}" onclick="toggleDay(${d.day})">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="day-num${all?' done':''}" id="daynum-${d.day}">${all?'✓':d.day}</div>
+          <div>
+            <div style="color:#e8e0d0;font-size:13px;font-weight:500">${d.title}</div>
+            <div style="color:#444;font-size:11px;margin-top:1px">${getPostDate(d.day-1)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="daycnt-${d.day}" style="font-size:11px;color:${all?'#2d4a2d':'#333'}">${done}/${d.tasks.length}</span>
+          <span id="daytog-${d.day}" style="color:#333;font-size:14px">+</span>
+        </div>
+      </button>
+      <div class="day-body" id="daybody-${d.day}">
+        <p class="brief">${d.brief}</p>
+        ${d.flag?`<div class="flag">! ${d.flag}</div>`:''}
+        <button class="why-btn" id="whybtn-${d.day}" onclick="toggleWhy(${d.day})">Why does this matter?</button>
+        <div class="why-box" id="why-${d.day}" style="display:none;border-left-color:${PHASES[d.phase].color}">${d.why}</div>
+        <div class="tasks-label">Tasks</div>
+        ${d.tasks.map((t,i)=>`
+          <div class="task" onclick="toggleTask(${d.day},${i})">
+            <div class="task-check${S.checked&&S.checked[d.day+'-'+i]?' done':''}" id="chk-${d.day}-${i}">${S.checked&&S.checked[d.day+'-'+i]?'✓':''}</div>
+            <span class="task-text${S.checked&&S.checked[d.day+'-'+i]?' done':''}" id="txt-${d.day}-${i}">${t}</span>
+          </div>`).join('')}
+        ${filled?`<div class="copy-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span class="copy-label">Example copy</span>
+            <button class="copy-btn" id="copybtn-${d.day}" onclick="copyText(${d.day})">Copy</button>
+          </div>
+          <pre class="copy-pre">${filled.replace(/</g,'&lt;')}</pre>
+        </div>`:''}
+      </div>`;
+    list.appendChild(wrap);
+  });
+  list.innerHTML+=`
+    <div class="cta-box">
+      <div style="color:#b8933f;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Ardito</div>
+      <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:#e8e0d0;margin:0 0 10px">Want someone to run this with you?</h3>
+      <p style="color:#666;font-size:13px;line-height:1.7;margin:0 0 20px;max-width:400px;margin-left:auto;margin-right:auto">The playbook is the what. Ardito is the how. We handle the pitching, the timing, the copy, and the outreach — so you can focus on the music.</p>
+      <a href="mailto:ardito.ldn@gmail.com?subject=I want to work with Ardito" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;border-radius:6px;padding:11px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none">Work with Ardito</a>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">Reset and start a new release</button>`;
+  updateProgress();
+}
+
+function startPlaybook(){
+  S.artistName=document.getElementById('artistName').value;
+  S.trackName=document.getElementById('trackName').value;
+  S.releaseDate=document.getElementById('releaseDate').value;
+  S.releaseLink=document.getElementById('releaseLink').value;
+  if(!S.artistName&&!S.trackName)return;
+  S.screen='playbook';
+  save();
+  showPlaybook();
+}
+
+function showPlaybook(){
+  document.getElementById('setup').style.display='none';
+  document.getElementById('playbook').style.display='block';
+  const title=S.artistName||(S.trackName?S.trackName:'Your release');
+  const date=S.releaseDate?` · ${fmtDate(S.releaseDate)}`:'';
+  document.getElementById('headerTitle').innerHTML=`${title}<span style="color:#555;font-weight:400">${date}</span>`;
+  buildDays();
+}
+
+function goSetup(){
+  S.screen='setup';save();
+  document.getElementById('setup').style.display='flex';
+  document.getElementById('playbook').style.display='none';
+  document.getElementById('artistName').value=S.artistName||'';
+  document.getElementById('trackName').value=S.trackName||'';
+  document.getElementById('releaseDate').value=S.releaseDate||'';
+  document.getElementById('releaseLink').value=S.releaseLink||'';
+  checkReady();
+}
+
+function resetAll(){
+  S={};save();goSetup();
+}
+
+// init
+if(S.artistName)document.getElementById('artistName').value=S.artistName;
+if(S.trackName)document.getElementById('trackName').value=S.trackName;
+if(S.releaseDate)document.getElementById('releaseDate').value=S.releaseDate;
+if(S.releaseLink)document.getElementById('releaseLink').value=S.releaseLink;
+checkReady();
+if(S.screen==='playbook')showPlaybook();
+</script>
+</body>
+</html>

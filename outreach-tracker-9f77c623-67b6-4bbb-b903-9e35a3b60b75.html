@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ardito — Outreach Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0d0;font-family:'DM Sans',sans-serif;min-height:100vh}
+
+.header{background:#111;border-bottom:1px solid #1f1f1f;padding:18px 24px;position:sticky;top:0;z-index:20}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{color:#b8933f;font-size:10px;letter-spacing:4px;text-transform:uppercase}
+.header-title{color:#e8e0d0;font-family:'Playfair Display',Georgia,serif;font-size:20px;margin-top:2px}
+.header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.release-input{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;padding:8px 14px;color:#e8e0d0;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:200px}
+.release-input::placeholder{color:#444}
+.btn{background:#2d4a2d;color:#e8e0d0;border:none;border-radius:6px;padding:8px 16px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn:hover{background:#3a5e3a}
+.btn-ghost{background:none;border:1px solid #2a2a2a;color:#666;border-radius:6px;padding:8px 16px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-ghost:hover{border-color:#444;color:#aaa}
+
+.filters-wrap{background:#0f0f0f;border-bottom:1px solid #1a1a1a;padding:14px 24px}
+.filters-inner{max-width:1200px;margin:0 auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-label{color:#444;font-size:10px;letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.chip{background:#111;border:1px solid #1f1f1f;border-radius:20px;padding:5px 14px;font-size:12px;color:#555;cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none}
+.chip:hover{border-color:#333;color:#aaa}
+.chip.active{background:#2d4a2d;border-color:#2d4a2d;color:#e8e0d0}
+.sep{width:1px;height:20px;background:#222;flex-shrink:0}
+.search-wrap{position:relative;margin-left:auto}
+.search-input{background:#111;border:1px solid #1f1f1f;border-radius:6px;padding:7px 12px 7px 32px;color:#e8e0d0;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:220px}
+.search-input::placeholder{color:#444}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#444;font-size:13px;pointer-events:none}
+
+.stats{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:16px 20px}
+.stat-num{font-family:'Playfair Display',Georgia,serif;font-size:32px;color:#e8e0d0;line-height:1}
+.stat-label{color:#444;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.stat.green .stat-num{color:#4a8a4a}
+.stat.gold .stat-num{color:#b8933f}
+.stat.blue .stat-num{color:#4a70aa}
+
+.table-wrap{max-width:1200px;margin:0 auto;padding:0 24px 60px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:800px}
+thead th{color:#444;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid #1a1a1a;white-space:nowrap;cursor:pointer}
+thead th:hover{color:#777}
+tbody tr{border-bottom:1px solid #111;transition:background .1s;cursor:default}
+tbody tr:hover{background:#111}
+td{padding:12px 14px;vertical-align:middle}
+
+/* PRIORITY DOT */
+.pri-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.pri-high{background:#c0392b}
+.pri-mid{background:#b8933f}
+.pri-low{background:#2d4a2d}
+
+/* NAME */
+.contact-name{color:#e8e0d0;font-size:14px;font-weight:500;line-height:1.3}
+.contact-sub{color:#444;font-size:11px;margin-top:2px}
+.contact-sub a{color:#444;text-decoration:none;transition:color .15s}
+.contact-sub a:hover{color:#b8933f}
+
+/* TYPE BADGE */
+.type-badge{display:inline-block;border-radius:4px;padding:3px 8px;font-size:10px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.t-blog{background:#1a2030;color:#6080aa}
+.t-playlist{background:#1a2e1a;color:#60aa70}
+.t-radio{background:#2e1a2e;color:#aa60aa}
+.t-label{background:#2e2a1a;color:#aa9040}
+.t-journalist{background:#2a1a1a;color:#aa6060}
+.t-sync{background:#1a2a2a;color:#60aaaa}
+
+/* GENRE TAGS */
+.tags{display:flex;gap:3px;flex-wrap:wrap}
+.tag{border-radius:20px;padding:2px 8px;font-size:10px;letter-spacing:0.5px;white-space:nowrap}
+.tag-pop{background:#1a1a2e;color:#7070cc}
+.tag-rnb{background:#2e1a1a;color:#cc7070}
+.tag-soul{background:#2e261a;color:#cc9a40}
+.tag-indie{background:#1a2e1a;color:#60aa60}
+.tag-alt{background:#2a1a2e;color:#b060cc}
+.tag-rock{background:#2e1f1a;color:#cc6040}
+
+/* PLATFORM */
+.plat{display:inline-block;border-radius:4px;padding:3px 8px;font-size:10px;letter-spacing:0.5px;white-space:nowrap}
+.p-submithub{background:#1a2030;color:#5080cc}
+.p-groover{background:#301a20;color:#cc5070}
+.p-email{background:#1a2e1a;color:#50aa60}
+.p-form{background:#2e2a1a;color:#aaa050}
+.p-portal{background:#2a1a2e;color:#9050cc}
+
+/* STATUS */
+.status-select{border:1px solid #222;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;padding:4px 8px;outline:none;min-width:90px}
+.s-unsent{color:#555;background:#111;border-color:#222}
+.s-sent{color:#5080cc;background:#1a2030;border-color:#2a3040}
+.s-opened{color:#aaa050;background:#2a2a1a;border-color:#3a3a2a}
+.s-passed{color:#cc5050;background:#2e1a1a;border-color:#3e2a2a}
+.s-added{color:#50aa60;background:#1a2e1a;border-color:#2a3e2a}
+.s-featured{color:#b8933f;background:#2a1e0a;border-color:#3a2e1a}
+
+/* DATE */
+.date-input{background:transparent;border:none;color:#555;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;color-scheme:dark;width:110px}
+
+/* NOTES */
+.note-cell{color:#555;font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;transition:color .15s}
+.note-cell:hover{color:#aaa}
+.note-cell.has-note{color:#777}
+
+/* EMPTY */
+.empty{text-align:center;padding:80px 20px;color:#333;font-size:14px}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.3}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#111;border:1px solid #222;border-radius:12px;padding:28px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Playfair Display',Georgia,serif;font-size:20px;margin-bottom:20px;color:#e8e0d0}
+.m-label{display:block;color:#555;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+.m-input{width:100%;background:#0d0d0d;border:1px solid #222;border-radius:6px;padding:10px 12px;color:#e8e0d0;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:14px}
+.m-input:focus{border-color:#2d4a2d}
+.m-select{width:100%;background:#0d0d0d;border:1px solid #222;border-radius:6px;padding:10px 12px;color:#e8e0d0;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:14px;color-scheme:dark}
+.m-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.modal-btns{display:flex;gap:8px;margin-top:6px;justify-content:flex-end}
+.genre-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="logo">Ardito</div>
+      <div class="header-title">Outreach Tracker</div>
+    </div>
+    <div class="header-right">
+      <input class="release-input" id="release-name" placeholder="Release name..." oninput="saveData()"/>
+      <button class="btn-ghost" onclick="exportCSV()">Export CSV</button>
+      <button class="btn" onclick="openAddModal()">+ Add Contact</button>
+    </div>
+  </div>
+</div>
+
+<div class="filters-wrap">
+  <div class="filters-inner">
+    <span class="filter-label">Genre</span>
+    <span class="chip active" data-filter="genre" data-val="all" onclick="setFilter('genre','all',this)">All</span>
+    <span class="chip" data-filter="genre" data-val="pop" onclick="setFilter('genre','pop',this)">Pop</span>
+    <span class="chip" data-filter="genre" data-val="rnb" onclick="setFilter('genre','rnb',this)">R&B</span>
+    <span class="chip" data-filter="genre" data-val="soul" onclick="setFilter('genre','soul',this)">Soul</span>
+    <span class="chip" data-filter="genre" data-val="indie" onclick="setFilter('genre','indie',this)">Indie</span>
+    <span class="chip" data-filter="genre" data-val="alt" onclick="setFilter('genre','alt',this)">Alt</span>
+    <span class="chip" data-filter="genre" data-val="rock" onclick="setFilter('genre','rock',this)">Rock</span>
+    <div class="sep"></div>
+    <span class="filter-label">Status</span>
+    <span class="chip active" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">All</span>
+    <span class="chip" data-filter="status" data-val="unsent" onclick="setFilter('status','unsent',this)">Unsent</span>
+    <span class="chip" data-filter="status" data-val="sent" onclick="setFilter('status','sent',this)">Sent</span>
+    <span class="chip" data-filter="status" data-val="added" onclick="setFilter('status','added',this)">Added</span>
+    <span class="chip" data-filter="status" data-val="featured" onclick="setFilter('status','featured',this)">Featured</span>
+    <span class="chip" data-filter="status" data-val="passed" onclick="setFilter('status','passed',this)">Passed</span>
+    <div class="sep"></div>
+    <span class="filter-label">Type</span>
+    <span class="chip active" data-filter="type" data-val="all" onclick="setFilter('type','all',this)">All</span>
+    <span class="chip" data-filter="type" data-val="blog" onclick="setFilter('type','blog',this)">Blogs</span>
+    <span class="chip" data-filter="type" data-val="playlist" onclick="setFilter('type','playlist',this)">Playlists</span>
+    <span class="chip" data-filter="type" data-val="radio" onclick="setFilter('type','radio',this)">Radio</span>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-input" placeholder="Search..." oninput="searchContacts(this.value)"/>
+    </div>
+  </div>
+</div>
+
+<div class="stats" id="stats-bar"></div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px"></th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Genres</th>
+        <th>Platform</th>
+        <th>Status</th>
+        <th>Date sent</th>
+        <th>Notes</th>
+        <th style="width:30px"></th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+  <div class="empty" id="empty-state" style="display:none">
+    <div class="empty-icon">◎</div>
+    No contacts match your filters.
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Add Contact</h3>
+    <label class="m-label">Name / Publication</label>
+    <input class="m-input" id="m-name" placeholder="e.g. The Line of Best Fit"/>
+    <label class="m-label">URL / Contact Link</label>
+    <input class="m-input" id="m-url" placeholder="https://..."/>
+    <div class="m-row">
+      <div>
+        <label class="m-label">Type</label>
+        <select class="m-select" id="m-type">
+          <option value="blog">Blog</option>
+          <option value="playlist">Playlist</option>
+          <option value="radio">Radio</option>
+          <option value="journalist">Journalist</option>
+          <option value="sync">Sync</option>
+        </select>
+      </div>
+      <div>
+        <label class="m-label">Platform</label>
+        <select class="m-select" id="m-platform">
+          <option value="email">Email</option>
+          <option value="submithub">SubmitHub</option>
+          <option value="groover">Groover</option>
+          <option value="form">Form</option>
+          <option value="portal">Portal</option>
+        </select>
+      </div>
+      <div>
+        <label class="m-label">Priority</label>
+        <select class="m-select" id="m-priority">
+          <option value="high">High</option>
+          <option value="mid">Mid</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <label class="m-label">Genres</label>
+    <div class="genre-chips" id="m-genre-chips">
+      <span class="chip" data-g="pop" onclick="toggleGenreChip(this)">Pop</span>
+      <span class="chip" data-g="rnb" onclick="toggleGenreChip(this)">R&B</span>
+      <span class="chip" data-g="soul" onclick="toggleGenreChip(this)">Soul</span>
+      <span class="chip" data-g="indie" onclick="toggleGenreChip(this)">Indie</span>
+      <span class="chip" data-g="alt" onclick="toggleGenreChip(this)">Alt</span>
+      <span class="chip" data-g="rock" onclick="toggleGenreChip(this)">Rock</span>
+    </div>
+    <label class="m-label">Notes</label>
+    <textarea class="m-input" id="m-notes" rows="3" placeholder="Submission tips, contact name, what they cover..." style="resize:vertical;min-height:70px"></textarea>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal">
+  <div class="modal">
+    <h3 id="note-modal-name">Notes</h3>
+    <textarea class="m-input" id="note-text" rows="5" style="resize:vertical;min-height:100px"></textarea>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeNoteModal()">Cancel</button>
+      <button class="btn" onclick="saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK='ardito-tracker-v2';
+let data={release:'',contacts:[]};
+let filters={genre:'all',status:'all',type:'all',search:''};
+let editingId=null,noteEditingId=null;
+
+const PRELOADED=[
+  // BLOGS — INDIE/ALT
+  {id:'p1',name:'The Line of Best Fit',url:'https://www.thelineofbestfit.com/send-us-your-music',type:'blog',genres:['indie','alt','pop'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Editor: Paul Bridgewater. Features: Hayden Merrick. Submit via dedicated music form (not contact page). news@thelineofbestfit.com / hello@thelineofbestfit.com. Weekly New Music Discovery Spotify playlist — a separate win to a feature.'},
+  {id:'p2',name:'Stereogum',url:'https://stereogum.com/contact',type:'blog',genres:['indie','alt','rock'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'Editor-in-chief: Scott Lapatine. Managing editor: Chris DeVille. Senior editor: Tom Breihan. Editors: Danielle Chelosky, Abby Jones. Coverage is largely editor-driven — build press elsewhere first then pitch directly.'},
+  {id:'p3',name:'Atwood Magazine',url:'https://atwoodmagazine.com/pitching-us',type:'blog',genres:['indie','alt','pop','soul'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Editor: Mitch Mosk — mitch@atwoodmagazine.com. Read their Pitching Us page before submitting. Only respond to submissions they want to use. Premieres, reviews, interviews available.'},
+  {id:'p4',name:'Gorilla vs. Bear',url:'https://www.gorillavsbear.net/contact',type:'blog',genres:['indie','alt'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'US indie tastemaker. Very selective. Strong editorial identity. Known for early coverage of major artists.'},
+  {id:'p5',name:'Pigeons & Planes',url:'https://www.pigeonsandplanes.com',type:'blog',genres:['indie','alt','pop','rnb'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'Submit to submissions@pigeonsandplanes.com. Subject: "PLAYLIST SUBMISSION". Spotify link only — no attachments. Direct artist submissions actively welcomed as of 2026.'},
+  {id:'p6',name:'The FADER',url:'https://www.thefader.com/contact',type:'blog',genres:['pop','rnb','soul','indie','alt'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Submit via contact form. Where music meets culture. More accessible than Pitchfork. Strong for R&B, soul, credible pop. Active 2026.'},
+  {id:'p7',name:'A&R Factory',url:'https://www.anrfactory.com/submit-music',type:'blog',genres:['indie','alt','pop','rock','soul','rnb'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'UK-based. Accepts all genres. Good for industry visibility. Americna Songwriter sister site for some content.'},
+  {id:'p8',name:'Ones To Watch',url:'https://onestowatch.com/submit',type:'blog',genres:['pop','indie','alt','rnb'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'850+ artist features. Alumni include Taylor Swift and Billie Eilish. Strong US discovery platform for emerging artists.'},
+  {id:'p9',name:'American Songwriter',url:'https://americansongwriter.com/contact',type:'blog',genres:['pop','indie','alt','rock','soul'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'1.5M monthly visitors. All genres. Contact page with "Music Submissions" dropdown. Covers write-ups and Q&As with established and emerging artists.'},
+  {id:'p10',name:'Aquarium Drunkard',url:'https://aquariumdrunkard.com/contact',type:'blog',genres:['indie','alt','soul'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'US blog since 2005. Good for psych, soul, left-field indie. Strong editorial identity.'},
+  {id:'p11',name:'This Song Is Sick',url:'https://thissongissick.com/submit',type:'blog',genres:['indie','alt','pop','rnb'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Submit via form. Global audience. Covers indie, alt, hip-hop and more. Been sharing fresh music since 2010.'},
+  {id:'p12',name:'Crack Magazine',url:'https://crackmagazine.net/contact',type:'blog',genres:['indie','alt','pop','soul','rnb'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'UK-based. Music, interviews, reviews spanning alternative and underground. Strong cultural credibility. Good for artists with a strong story.'},
+  {id:'p13',name:'GoldFlakePaint',url:'https://goldflakepaint.co.uk/contact',type:'blog',genres:['indie','alt','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK-based. Known for in-depth storytelling and artist interviews. Good for premiere features on upcoming releases.'},
+  {id:'p14',name:'Obscure Sound',url:'https://obscuresound.com/contact',type:'blog',genres:['indie','alt','pop','soul'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'US blog since 2006. Covers emerging artists exclusively. Good for artists that don\'t fit mainstream categories.'},
+  {id:'p15',name:'Right Chord Music',url:'https://www.rightchordmusic.com/submit-music',type:'blog',genres:['indie','alt','pop','rock'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'UK blog and indie collective. One submission gets you across their partner network (blogs, playlists, radio). Free. Requires bio/press release.'},
+  {id:'p16',name:'We All Want Someone',url:'https://weallwantsomeone.org/contact',type:'blog',genres:['indie','alt','rock'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'NY-based indie blog since 2008. Indie rock, shoegaze, post-punk, alternative. Email submissions.'},
+  {id:'p17',name:'XS Noize',url:'https://www.xsnoize.com/contact',type:'blog',genres:['indie','alt','rock','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Global reach, independent and alternative focus. In-depth reviews and ones-to-watch features. Established since 2012. Email submissions welcomed.'},
+  {id:'p18',name:'Bearded Magazine',url:'https://beardedmagazine.com/contact',type:'blog',genres:['indie','alt','rock','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Brighton-based. Independent labels and artists only. No advertiser influence. info@beardedmagazine.com. Reviews all genres.'},
+  {id:'p19',name:'Neon Music',url:'https://neonmusic.co.uk/contact',type:'blog',genres:['pop','indie','alt'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK blog. High domain authority (62). Pop, culture, new music. Email submissions.'},
+  {id:'p20',name:'It\'s All Indie',url:'https://itsallindie.com/contact',type:'blog',genres:['indie','alt','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK indie and alternative discovery blog. 45K Facebook following. DA 40. Free submissions welcomed.'},
+  {id:'p21',name:'Artistrack',url:'https://artistrack.com/submit',type:'blog',genres:['pop','indie','alt','rock','soul','rnb'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Broad genre coverage. Dedicated submission page. Good for first-wave exposure and quick features. Consistent platform for independent discovery 2026.'},
+  {id:'p22',name:'Bandcamp Daily',url:'https://daily.bandcamp.com',type:'blog',genres:['indie','alt','rock','soul','rnb','pop'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Must have completed Bandcamp page. Editors actively scout the platform. No direct submission form — be active on Bandcamp and pitch via editorial contact.'},
+  {id:'p23',name:'Pitchfork',url:'https://pitchfork.com/contact',type:'blog',genres:['indie','alt','rock','pop','soul','rnb'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'No direct submissions — coverage is editor-led. Best approached via PR or by building press elsewhere first. Pitchfork Rising is the target for emerging artists.'},
+  {id:'p24',name:'Consequence of Sound',url:'https://consequenceofsound.net/contact',type:'blog',genres:['pop','rock','indie','alt','soul'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Major US publication. Submit via contact page, "Music Submissions" from dropdown. 1.5M monthly visitors. Wide genre coverage.'},
+  {id:'p25',name:'NME',url:'https://www.nme.com/contact',type:'blog',genres:['rock','indie','alt','pop'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'One of the biggest UK music publications. Strong for indie, rock, alt. News, opinion, reviews, interviews. Best approached with a strong story angle.'},
+  {id:'p26',name:'DIY Magazine',url:'https://diymag.com/about',type:'blog',genres:['indie','alt','rock','pop'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'UK indie publication. Strong for guitar music and alt-pop. Part of the same ecosystem as The Line of Best Fit.'},
+  // BLOGS — SOUL/R&B
+  {id:'p27',name:'SoulBounce',url:'https://soulbounce.com/contact-soulbounce',type:'blog',genres:['soul','rnb'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'Submit to soulbounceonline@gmail.com. Soul Train Award winner. Active in 2026 covering contemporary soul and R&B. Strong established platform.'},
+  {id:'p28',name:'Rated R&B',url:'https://ratedrnb.com/contact',type:'blog',genres:['rnb','soul'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'Leading R&B blog. Email via contact page. DA 54. Covering Mary J. Blige, FLO, Olivia Dean in 2026. Very active.'},
+  {id:'p29',name:'We Plug Good Music',url:'https://wepluggoodmusic.com/contact',type:'blog',genres:['soul','rnb','pop','indie'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'London-based multi-award-winning platform. 88K Facebook following. Covers Afrobeat, hip-hop, neo-soul, R&B. Strong UK tastemaker. Free to submit.'},
+  {id:'p30',name:'The Blues Project',url:'https://thebluesproject.co/contact',type:'blog',genres:['rnb','soul'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK R&B and soul publication. Music submissions ONLY to dedicated inbox (check contact page). Active 2026 covering UK artists like Olivia Dean and SIPHO.'},
+  {id:'p31',name:'This Is RnB',url:'https://www.thisisrnb.com/contact',type:'blog',genres:['rnb','soul'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Online platform covering all things R&B. News, music, videos, artist interviews worldwide. Active and well-followed.'},
+  {id:'p32',name:'YouKnowIGotSoul',url:'https://youknowigotsoul.com/contact',type:'blog',genres:['rnb','soul'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'R&B focused. Strong social following. Good for neo-soul and contemporary R&B.'},
+  {id:'p33',name:'Hullabaloo',url:'https://hullabaloomusic.com',type:'blog',genres:['soul','rnb','pop','indie','rock'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Focuses on intersection of music and poetry, activism, mental health, community, feminism. All genres. Email address at bottom of their about page.'},
+  // BLOGS — ROCK
+  {id:'p34',name:'New Noise Magazine',url:'https://newnoisemagazine.com/music-submission',type:'blog',genres:['rock','alt','indie'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Dedicated to punk, rock, alternative. Loyal readership. Submit via music submission page. Good for guitar-driven artists.'},
+  {id:'p35',name:'Soundsphere Magazine',url:'https://soundspheremag.com/contact',type:'blog',genres:['rock','alt','indie','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK-based. Alternative culture across the North of England and worldwide. Indie, punk, rock, goth. info@soundspheremag.com.'},
+  {id:'p36',name:'Louder Than War',url:'https://louderthanwar.com/contact',type:'blog',genres:['rock','alt','indie'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK music news, reviews, interviews. Indie, punk, alternative, post-punk focus. Strong community following.'},
+  // EUROPEAN
+  {id:'p37',name:'Poule d\'Or (DE/FR)',url:'https://pouledor.com/contact',type:'blog',genres:['indie','pop','alt'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Hamburg base, Paris roots. Indie pop, shoegaze, electropop, wave, folk, twee. Strong Scandinavian, North American, and UK coverage.'},
+  {id:'p38',name:'Lefuturewave (NL)',url:'https://lefuturewave.com/contact',type:'blog',genres:['indie','pop','alt','soul'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Netherlands-based blog and playlist curator. 12K Instagram following. Covers emerging and established artists. Good EU reach.'},
+  {id:'p39',name:'Herzmukke (DE)',url:'https://herzmukke.de/contact',type:'blog',genres:['indie','rock','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Berlin-based. Indie, rock, pop culture. Reviews, interviews, music news. Good for German-speaking market reach.'},
+  {id:'p40',name:'HighClouds (BE)',url:'https://highclouds.org/contact',type:'blog',genres:['indie','alt','pop'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'Brussels-based. Indie and alt pop in its widest definition. SubmitHub only. Unreleased tracks only.'},
+  {id:'p41',name:'Stereofox (EU)',url:'https://stereofox.com/submit',type:'blog',genres:['indie','alt','pop'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'European indie/alt blog and playlist. Shares music from artists you\'ve never heard of. Submit via website.'},
+  // SUBMITHUB BLOGS
+  {id:'p42',name:'Earmilk',url:'https://www.submithub.com',type:'blog',genres:['indie','pop','rnb','soul'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub only. Covers indie, pop, hip-hop, R&B. Eclectic, global audience.'},
+  {id:'p43',name:'Ear to the Ground',url:'https://www.submithub.com',type:'blog',genres:['indie','alt'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub only. Indie folk, rock, pop, singer-songwriter. Thoughtful coverage of emerging artists.'},
+  {id:'p44',name:'Indie Shuffle',url:'https://www.submithub.com',type:'blog',genres:['indie','alt','pop'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub only. Founded by Jason Grishkoff (same person as SubmitHub). Likes intricate indie and downtempo/house. No commercial pop.'},
+  {id:'p45',name:'HighClouds',url:'https://www.submithub.com',type:'blog',genres:['indie','alt','pop'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub only. Unreleased music only. Good for alt-pop.'},
+  {id:'p46',name:'Kings of A&R',url:'https://www.kingsofar.com/contact',type:'blog',genres:['indie','alt','pop','soul','rnb','rock'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'US blog. 57K Facebook, 45K Twitter. Features emerging artists across all genres before they break. info@kingsofar.com.'},
+  // PLAYLISTS
+  {id:'p47',name:'Indiemono',url:'https://indiemono.com/submit',type:'playlist',genres:['indie','alt','pop'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Free Spotify playlist submissions. Indie and alternative focus. Active curation. Post-release only.'},
+  {id:'p48',name:'Soundplate',url:'https://soundplate.com/submit-music',type:'playlist',genres:['indie','pop','alt','soul'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Free playlist submissions. Good starting point. Post-release only.'},
+  {id:'p49',name:'DailyPlaylists',url:'https://dailyplaylists.com',type:'playlist',genres:['pop','indie','alt','rock','soul','rnb'],platform:'portal',priority:'high',status:'unsent',dateSent:'',notes:'40,000+ curators, 7M+ placements since 2017. Free and premium. Huge reach across all genres. Post-release.'},
+  {id:'p50',name:'Pitchplaylists',url:'https://pitchplaylists.com',type:'playlist',genres:['indie','alt','pop','soul','rnb'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Independent playlist pitching. Good for niche genres. Post-release only.'},
+  {id:'p51',name:'Le Belle Musique',url:'https://www.submithub.com',type:'playlist',genres:['soul','rnb','indie','pop'],platform:'submithub',priority:'high',status:'unsent',dateSent:'',notes:'Started on YouTube, strong Spotify curation. Multiple themed playlists. Perfect for chill, soulful R&B and indie.'},
+  {id:'p52',name:'Howard Zhu',url:'https://www.submithub.com',type:'playlist',genres:['indie','pop','alt'],platform:'submithub',priority:'high',status:'unsent',dateSent:'',notes:'100K+ follower playlist. Actively supports indie artists. Strong track record for emerging acts.'},
+  {id:'p53',name:'Unity Records Playlists',url:'https://groover.co',type:'playlist',genres:['indie','alt','rnb','soul','pop'],platform:'groover',priority:'high',status:'unsent',dateSent:'',notes:'Four major Spotify playlists (45K to 404K followers). Indie & Alternative, Hot Hits World, Best Alternative Soul & RnB. Submit via Groover.'},
+  {id:'p54',name:'Soundsol',url:'https://groover.co',type:'playlist',genres:['rnb','indie','pop'],platform:'groover',priority:'mid',status:'unsent',dateSent:'',notes:'Canadian curator. 64K Instagram followers, 195 Spotify playlists. Covers R&B, indie pop, hip-hop, house. Submit via Groover.'},
+  {id:'p55',name:'Hype Machine',url:'https://hypem.com',type:'playlist',genres:['indie','alt','pop','soul'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'Blog aggregator since 2005. Getting featured on a Hype Machine-indexed blog gets your track on their database. Filter SubmitHub to show Hype Machine blogs.'},
+  {id:'p56',name:'SubmitLink',url:'https://www.submitlink.io',type:'playlist',genres:['pop','indie','alt','rock','soul','rnb'],platform:'portal',priority:'mid',status:'unsent',dateSent:'',notes:'AI-matched playlist submissions. 21% average placement rate vs industry 2-5%. 7-day response or refund. 300+ verified curators.'},
+  {id:'p57',name:'Musosoup',url:'https://www.musosoup.com',type:'playlist',genres:['indie','alt','pop','soul','rnb'],platform:'portal',priority:'mid',status:'unsent',dateSent:'',notes:'PR-style marketplace. Blogs, radio, press. Connects artists with curators — no upfront cost to submit.'},
+  // PLATFORMS
+  {id:'p58',name:'SubmitHub',url:'https://www.submithub.com',type:'playlist',genres:['pop','indie','alt','rock','soul','rnb'],platform:'submithub',priority:'high',status:'unsent',dateSent:'',notes:'Use Advanced Mode. Filter carefully by genre. Free standard credits refresh every 4 hours. Premium unlocks 230+ extra curators.'},
+  {id:'p59',name:'Groover',url:'https://groover.co',type:'playlist',genres:['pop','indie','alt','rock','soul','rnb'],platform:'groover',priority:'high',status:'unsent',dateSent:'',notes:'~€2 per curator. 7-day response guarantee. Strong European coverage. Run country-specific campaigns using their filter.'},
+  {id:'p60',name:'Groover — France',url:'https://groover.co/en/influencer/list/tags/france/',type:'playlist',genres:['pop','indie','alt','soul','rnb','rock'],platform:'groover',priority:'high',status:'unsent',dateSent:'',notes:'French market is strong for indie, pop, soul. Worth running a separate France-targeted Groover campaign.'},
+  {id:'p61',name:'Groover — Germany',url:'https://groover.co/en/influencer/list/tags/germany/',type:'playlist',genres:['indie','alt','rock','pop'],platform:'groover',priority:'high',status:'unsent',dateSent:'',notes:'Strong indie and rock scene. Filter by genre to find relevant German curators.'},
+  {id:'p62',name:'Groover — Netherlands',url:'https://groover.co/en/influencer/list/tags/netherlands/',type:'playlist',genres:['indie','pop','soul','rnb'],platform:'groover',priority:'high',status:'unsent',dateSent:'',notes:'Amsterdam/Rotterdam scenes strong in indie, pop, house. Good EU gateway market.'},
+  {id:'p63',name:'Groover — Scandinavia',url:'https://groover.co',type:'playlist',genres:['indie','pop','alt','soul'],platform:'groover',priority:'high',status:'unsent',dateSent:'',notes:'Filter for Sweden, Norway, Denmark. Scandinavian market punches above its weight for indie and pop streaming.'},
+  // RADIO
+  {id:'p64',name:'BBC Introducing',url:'https://www.bbc.co.uk/introducing/upload',type:'radio',genres:['pop','indie','alt','rock','soul','rnb'],platform:'portal',priority:'high',status:'unsent',dateSent:'',notes:'Must-submit for UK artists. Upload via their portal. Can lead to BBC Radio 1, 2, 6 Music plays. Needs UK postcode.'},
+  {id:'p65',name:'Amazing Radio',url:'https://amazingradio.com/submit',type:'radio',genres:['indie','alt','pop','rock'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'UK indie radio. Supportive of emerging artists. Submit via website. Must be live on Spotify first — post-release only.'},
+  {id:'p66',name:'Tom Robinson\'s 6 Music / Fresh on the Net',url:'https://freshonthenet.co.uk',type:'radio',genres:['indie','alt','pop','soul','rock'],platform:'form',priority:'high',status:'unsent',dateSent:'',notes:'BBC Radio 6 Music presenter Tom Robinson runs Fresh on the Net — weekly slots for independent artists. Free to submit. One of the most accessible routes into BBC 6 Music airplay.'},
+  {id:'p67',name:'Worldwide FM',url:'https://worldwidefm.net/contact',type:'radio',genres:['soul','rnb','indie','pop'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'London-based. Soul, R&B, eclectic. Founded by Gilles Peterson. Strong tastemaker credibility.'},
+  {id:'p68',name:'NTS Radio',url:'https://www.nts.live/contact',type:'radio',genres:['indie','alt','soul','rnb','pop'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'London/LA. Experimental and left-field but covers all genres. Strong cultural cachet.'},
+  {id:'p69',name:'Soho Radio',url:'https://sohoradio.com/contact',type:'radio',genres:['soul','rnb','indie','pop'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'London-based eclectic station. Research individual show hosts on their website and pitch the right show directly.'},
+  {id:'p70',name:'Rinse FM',url:'https://rinse.fm/contact',type:'radio',genres:['rnb','soul','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'East London. R&B, soul, grime. Contact individual show presenters directly via Instagram or email — relationships matter.'},
+  {id:'p71',name:'Reprezent Radio',url:'https://reprezent.org.uk/contact',type:'radio',genres:['rnb','soul','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK youth radio. Strong R&B and soul coverage. Based in Brixton.'},
+  {id:'p72',name:'KEXP (US)',url:'https://www.kexp.org/music/contact',type:'radio',genres:['indie','alt','rock','soul','pop'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Seattle-based. One of the most respected indie discovery stations globally. Target individual DJs through show pages. Strong international credibility for UK artists.'},
+  {id:'p73',name:'Radio Paradise (US)',url:'https://www.radioparadise.com/music/submissions/submit',type:'radio',genres:['indie','alt','rock','soul','pop'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Submit via Spotify, YouTube, or SoundCloud link — no file uploads. Freeform programming across genres. Free. Good for indie/alt/soul crossover artists.'},
+  {id:'p74',name:'Resonance FM',url:'https://resonancefm.com/contact',type:'radio',genres:['indie','alt','soul'],platform:'email',priority:'low',status:'unsent',dateSent:'',notes:'London arts radio. Experimental and eclectic. Good for left-field indie and alt.'},
+  {id:'p75',name:'Denmark Street Radio',url:'https://www.denmarkstreetradio.com',type:'radio',genres:['indie','alt','rock','pop','soul'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'UK. Requires MP3, artwork, and press shot sent via email. Good for emerging artists. Send before release.'},
+  {id:'p76',name:'Radio Fandango',url:'https://www.radiofandango.com',type:'radio',genres:['indie','alt','pop','rock'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'UK. MP3, artwork, and press shot required — no press shot, no submission. Send before release date.'},
+  {id:'p77',name:'Ear Milk',url:'https://www.submithub.com',type:'blog',genres:['rnb','soul','pop','indie'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub only. Gravitates toward hip-hop, R&B, funk but describes taste as eclectic and open-minded.'},
+  {id:'p78',name:'Glide Magazine',url:'https://www.submithub.com',type:'blog',genres:['rock','pop','indie'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub only. Focus on great lyrics, guitar-driven music. No autotune. Good for singer-songwriters.'},
+  {id:'p79',name:'Gorilla vs. Beer',url:'https://www.submithub.com',type:'playlist',genres:['indie','alt'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'SubmitHub playlist. Dreamy indie, lo-fi pop. Known for discovering Beach House, Grimes. Experimental and textured music works well.'},
+  {id:'p80',name:'Going Solo',url:'https://www.submithub.com',type:'playlist',genres:['indie','alt','pop'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'Italian curator with global taste. Dreamy, genre-fluid indie. Accepts artists in any language. Actively looking for new artists.'},
+  {id:'p81',name:'Essentially Pop',url:'https://essentiallypop.com/epop/contact',type:'blog',genres:['pop','indie'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'UK-based. Indie pop focus. Good for emerging pop artists. Submit via contact page.'},
+  {id:'p82',name:'Plastic Mag',url:'https://plasticmag.co.uk/contact',type:'blog',genres:['pop','indie','alt'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'UK publication. Covers new music across pop, indie, alt. Provides feedback on submissions.'},
+  {id:'p83',name:'EQ Music Blog',url:'https://eqmusicblog.com/contact',type:'blog',genres:['pop','indie','alt'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'London-based. Electronic pop, alternative, indie-pop focus. DA 39. Good for left-of-centre pop artists.'},
+  {id:'p84',name:'Jammerzine',url:'https://jammerzine.com/contact',type:'blog',genres:['indie','alt','rock'],platform:'email',priority:'low',status:'unsent',dateSent:'',notes:'Underground and independent music focus. Email submissions via contact page.'},
+  {id:'p85',name:'Beats 1 / Apple Music Radio',url:'https://artists.apple.com',type:'radio',genres:['pop','rnb','soul','indie'],platform:'portal',priority:'high',status:'unsent',dateSent:'',notes:'Submit via Apple Music for Artists portal. Global reach. Worth doing alongside Spotify editorial.'},
+  {id:'p86',name:'Rinse FM',url:'https://rinse.fm/contact',type:'radio',genres:['rnb','soul','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'East London. R&B, soul, grime. Contact individual show presenters directly via Instagram or email — community-based, relationships matter.'},
+  {id:'p87',name:'iMusician Playlists',url:'https://imusician.pro',type:'playlist',genres:['indie','pop','alt','soul'],platform:'form',priority:'mid',status:'unsent',dateSent:'',notes:'Digital distributor with active Spotify playlists (10K+ followers each). Free and paid submission options. Team listens to every submission.'},
+  {id:'p88',name:'One Submit',url:'https://www.one-submit.com',type:'playlist',genres:['pop','indie','alt','rock','soul','rnb'],platform:'portal',priority:'mid',status:'unsent',dateSent:'',notes:'Multi-channel submissions from one dashboard. Playlists, blogs, TikTok, radio, labels. Saves time vs submitting separately.'},
+  {id:'p89',name:'Groover — Spain',url:'https://groover.co/en/influencer/list/tags/spain/',type:'playlist',genres:['indie','pop','alt','soul','rnb'],platform:'groover',priority:'mid',status:'unsent',dateSent:'',notes:'Spanish market. Fast-growing streaming audience. Filter by genre on Groover. Worth including in any campaign with European ambitions.'},
+  {id:'p90',name:'Connor Franta Playlists',url:'https://www.submithub.com',type:'playlist',genres:['indie','pop','alt'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'YouTube creator turned serious curator. "Hidden Gems" playlist has 30K+ saves. Blends YouTube reach with genuine Spotify curation.'},
+  {id:'p91',name:'BIRP.fm',url:'https://www.submithub.com',type:'playlist',genres:['indie','pop','rock'],platform:'submithub',priority:'mid',status:'unsent',dateSent:'',notes:'Monthly playlist and blog. Bedroom pop and indie rock focus. SubmitHub only. Strong consistent following.'},
+  {id:'p92',name:'Musikmussmit (DE)',url:'https://musikmussmit.de/contact',type:'blog',genres:['indie','pop','soul','rock'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'Berlin-based blog. Electro-pop, rock, hip-hop, soul. Covers newcomers and emerging artists. Email submissions.'},
+  {id:'p93',name:'KCRW (US)',url:'https://www.kcrw.com/contact',type:'radio',genres:['indie','alt','soul','pop'],platform:'email',priority:'mid',status:'unsent',dateSent:'',notes:'LA-based public radio. Strong indie and alternative programming. Reach individual show hosts directly. International credibility for UK artists.'},
+  {id:'p94',name:'Vicky Madzak',url:'https://www.vickymadzak.com',type:'journalist',genres:['pop','indie'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'London-based music journalist, BIMM grad. Writes for GEM Magazine, The Forty Five, LDN Magazine (New Music Friday column). Covers pop, indie, singer-songwriter. Instagram: @vi.c.k.y — DM or contact via website. Warm lead — BIMM connection.'},
+  {id:'p95',name:'Iris Beek',url:'https://www.unitedbypop.com/author/irisbeek/',type:'journalist',genres:['pop'],platform:'email',priority:'high',status:'unsent',dateSent:'',notes:'Music journalist specialising in K-pop and pop. Writes for United By Pop. Email: iris@unitedbypop.com. Instagram: @lifecriris. Pitch pop and K-pop artists directly to her email.'},
+];
+
+function loadData(){
+  try{
+    const s=localStorage.getItem(SK);
+    if(s){data=JSON.parse(s);if(!data.contacts||!data.contacts.length)data.contacts=[...PRELOADED];}
+    else data={release:'',contacts:[...PRELOADED]};
+  }catch(e){data={release:'',contacts:[...PRELOADED]};}
+}
+
+function saveData(){
+  const rn=document.getElementById('release-name');
+  if(rn)data.release=rn.value;
+  try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){}
+  render();
+}
+
+function setFilter(type,val,el){
+  filters[type]=val;
+  document.querySelectorAll(`[data-filter="${type}"]`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function searchContacts(val){filters.search=val.toLowerCase();render();}
+
+function getFiltered(){
+  return data.contacts.filter(c=>{
+    if(filters.genre!=='all'&&!c.genres.includes(filters.genre))return false;
+    if(filters.status!=='all'&&c.status!==filters.status)return false;
+    if(filters.type!=='all'&&c.type!==filters.type)return false;
+    if(filters.search&&!c.name.toLowerCase().includes(filters.search)&&!c.notes.toLowerCase().includes(filters.search))return false;
+    return true;
+  });
+}
+
+const GL={pop:'Pop',rnb:'R&B',soul:'Soul',indie:'Indie',alt:'Alt',rock:'Rock'};
+const PL={submithub:'SubmitHub',groover:'Groover',email:'Email',form:'Form',portal:'Portal'};
+const PO={high:0,mid:1,low:2};
+
+function render(){
+  const filtered=getFiltered();
+  const tbody=document.getElementById('table-body');
+  const empty=document.getElementById('empty-state');
+
+  const total=data.contacts.length;
+  const sent=data.contacts.filter(c=>['sent','opened'].includes(c.status)).length;
+  const added=data.contacts.filter(c=>c.status==='added').length;
+  const featured=data.contacts.filter(c=>c.status==='featured').length;
+
+  document.getElementById('stats-bar').innerHTML=`
+    <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">Total contacts</div></div>
+    <div class="stat blue"><div class="stat-num">${sent}</div><div class="stat-label">Pitched</div></div>
+    <div class="stat green"><div class="stat-num">${added}</div><div class="stat-label">Playlist adds</div></div>
+    <div class="stat gold"><div class="stat-num">${featured}</div><div class="stat-label">Featured</div></div>
+  `;
+
+  if(!filtered.length){empty.style.display='block';tbody.innerHTML='';return;}
+  empty.style.display='none';
+
+  const sorted=[...filtered].sort((a,b)=>PO[a.priority]-PO[b.priority]);
+
+  tbody.innerHTML=sorted.map(c=>`
+    <tr>
+      <td><span class="pri-dot pri-${c.priority}" title="${c.priority} priority"></span></td>
+      <td>
+        <div class="contact-name">${c.name}</div>
+        ${c.url?`<div class="contact-sub"><a href="${c.url}" target="_blank" rel="noopener">${c.url.replace(/https?:\/\//,'').split('/')[0]}</a></div>`:''}
+      </td>
+      <td><span class="type-badge t-${c.type}">${c.type}</span></td>
+      <td><div class="tags">${c.genres.map(g=>`<span class="tag tag-${g}">${GL[g]||g}</span>`).join('')}</div></td>
+      <td><span class="plat p-${c.platform}">${PL[c.platform]||c.platform}</span></td>
+      <td>
+        <select class="status-select s-${c.status}" onchange="updateStatus('${c.id}',this)">
+          <option value="unsent" ${c.status==='unsent'?'selected':''}>Unsent</option>
+          <option value="sent" ${c.status==='sent'?'selected':''}>Sent</option>
+          <option value="opened" ${c.status==='opened'?'selected':''}>Opened</option>
+          <option value="passed" ${c.status==='passed'?'selected':''}>Passed</option>
+          <option value="added" ${c.status==='added'?'selected':''}>Added</option>
+          <option value="featured" ${c.status==='featured'?'selected':''}>Featured</option>
+        </select>
+      </td>
+      <td><input type="date" class="date-input" value="${c.dateSent||''}" onchange="updateDate('${c.id}',this.value)"/></td>
+      <td><div class="note-cell${c.notes?' has-note':''}" onclick="openNoteModal('${c.id}')">${c.notes?c.notes.substring(0,40)+'…':'+ add note'}</div></td>
+      <td><span style="color:#333;cursor:pointer;font-size:16px" onclick="deleteContact('${c.id}')" title="Delete">×</span></td>
+    </tr>
+  `).join('');
+}
+
+function updateStatus(id,el){
+  const c=data.contacts.find(x=>x.id===id);
+  if(c){c.status=el.value;el.className='status-select s-'+el.value;saveData();}
+}
+
+function updateDate(id,val){
+  const c=data.contacts.find(x=>x.id===id);
+  if(c){c.dateSent=val;saveData();}
+}
+
+function deleteContact(id){
+  if(!confirm('Remove this contact?'))return;
+  data.contacts=data.contacts.filter(x=>x.id!==id);
+  saveData();
+}
+
+function openNoteModal(id){
+  noteEditingId=id;
+  const c=data.contacts.find(x=>x.id===id);
+  document.getElementById('note-modal-name').textContent=c?c.name:'Notes';
+  document.getElementById('note-text').value=c?c.notes:'';
+  document.getElementById('note-modal').classList.add('open');
+}
+function closeNoteModal(){document.getElementById('note-modal').classList.remove('open');noteEditingId=null;}
+function saveNote(){
+  if(!noteEditingId)return;
+  const c=data.contacts.find(x=>x.id===noteEditingId);
+  if(c){c.notes=document.getElementById('note-text').value;saveData();}
+  closeNoteModal();
+}
+
+function openAddModal(){
+  editingId=null;
+  document.getElementById('modal-title').textContent='Add Contact';
+  ['m-name','m-url','m-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-type').value='blog';
+  document.getElementById('m-platform').value='email';
+  document.getElementById('m-priority').value='mid';
+  document.querySelectorAll('#m-genre-chips .chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');editingId=null;}
+function toggleGenreChip(el){el.classList.toggle('active');}
+
+function saveContact(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name)return;
+  const genres=[...document.querySelectorAll('#m-genre-chips .chip.active')].map(c=>c.dataset.g);
+  const contact={
+    id:editingId||('c'+Date.now()),
+    name,url:document.getElementById('m-url').value.trim(),
+    type:document.getElementById('m-type').value,
+    genres,platform:document.getElementById('m-platform').value,
+    priority:document.getElementById('m-priority').value,
+    status:'unsent',dateSent:'',
+    notes:document.getElementById('m-notes').value.trim(),
+  };
+  if(editingId){const idx=data.contacts.findIndex(x=>x.id===editingId);if(idx>-1)data.contacts[idx]={...data.contacts[idx],...contact};}
+  else data.contacts.push(contact);
+  closeModal();saveData();
+}
+
+function exportCSV(){
+  const h=['Name','URL','Type','Genres','Platform','Priority','Status','Date Sent','Notes'];
+  const rows=data.contacts.map(c=>[c.name,c.url,c.type,c.genres.join(';'),c.platform,c.priority,c.status,c.dateSent||'',(c.notes||'').replace(/,/g,';')].map(v=>`"${v}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`ardito-outreach-${data.release||'tracker'}.csv`;
+  a.click();
+}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('note-modal').addEventListener('click',function(e){if(e.target===this)closeNoteModal();});
+
+loadData();
+if(data.release)document.getElementById('release-name').value=data.release;
+render();
+</script>
+</body>
+</html>

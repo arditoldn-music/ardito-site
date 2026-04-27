@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Release Campaign Timeline — Ardito</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#e8e0d0;color:#1a1a1a;font-family:'DM Sans',sans-serif;min-height:100vh;padding:48px 24px 80px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:700px;margin:0 auto}
+nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:64px}
+.nav-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#0d0d0d}
+.nav-links a{color:#888;font-size:13px;margin-left:24px}
+.nav-links a:hover{color:#0d0d0d}
+.eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#888;margin-bottom:10px}
+h1{font-family:'Playfair Display',Georgia,serif;font-size:34px;color:#0d0d0d;margin-bottom:6px;line-height:1.15}
+h1 em{font-style:normal;color:#2d4a2d}
+.meta{font-size:13px;color:#888;margin-bottom:40px}
+.timeline{position:relative;padding-left:12px}
+.timeline::before{content:'';position:absolute;left:23px;top:20px;bottom:80px;width:2px;background:#ccc;z-index:0}
+.phase{position:relative;z-index:1;margin-bottom:10px}
+.phase-header{display:flex;align-items:center;gap:14px;cursor:pointer;background:#f8f4ee;border:2px solid #ddd;border-radius:8px;padding:13px 16px;transition:all .15s;user-select:none}
+.phase-header:hover{background:#fff}
+.phase-header.open{background:#fff}
+.dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:3px solid #e8e0d0}
+.phase-name{font-weight:700;font-size:14px;color:#0d0d0d}
+.phase-timing{font-size:11px;color:#888;margin-top:1px}
+.phase-arrow{font-size:12px;color:#aaa;font-weight:600;transition:transform .15s;margin-left:auto}
+.phase-header.open .phase-arrow{transform:rotate(180deg)}
+.modules{display:none;background:#fff;border:2px solid #ddd;border-top:none;border-radius:0 0 8px 8px;padding:20px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.modules.open{display:grid}
+.module{border-radius:6px;padding:12px 14px}
+.module-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.module ul{list-style:none}
+.module ul li{font-size:11px;color:#333;padding:3px 0 3px 12px;position:relative;line-height:1.5}
+.module ul li::before{content:'→';position:absolute;left:0;color:#aaa;font-size:10px}
+.nonneg{background:#fff;border:2px solid #c0392b;border-radius:8px;padding:20px;margin-top:28px}
+.nonneg-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#c0392b;margin-bottom:12px}
+.nonneg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px 20px}
+.nonneg-grid div{font-size:11px;color:#555;padding:3px 0 3px 16px;position:relative;line-height:1.5}
+.nonneg-grid div::before{content:'!';position:absolute;left:0;font-size:10px;color:#c0392b;font-weight:700}
+.cta-box{background:#0d0d0d;border-radius:10px;padding:28px;margin-top:32px;text-align:center}
+footer{margin-top:48px;padding-top:24px;border-top:1px solid #ccc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:15px;color:#0d0d0d}
+.footer-links a{color:#aaa;font-size:12px;margin-left:20px}
+.footer-links a:hover{color:#0d0d0d}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/index.html" class="nav-logo">Ardito</a>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="eyebrow">Ardito — Release management</div>
+  <h1>Release Campaign <em>Timeline</em></h1>
+  <p class="meta">Click any phase to expand. Work through in order.</p>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="nonneg">
+    <div class="nonneg-title">Non-negotiables — campaign does not start without these</div>
+    <div class="nonneg-grid">
+      <div>Professional press shot — not Instagram photos</div>
+      <div>Mixed and mastered audio — not demos</div>
+      <div>Single artwork 3000x3000px minimum</div>
+      <div>ISRC + UPC retrieved before sync or radio pitching</div>
+      <div>Spotify editorial pitch submitted minimum 7 days before release</div>
+      <div>Artist approval on ALL pitch copy before anything goes out</div>
+      <div>Private SoundCloud link for pre-release — not the pre-save</div>
+      <div>PRS + PPL registration confirmed — flag if missing</div>
+      <div>Master + publishing ownership confirmed in writing</div>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <div style="color:#b8933f;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Ardito</div>
+    <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:#e8e0d0;margin:0 0 10px">Want someone to run this with you?</h3>
+    <p style="color:#666;font-size:13px;line-height:1.7;margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto">The timeline is the what. Ardito is the how.</p>
+    <a href="/contact.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;border-radius:6px;padding:11px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase">Work with Ardito</a>
+  </div>
+
+  <footer>
+    <span class="footer-logo">Ardito</span>
+    <div class="footer-links">
+      <a href="/index.html">Home</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://instagram.com/ardito.ldn" target="_blank">Instagram</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const phases=[
+  {label:"Onboarding",timing:"Once per artist",color:"#2d4a2d",light:"#d4edda",
+    modules:[
+      {title:"Artist info",items:["All social handles + platform URLs","DistroKid / distributor login","Genre, sound references, influences","Artist bio (2 paragraphs)","Complete artist development questionnaire"]},
+      {title:"Rights & admin",items:["PRS for Music registration — flag if missing","PPL registration — flag if missing","Confirm 100% master ownership in writing","Confirm publishing ownership","Royalty splits with collaborators confirmed"]},
+      {title:"Access",items:["Spotify for Artists — get added as admin","Apple Music for Artists — get added as admin","YouTube — get added as manager","Mailchimp — add artist as user","Add to Ardito Command Centre roster"]},
+      {title:"Assets",items:["Professional press shot — flag if unavailable","EPK built or updated","Spotify bio + photo refreshed","Linktree set up","Instagram link in bio updated"]}
+    ]},
+  {label:"Admin & distribution",timing:"8 weeks out",color:"#c9a227",light:"#fff3cd",
+    modules:[
+      {title:"Files",items:["Final WAV — mixed & mastered","MP3 (320kbps)","Single artwork (3000x3000px minimum)","Instrumental version (yes/no)","Lyrics document saved","Spotify Canvas visual (8 sec looping)"]},
+      {title:"Distribution",items:["Submit via DistroKid (min 3 weeks before release)","ISRC code retrieved + logged","UPC code retrieved + logged","Pre-save / hyperfollow link live + tested","Private SoundCloud link created","MP3 on Google Drive (anyone with link)"]},
+      {title:"Platform pitches",items:["Spotify editorial pitch submitted (min 7 days before)","Apple Music Connect pitch submitted","Amazon Music profile updated","Check no major competing releases on date"]},
+      {title:"Press release",items:["Music press release written","Artist approved on press release copy","Saved and ready to attach to blog pitches"]}
+    ]},
+  {label:"Pitching",timing:"6 weeks out",color:"#1a3a5c",light:"#d6e4f0",
+    modules:[
+      {title:"Pitch copy",items:["Base pitch written (playlist / blog / radio versions)","Personalised openers written per blog","SubmitHub pitch (200 chars)","Subject line agreed","Artist approval on ALL copy before sending"]},
+      {title:"Blogs",items:["Line of Best Fit, Atwood, Aquarium Drunkard, Obscure Sound","A&R Factory, Louder Than War, The Alternative, Gorilla vs Bear","Turtle Tempo, It's All Indie, We All Want Someone","DIY Magazine, American Songwriter, CoS, This Song Is Sick"]},
+      {title:"Radio",items:["Denmark Street Radio (MP3 + artwork + press shot)","Radio Fandango (MP3 + artwork + press shot)","Soho Radio (MP3 + artwork)","BBC Introducing — uploader, needs UK postcode","Amazing Radio — post-release only"]},
+      {title:"Send strategy",items:["Schedule all pitches for Tuesday 9:27am","NOT Friday, NOT Monday","Log every submission in outreach tracker","Date sent, contact, status"]}
+    ]},
+  {label:"Content & email",timing:"3–4 weeks out",color:"#2d6b6b",light:"#d0ecec",
+    modules:[
+      {title:"Film in bulk",items:["Story behind the song (talking head)","Lyric / text overlay reels (x3)","Pre-save CTA clip","Release day announcement clip","3x artist Q&A clips","Behind the scenes / recording footage"]},
+      {title:"Email",items:["Mailing list imported to Mailchimp","Email 1 built — pre-save (send 3–7 days before)","Email 2 built — release day","Artist approval on both","ManyChat automation set up if applicable"]},
+      {title:"Profiles",items:["Spotify Canvas uploaded","Spotify bio + photo updated","Apple Music profile updated","Linktree updated with pre-save","Pre-save pinned in Instagram bio"]},
+      {title:"Gig outreach",items:["Research relevant venues / promoters","Draft outreach message","Send — build pipeline for post-release live push"]}
+    ]},
+  {label:"Release week",timing:"Day 0",color:"#c0392b",light:"#fdecea",
+    modules:[
+      {title:"3 days before",items:["Email 1 sent via Mailchimp","Pre-save post up on Ardito Instagram","Artist story reposted by Ardito"]},
+      {title:"Release day",items:["Confirm track live on all DSPs","Email 2 sent","Ardito release day post goes live","Playlist submissions — Indiemono, Soundplate, BIRP","Amazing Radio — upload then email music@amazingradio.com","SubmitHub free credits submitted","Groover campaign launched (if budget)","Spotify + Apple Music track URLs logged"]}
+    ]},
+  {label:"Post-release",timing:"2 weeks after",color:"#555",light:"#f0f0f0",
+    modules:[
+      {title:"Follow up",items:["Follow up on unanswered blog pitches — once only","Sync pitching begins (instrumental + pitch + clearance confirmed)","Screenshot coverage and share with artist"]},
+      {title:"Review",items:["Spotify for Artists — streams, playlist adds, Discover Weekly","Apple Music for Artists analytics","DistroKid payout confirmed","All placements logged in outreach tracker","Note what worked / what didn't"]},
+      {title:"Plan next",items:["Discuss next release with artist","Add to Command Centre release tracker","Start workflow again from Phase 2"]}
+    ]}
+];
+
+const tl=document.getElementById('timeline');
+phases.forEach((p,i)=>{
+  const phase=document.createElement('div');
+  phase.className='phase';
+  const header=document.createElement('div');
+  header.className='phase-header';
+  header.innerHTML=`<div class="dot" style="background:${p.color}"></div><div><div class="phase-name">${p.label}</div><div class="phase-timing">${p.timing}</div></div><div class="phase-arrow">▼</div>`;
+  const mods=document.createElement('div');
+  mods.className='modules';
+  mods.style.borderColor=p.color;
+  p.modules.forEach(m=>{
+    const mod=document.createElement('div');
+    mod.className='module';
+    mod.style.background=p.light;
+    mod.innerHTML=`<div class="module-title" style="color:${p.color}">${m.title}</div><ul>${m.items.map(it=>`<li>${it}</li>`).join('')}</ul>`;
+    mods.appendChild(mod);
+  });
+  header.addEventListener('click',()=>{
+    const isOpen=header.classList.contains('open');
+    header.classList.toggle('open',!isOpen);
+    header.style.borderColor=isOpen?'#ddd':p.color;
+    mods.classList.toggle('open',!isOpen);
+  });
+  phase.appendChild(header);
+  phase.appendChild(mods);
+  tl.appendChild(phase);
+});
+</script>
+</body>
+</html>

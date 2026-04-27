@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Strategy Call Intake — Ardito</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0d0;font-family:'DM Sans',sans-serif;min-height:100vh;padding:48px 24px 80px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:560px;margin:0 auto}
+nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:64px}
+.nav-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#e8e0d0}
+.nav-links a{color:#555;font-size:13px}
+.nav-links a:hover{color:#e8e0d0}
+.eyebrow{color:#b8933f;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px}
+h1{font-family:'Playfair Display',Georgia,serif;font-size:32px;line-height:1.2;margin-bottom:8px}
+.sub{color:#666;font-size:14px;line-height:1.7;margin-bottom:40px}
+.progress{display:flex;gap:6px;margin-bottom:36px}
+.prog-step{height:3px;flex:1;border-radius:2px;background:#1f1f1f;transition:background .3s}
+.prog-step.done{background:#2d4a2d}
+.prog-step.active{background:#b8933f}
+.page{display:none}
+.page.active{display:block}
+.section-label{color:#b8933f;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #1f1f1f}
+.field{margin-bottom:20px}
+.field label{display:block;color:#e8e0d0;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.field label span{color:#444;font-size:10px;letter-spacing:0;text-transform:none;margin-left:4px}
+.field input,.field select,.field textarea{width:100%;background:#111;border:1px solid #222;border-radius:6px;padding:12px 14px;color:#e8e0d0;font-size:14px;outline:none;transition:border .15s;color-scheme:dark;font-family:'DM Sans',sans-serif}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#2d4a2d}
+.field textarea{resize:vertical;min-height:90px;line-height:1.6}
+.field select option{background:#111}
+.field input::placeholder,.field textarea::placeholder{color:#333}
+.hint{color:#444;font-size:12px;margin-top:6px;line-height:1.5}
+.radio-group,.checklist{display:flex;flex-direction:column;gap:8px}
+.radio-option,.check-option{display:flex;align-items:center;gap:12px;background:#111;border:1px solid #222;border-radius:6px;padding:12px 14px;cursor:pointer;transition:border .15s}
+.radio-option:hover,.check-option:hover{border-color:#333}
+.radio-option.selected,.check-option.checked{border-color:#2d4a2d;background:#0d1a0d}
+.radio-dot{width:16px;height:16px;border-radius:50%;border:1px solid #333;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.radio-option.selected .radio-dot{border-color:#2d4a2d;background:#2d4a2d}
+.radio-dot::after{content:'';width:6px;height:6px;border-radius:50%;background:#e8e0d0;display:none}
+.radio-option.selected .radio-dot::after{display:block}
+.radio-text,.check-label{color:#ccc;font-size:13px}
+.check-box{width:16px;height:16px;border-radius:4px;border:1px solid #333;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#e8e0d0}
+.check-option.checked .check-box{background:#2d4a2d;border-color:#2d4a2d}
+.nav-btns{display:flex;gap:10px;margin-top:24px}
+.back-btn{background:none;border:1px solid #222;border-radius:6px;padding:14px 20px;color:#555;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;flex:1;font-family:'DM Sans',sans-serif}
+.next-btn{background:#2d4a2d;color:#e8e0d0;border:none;border-radius:6px;padding:14px 20px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;flex:2;font-family:'DM Sans',sans-serif}
+.success{display:none;text-align:center;padding:60px 20px}
+.check-big{width:56px;height:56px;border-radius:50%;background:#2d4a2d;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:24px}
+footer{margin-top:64px;padding-top:24px;border-top:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:15px;color:#e8e0d0}
+.footer-links{display:flex;gap:20px}
+.footer-links a{color:#444;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/index.html" class="nav-logo">Ardito</a>
+    <div class="nav-links">
+      <a href="/contact.html" style="color:#555;font-size:13px">Contact</a>
+    </div>
+  </nav>
+
+  <div class="eyebrow">Strategy call</div>
+  <h1>Tell us about your release.</h1>
+  <p class="sub">Fill this in before your call. The more detail you give, the more useful the session will be. Takes about 5 minutes.</p>
+
+  <div class="progress" id="progress">
+    <div class="prog-step active" id="p0"></div>
+    <div class="prog-step" id="p1"></div>
+    <div class="prog-step" id="p2"></div>
+    <div class="prog-step" id="p3"></div>
+    <div class="prog-step" id="p4"></div>
+  </div>
+
+  <div class="page active" id="page0">
+    <div class="section-label">About you</div>
+    <div class="field"><label>Your name</label><input type="text" id="name" placeholder="First name is fine"/></div>
+    <div class="field"><label>Artist name</label><input type="text" id="artist" placeholder="e.g. Omjine"/></div>
+    <div class="field"><label>Your email</label><input type="email" id="email" placeholder="So we can send you a summary after the call"/></div>
+    <div class="field">
+      <label>Genre <span>pick the closest one</span></label>
+      <select id="genre">
+        <option value="">Select...</option>
+        <option>Indie</option><option>Alternative</option><option>Pop</option>
+        <option>Soul</option><option>R&B</option><option>Rock</option>
+        <option>Singer-songwriter</option><option>Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Two artists you sound like</label><input type="text" id="sounds-like" placeholder="e.g. Cat Power and The xx"/></div>
+    <div class="nav-btns"><button class="next-btn" onclick="next(0)">Next</button></div>
+  </div>
+
+  <div class="page" id="page1">
+    <div class="section-label">The release</div>
+    <div class="field"><label>Track / EP / Album name</label><input type="text" id="track" placeholder="e.g. Precious One"/></div>
+    <div class="field"><label>Release date <span>approximate if not confirmed</span></label><input type="date" id="release-date" style="color-scheme:dark"/></div>
+    <div class="field">
+      <label>Link to the music <span>SoundCloud, Drive, Dropbox — anything we can stream</span></label>
+      <input type="text" id="music-link" placeholder="https://..."/>
+      <div class="hint">Make sure the link is accessible before the call. We'll listen before we speak.</div>
+    </div>
+    <div class="field">
+      <label>What is this song about? <span>in your own words</span></label>
+      <textarea id="song-about" placeholder="Where did it come from? What does it mean to you? What's the feeling behind it?"></textarea>
+    </div>
+    <div class="nav-btns">
+      <button class="back-btn" onclick="back(1)">Back</button>
+      <button class="next-btn" onclick="next(1)">Next</button>
+    </div>
+  </div>
+
+  <div class="page" id="page2">
+    <div class="section-label">Where you are right now</div>
+    <div class="field">
+      <label>Have you released music before?</label>
+      <div class="radio-group" id="released-before">
+        <div class="radio-option" onclick="selectRadio('released-before',this)"><div class="radio-dot"></div><span class="radio-text">Yes — I have previous releases</span></div>
+        <div class="radio-option" onclick="selectRadio('released-before',this)"><div class="radio-dot"></div><span class="radio-text">This is my first release</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Approximate following <span>combined across all platforms</span></label>
+      <div class="radio-group" id="following">
+        <div class="radio-option" onclick="selectRadio('following',this)"><div class="radio-dot"></div><span class="radio-text">Under 500</span></div>
+        <div class="radio-option" onclick="selectRadio('following',this)"><div class="radio-dot"></div><span class="radio-text">500–2k</span></div>
+        <div class="radio-option" onclick="selectRadio('following',this)"><div class="radio-dot"></div><span class="radio-text">2k–5k</span></div>
+        <div class="radio-option" onclick="selectRadio('following',this)"><div class="radio-dot"></div><span class="radio-text">5k–20k</span></div>
+        <div class="radio-option" onclick="selectRadio('following',this)"><div class="radio-dot"></div><span class="radio-text">20k+</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label>What do you already have ready?</label>
+      <div class="checklist" id="ready-checklist">
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Distributor set up (DistroKid, TuneCore etc.)</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Release date confirmed</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Artwork finalised</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Professional press shot</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Pre-save or streaming link</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Spotify editorial pitch submitted</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">SubmitHub account set up</span></div>
+        <div class="check-option" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Any press or playlist adds already secured</span></div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="back-btn" onclick="back(2)">Back</button>
+      <button class="next-btn" onclick="next(2)">Next</button>
+    </div>
+  </div>
+
+  <div class="page" id="page3">
+    <div class="section-label">Goals and challenges</div>
+    <div class="field">
+      <label>What does success look like for this release? <span>be specific</span></label>
+      <textarea id="success-field" placeholder="e.g. Get on one playlist with 10k+ followers. Get a blog feature. Hit 1,000 streams in the first week."></textarea>
+    </div>
+    <div class="field">
+      <label>What's your biggest worry about this release?</label>
+      <textarea id="worry" placeholder="Be honest — this is exactly what the call is for."></textarea>
+    </div>
+    <div class="field">
+      <label>What have you already tried that hasn't worked?</label>
+      <textarea id="tried" placeholder="Platforms, approaches, anything. No wrong answers."></textarea>
+    </div>
+    <div class="field">
+      <label>Budget for this campaign <span>approximate is fine</span></label>
+      <div class="radio-group" id="budget">
+        <div class="radio-option" onclick="selectRadio('budget',this)"><div class="radio-dot"></div><span class="radio-text">£0 — bootstrapping completely</span></div>
+        <div class="radio-option" onclick="selectRadio('budget',this)"><div class="radio-dot"></div><span class="radio-text">Up to £50</span></div>
+        <div class="radio-option" onclick="selectRadio('budget',this)"><div class="radio-dot"></div><span class="radio-text">£50–£150</span></div>
+        <div class="radio-option" onclick="selectRadio('budget',this)"><div class="radio-dot"></div><span class="radio-text">£150–£500</span></div>
+        <div class="radio-option" onclick="selectRadio('budget',this)"><div class="radio-dot"></div><span class="radio-text">£500+</span></div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="back-btn" onclick="back(3)">Back</button>
+      <button class="next-btn" onclick="next(3)">Next</button>
+    </div>
+  </div>
+
+  <div class="page" id="page4">
+    <div class="section-label">Last thing</div>
+    <div class="field">
+      <label>Anything else we should know before the call?</label>
+      <textarea id="anything-else" placeholder="Deadlines, personal context, something specific you want to cover."></textarea>
+    </div>
+    <div class="field">
+      <label>Your Instagram or main social handle</label>
+      <input type="text" id="social" placeholder="@yourusername"/>
+    </div>
+    <div class="field">
+      <label>How did you hear about Ardito?</label>
+      <select id="how-heard">
+        <option value="">Select...</option>
+        <option>Instagram</option><option>TikTok</option>
+        <option>Word of mouth</option><option>Listen to Better Shit (Tom's blog)</option>
+        <option>Google search</option><option>Other</option>
+      </select>
+    </div>
+    <div class="nav-btns">
+      <button class="back-btn" onclick="back(4)">Back</button>
+      <button class="next-btn" onclick="submit()">Submit</button>
+    </div>
+  </div>
+
+  <div class="success" id="success">
+    <div class="check-big">✓</div>
+    <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:24px;margin-bottom:12px">You're all set.</h2>
+    <p style="color:#666;font-size:14px;line-height:1.7">Thanks for filling this in. We'll read through everything before your call so we hit the ground running.<br><br>Questions in the meantime: <a href="mailto:ardito.ldn@gmail.com" style="color:#b8933f">ardito.ldn@gmail.com</a></p>
+    <a href="/index.html" style="display:inline-block;margin-top:28px;color:#555;font-size:12px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #333">Back to home</a>
+  </div>
+
+  <footer>
+    <span class="footer-logo">Ardito</span>
+    <div class="footer-links">
+      <a href="/index.html">Home</a>
+      <a href="mailto:ardito.ldn@gmail.com">Email</a>
+      <a href="https://instagram.com/ardito.ldn" target="_blank">Instagram</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+let currentPage=0;
+function selectRadio(groupId,el){
+  document.querySelectorAll('#'+groupId+' .radio-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  el.querySelector('.check-box').textContent=el.classList.contains('checked')?'✓':'';
+}
+function updateProgress(p){
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('p'+i);
+    el.classList.remove('done','active');
+    if(i<p)el.classList.add('done');
+    else if(i===p)el.classList.add('active');
+  }
+}
+function showPage(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page'+n);
+  if(pg)pg.classList.add('active');
+  updateProgress(n);
+  currentPage=n;
+  window.scrollTo(0,0);
+}
+function next(from){showPage(from+1);}
+function back(from){showPage(from-1);}
+function getChecked(id){
+  return[...document.querySelectorAll('#'+id+' .check-option.checked')].map(el=>el.querySelector('.check-label').textContent);
+}
+function getRadio(id){
+  const sel=document.querySelector('#'+id+' .radio-option.selected');
+  return sel?sel.querySelector('.radio-text').textContent:'';
+}
+function submit(){
+  const a={
+    name:document.getElementById('name').value,
+    artist:document.getElementById('artist').value,
+    email:document.getElementById('email').value,
+    genre:document.getElementById('genre').value,
+    soundsLike:document.getElementById('sounds-like').value,
+    track:document.getElementById('track').value,
+    releaseDate:document.getElementById('release-date').value,
+    musicLink:document.getElementById('music-link').value,
+    songAbout:document.getElementById('song-about').value,
+    releasedBefore:getRadio('released-before'),
+    following:getRadio('following'),
+    ready:getChecked('ready-checklist'),
+    success:document.getElementById('success-field').value,
+    worry:document.getElementById('worry').value,
+    tried:document.getElementById('tried').value,
+    budget:getRadio('budget'),
+    anythingElse:document.getElementById('anything-else').value,
+    social:document.getElementById('social').value,
+    howHeard:document.getElementById('how-heard').value,
+  };
+  const body=`ARDITO STRATEGY CALL INTAKE\n============================\n\nABOUT\nName: ${a.name}\nArtist: ${a.artist}\nEmail: ${a.email}\nGenre: ${a.genre}\nSounds like: ${a.soundsLike}\nSocial: ${a.social}\nHow heard: ${a.howHeard}\n\nTHE RELEASE\nTrack: ${a.track}\nRelease date: ${a.releaseDate}\nMusic link: ${a.musicLink}\n\nWhat the song is about:\n${a.songAbout}\n\nWHERE THEY ARE\nReleased before: ${a.releasedBefore}\nFollowing: ${a.following}\nBudget: ${a.budget}\n\nAlready have ready:\n${a.ready.length?a.ready.join('\n'):'Nothing ticked'}\n\nGOALS AND CHALLENGES\nWhat success looks like:\n${a.success}\n\nBiggest worry:\n${a.worry}\n\nWhat they've tried:\n${a.tried}\n\nANYTHING ELSE\n${a.anythingElse}`.trim();
+  window.location.href=`mailto:ardito.ldn@gmail.com?subject=Strategy Call Intake — ${encodeURIComponent(a.artist||a.name)}&body=${encodeURIComponent(body)}`;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('progress').style.display='none';
+  document.getElementById('success').style.display='block';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

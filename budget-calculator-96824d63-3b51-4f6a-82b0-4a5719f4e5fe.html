@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Release Budget Calculator — Ardito</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0d0;font-family:'DM Sans',sans-serif;min-height:100vh;padding:48px 24px 80px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:580px;margin:0 auto}
+nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:64px}
+.nav-logo{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:#e8e0d0}
+.nav-links a{color:#555;font-size:13px;margin-left:24px}
+.nav-links a:hover{color:#e8e0d0}
+.eyebrow{color:#b8933f;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px}
+h1{font-family:'Playfair Display',Georgia,serif;font-size:34px;line-height:1.15;margin-bottom:10px}
+.sub{color:#666;font-size:14px;line-height:1.7;margin-bottom:40px}
+.progress{display:flex;gap:6px;margin-bottom:32px}
+.prog-step{height:3px;flex:1;border-radius:2px;background:#1f1f1f;transition:background .3s}
+.prog-step.done{background:#2d4a2d}
+.prog-step.active{background:#b8933f}
+.card{background:rgba(232,224,208,.04);border:1px solid rgba(232,224,208,.08);border-radius:12px;padding:24px;margin-bottom:14px}
+.q-num{font-size:12px;color:#444;margin-bottom:6px}
+.q-text{font-size:17px;font-weight:500;line-height:1.4;margin-bottom:6px}
+.q-sub{font-size:13px;color:#666;margin-bottom:20px}
+.opt-btn{width:100%;padding:13px 16px;background:rgba(232,224,208,.04);border:1.5px solid rgba(232,224,208,.1);border-radius:8px;color:#e8e0d0;font-size:14px;text-align:left;cursor:pointer;margin-bottom:8px;transition:all .15s;font-family:'DM Sans',sans-serif}
+.opt-btn:hover{background:rgba(232,224,208,.08);border-color:rgba(232,224,208,.2)}
+.slider-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.slider-val{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700}
+.slider-muted{font-size:13px;color:#555}
+input[type=range]{width:100%;accent-color:#2d4a2d;cursor:pointer;margin-bottom:16px}
+.continue-btn{width:100%;background:#e8e0d0;color:#0d0d0d;border:none;border-radius:6px;padding:14px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif}
+.back-link{background:none;border:none;color:#444;font-size:13px;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif}
+.results{display:none}
+.budget-card{background:rgba(45,74,45,.2);border:1px solid rgba(45,74,45,.4);border-radius:12px;padding:24px;margin-bottom:20px}
+.big-num{font-family:'Playfair Display',Georgia,serif;font-size:44px;font-weight:700;margin:4px 0}
+.advice-card{background:rgba(232,224,208,.04);border:1px solid rgba(232,224,208,.08);border-radius:10px;padding:20px;margin-bottom:20px}
+.result-item{background:rgba(232,224,208,.04);border:1px solid rgba(232,224,208,.07);border-radius:10px;padding:18px 20px;margin-bottom:10px}
+.result-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.result-name{font-size:15px;font-weight:500}
+.tag{display:inline-block;border-radius:99px;padding:2px 10px;font-size:10px;font-weight:700;letter-spacing:1.5px;margin-top:4px}
+.result-amount{font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;text-align:right}
+.result-pct{font-size:11px;color:#444;text-align:right}
+.result-note{font-size:13px;color:#777;line-height:1.6}
+.cta-green{background:#0f1a0f;border:1px solid #1a2e1a;border-radius:10px;padding:28px;text-align:center;margin-top:24px}
+.restart-btn{background:none;border:none;color:#2a2a2a;font-size:11px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;margin-top:20px;display:block;margin-left:auto;margin-right:auto;font-family:'DM Sans',sans-serif}
+footer{margin-top:64px;padding-top:24px;border-top:1px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-size:15px;color:#e8e0d0}
+.footer-links a{color:#444;font-size:12px;margin-left:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="/index.html" class="nav-logo">Ardito</a>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="eyebrow">Free tool</div>
+  <h1>Release Budget Calculator</h1>
+  <p class="sub">Answer four questions. Get a real breakdown of where your money should go.</p>
+
+  <div class="progress" id="progress">
+    <div class="prog-step active" id="p0"></div>
+    <div class="prog-step" id="p1"></div>
+    <div class="prog-step" id="p2"></div>
+    <div class="prog-step" id="p3"></div>
+  </div>
+
+  <div id="questions">
+    <div class="card" id="q0">
+      <div class="q-num">Question 1 of 4</div>
+      <div class="q-text">What's your total release budget?</div>
+      <div class="q-sub">Be honest. This tool is only useful if the number is real.</div>
+      <div class="slider-row">
+        <span class="slider-muted">£0</span>
+        <span class="slider-val" id="sliderVal">£150</span>
+        <span class="slider-muted">£1,000</span>
+      </div>
+      <input type="range" min="0" max="1000" step="10" value="150" id="budgetSlider" oninput="document.getElementById('sliderVal').textContent='£'+this.value"/>
+      <button class="continue-btn" onclick="setAnswer('budget', parseInt(document.getElementById('budgetSlider').value)); showQ(1)">Continue</button>
+    </div>
+
+    <div class="card" id="q1" style="display:none">
+      <div class="q-num">Question 2 of 4</div>
+      <div class="q-text">Is your track already mixed and mastered?</div>
+      <button class="opt-btn" onclick="setAnswer('track_ready','yes');showQ(2)">Yes, it's done</button>
+      <button class="opt-btn" onclick="setAnswer('track_ready','no');showQ(2)">No, still needs work</button>
+      <button class="opt-btn" onclick="setAnswer('track_ready','unsure');showQ(2)">Not sure</button>
+      <button class="back-link" onclick="showQ(0)">Back</button>
+    </div>
+
+    <div class="card" id="q2" style="display:none">
+      <div class="q-num">Question 3 of 4</div>
+      <div class="q-text">What's your main goal for this release?</div>
+      <button class="opt-btn" onclick="setAnswer('goal','playlists');showQ(3)">Get on playlists</button>
+      <button class="opt-btn" onclick="setAnswer('goal','press');showQ(3)">Press and blog coverage</button>
+      <button class="opt-btn" onclick="setAnswer('goal','socials');showQ(3)">Build my audience on socials</button>
+      <button class="opt-btn" onclick="setAnswer('goal','all');showQ(3)">All of the above</button>
+      <button class="back-link" onclick="showQ(1)">Back</button>
+    </div>
+
+    <div class="card" id="q3" style="display:none">
+      <div class="q-num">Question 4 of 4</div>
+      <div class="q-text">Which best describes you?</div>
+      <button class="opt-btn" onclick="setAnswer('stage','first');showResults()">First ever release</button>
+      <button class="opt-btn" onclick="setAnswer('stage','some');showResults()">Released before but not seen much traction</button>
+      <button class="opt-btn" onclick="setAnswer('stage','growing');showResults()">I have an audience and want to grow it</button>
+      <button class="back-link" onclick="showQ(2)">Back</button>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <footer>
+    <span class="footer-logo">Ardito</span>
+    <div class="footer-links">
+      <a href="/index.html">Home</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://instagram.com/ardito.ldn" target="_blank">Instagram</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const CATS=[
+  {id:"mixing",label:"Mixing & mastering",tag:"NON-NEGOTIABLE",tagBg:"rgba(192,57,43,.2)",tagColor:"#e07060",icon:"🎚",
+    tiers:[{max:100,amount:()=>80,note:"Look for emerging engineers on SoundBetter or ask your network. £60-80 gets you something solid."},{max:300,amount:()=>120,note:"£100-150 opens up more experienced engineers. Worth stretching to here if you can."},{max:500,amount:()=>180,note:"At this level you should get a proper mix and a separate master. Don't bundle them cheaply."},{max:Infinity,amount:()=>200,note:"Allocate £180-220 and don't compromise. The rest of your budget works harder when the track sounds right."}]},
+  {id:"pr",label:"Blog & radio outreach",tag:"HIGH PRIORITY",tagBg:"rgba(45,74,45,.3)",tagColor:"#6aad6a",icon:"📻",
+    tiers:[{max:100,amount:()=>0,note:"At this budget, do it yourself. Free SubmitHub credits and direct email to blogs costs nothing."},{max:300,amount:()=>50,note:"£40-60 on SubmitHub Premium unlocks 230+ more curators. Worth it for one serious outreach push."},{max:500,amount:()=>100,note:"Consider a small Groover campaign alongside SubmitHub. Good European blog and playlist coverage."},{max:Infinity,amount:b=>Math.round(b*.18),note:"Allocate around 15-20% here. A one-off PR consultant for a day rate can be worth it at this level."}]},
+  {id:"groover",label:"Playlist pitching",tag:"RECOMMENDED",tagBg:"rgba(125,107,45,.25)",tagColor:"#c9a227",icon:"🎵",
+    tiers:[{max:100,amount:()=>0,note:"Skip for now. Use free SubmitHub credits instead."},{max:300,amount:()=>40,note:"£30-50 gets you 15-25 Groover pitches. Target carefully — quality over volume."},{max:500,amount:()=>80,note:"£70-90 is a solid Groover campaign. Around 35-45 curators, enough to get meaningful data back."},{max:Infinity,amount:b=>Math.round(b*.15),note:"Scale this as budget grows. Groover compounds — curators who add you once are more likely to take your next pitch."}]},
+  {id:"visuals",label:"Artwork & visuals",tag:"IMPORTANT",tagBg:"rgba(45,58,107,.3)",tagColor:"#7080c9",icon:"🎨",
+    tiers:[{max:100,amount:()=>20,note:"Canva Pro is £11/month and gives you professional templates. Prioritise this over nothing."},{max:300,amount:()=>50,note:"£40-60 can get you a freelance designer for a single cover. Fiverr and local art students are good options."},{max:500,amount:()=>80,note:"Budget for both artwork and a basic press shot session. You'll use the press shot across every release."},{max:Infinity,amount:()=>120,note:"Invest in a proper press shot session. A good photographer for a half day runs £100-150 and gives you images across multiple releases."}]},
+  {id:"ads",label:"Social media ads",tag:"OPTIONAL",tagBg:"rgba(80,80,80,.2)",tagColor:"#777",icon:"📱",
+    tiers:[{max:100,amount:()=>0,note:"Don't bother at this budget. Every pound needs to work harder elsewhere."},{max:300,amount:()=>0,note:"Still not the priority. Cover the track and outreach first."},{max:500,amount:()=>50,note:"If everything else is covered, £40-60 on a boosted post around release day can help."},{max:Infinity,amount:b=>Math.round(b*.1),note:"Around 10% is reasonable once the rest is solid. Test small, learn, then scale."}]}
+];
+
+const answers={budget:150};
+function setAnswer(k,v){answers[k]=v;}
+
+function showQ(n){
+  document.querySelectorAll('[id^=q]').forEach(el=>el.style.display='none');
+  const el=document.getElementById('q'+n);
+  if(el)el.style.display='block';
+  for(let i=0;i<4;i++){
+    const p=document.getElementById('p'+i);
+    p.className='prog-step'+(i<n?' done':i===n?' active':'');
+  }
+  window.scrollTo(0,0);
+}
+
+function getTier(cat,budget){
+  return cat.tiers.find(t=>budget<t.max)||cat.tiers[cat.tiers.length-1];
+}
+
+function showResults(){
+  document.getElementById('questions').style.display='none';
+  document.getElementById('progress').style.display='none';
+  const b=answers.budget||0;
+  const breakdown=CATS.map(c=>{const t=getTier(c,b);return{...c,amount:t.amount(b),note:t.note};});
+  const total=breakdown.reduce((s,c)=>s+c.amount,0);
+  const unalloc=Math.max(0,b-total);
+
+  const advice=[];
+  if(answers.track_ready==='no'||answers.track_ready==='unsure')
+    advice.push("Your track needs to be mixed and mastered before anything else. Promoting a demo-quality recording is one of the most common mistakes first-time releasers make.");
+  if(answers.stage==='first')
+    advice.push("For a first release, focus on laying the groundwork: a good track, clean artwork, and one focused outreach push. Don't spread the budget thin.");
+  if(answers.goal==='playlists')
+    advice.push("Playlist pitching works best when you pitch early — at least 4 weeks before release. Spotify editorial is free via your distributor. Groover and SubmitHub cover independent curators.");
+  if(answers.goal==='press')
+    advice.push("Blog outreach is relationship-based. A short, direct pitch with a good press shot and a clear story gets more responses than a long bio.");
+  if(b<100)
+    advice.push("At this budget, DIY as much as possible. Free tools go a long way when used well.");
+
+  const active=breakdown.filter(c=>c.amount>0);
+  const inactive=breakdown.filter(c=>c.amount===0);
+
+  let html=`
+    <div class="budget-card">
+      <div style="color:#b8933f;font-size:10px;letter-spacing:3px;text-transform:uppercase">Your budget</div>
+      <div class="big-num">£${b}</div>
+      <div style="font-size:13px;color:#666">£${total} recommended spend${unalloc>0?' · £'+unalloc+' reserve':' · fully allocated'}</div>
+    </div>`;
+
+  if(advice.length){
+    html+=`<div class="advice-card"><div style="color:#555;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Based on your answers</div>`;
+    advice.slice(0,2).forEach(msg=>{
+      html+=`<div style="display:flex;gap:10px;margin-bottom:10px"><span style="color:#2d4a2d;font-size:16px;flex-shrink:0">→</span><p style="margin:0;font-size:13px;line-height:1.6;color:rgba(232,224,208,.85)">${msg}</p></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  html+=`<div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#444;margin-bottom:12px">Spend in this order</div>`;
+
+  active.forEach(c=>{
+    html+=`<div class="result-item">
+      <div class="result-top">
+        <div>
+          <div class="result-name">${c.label}</div>
+          <span class="tag" style="background:${c.tagBg};color:${c.tagColor}">${c.tag}</span>
+        </div>
+        <div>
+          <div class="result-amount">£${Math.round(c.amount)}</div>
+          <div class="result-pct">${b>0?Math.round((c.amount/b)*100):0}% of budget</div>
+        </div>
+      </div>
+      <div class="result-note">${c.note}</div>
+    </div>`;
+  });
+
+  if(inactive.length){
+    html+=`<div class="result-item" style="opacity:.4;margin-top:6px">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#444;margin-bottom:8px">Not recommended at this budget</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">${inactive.map(c=>`<span style="font-size:13px">${c.label}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  html+=`<div class="cta-green">
+    <div style="color:#b8933f;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">Ardito</div>
+    <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:20px;color:#e8e0d0;margin:0 0 10px">Want help putting this into action?</h3>
+    <p style="color:#666;font-size:13px;line-height:1.7;margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto">Ardito works with independent artists to plan and run release campaigns. From the first pitch to release day and beyond.</p>
+    <a href="/contact.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;border-radius:6px;padding:11px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase">Talk to us</a>
+  </div>
+  <button class="restart-btn" onclick="restart()">Start again</button>`;
+
+  const r=document.getElementById('results');
+  r.innerHTML=html;
+  r.style.display='block';
+  window.scrollTo(0,0);
+}
+
+function restart(){
+  Object.keys(answers).forEach(k=>delete answers[k]);
+  answers.budget=150;
+  document.getElementById('budgetSlider').value=150;
+  document.getElementById('sliderVal').textContent='£150';
+  document.getElementById('results').style.display='none';
+  document.getElementById('results').innerHTML='';
+  document.getElementById('questions').style.display='block';
+  document.getElementById('progress').style.display='flex';
+  showQ(0);
+}
+</script>
+</body>
+</html>
