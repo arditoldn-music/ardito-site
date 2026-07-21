@@ -483,7 +483,15 @@ function logout(){sessionStorage.removeItem('aa');location.reload();}
 async function init(){
   aLib=[];aArt=[];aRel=[];aIdeas=[];
   setG();
-  [aLib,aArt,aRel,aIdeas]=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc')]);
+  try{
+    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc')]);
+    [aLib,aArt,aRel,aIdeas]=results.map(r=>Array.isArray(r)?r:[]);
+    const bad=results.find(r=>!Array.isArray(r));
+    if(bad)console.error('Ardito dashboard: unexpected response from Supabase',bad);
+  }catch(e){
+    console.error('Ardito dashboard failed to load data:',e);
+    document.getElementById('greet').insertAdjacentHTML('afterend','<div style="color:#c87941;font-size:13px;margin-top:8px;">Couldn\'t load your data. Open the browser console (right click, Inspect, Console tab) to see why.</div>');
+  }
   const savedPage=sessionStorage.getItem('ap')||'home';
   nav(savedPage);
 }
