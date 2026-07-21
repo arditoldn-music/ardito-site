@@ -5,13 +5,29 @@ on:
     - cron: '0 9 * * 1,4'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Ping Supabase
         run: |
           curl -s -o /dev/null -w "%{http_code}" \
             "https://rtgqiblekgeriehyapnw.supabase.co/rest/v1/artists?select=id&limit=1" \
             -H "apikey: sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN" \
             -H "Authorization: Bearer sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN"
+
+      - name: Record last ping
+        run: echo "Last ping: $(date -u)" > .github/last-ping.txt
+
+      - name: Commit timestamp
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/last-ping.txt
+          git commit -m "keep-alive ping $(date -u +%Y-%m-%d)" || echo "nothing to commit"
+          git push
