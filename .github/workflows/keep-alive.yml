@@ -22,7 +22,8 @@ jobs:
             -H "Authorization: Bearer sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN"
 
       - name: Record last ping
-        run: echo "Last ping: $(date -u)" > .github/last-ping.txt
+        run: |
+          echo "Last ping: $(date -u)" > .github/last-ping.txt
 
       - name: Commit timestamp
         run: |
