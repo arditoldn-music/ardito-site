@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Case 002 — Omjine | Ardito</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0d0d0d;--cream:#e8e0d0;--green-dark:#1a2e1a;--green-mid:#2d4a2d;--warm-dark:#1c1a14}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(232,224,208,0.08);padding:0 40px}
+.nav-inner{max-width:800px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
+.nav-logo{font-family:'Playfair Display',serif;font-size:18px;color:#e8e0d0;letter-spacing:2px;text-decoration:none}
+.nav-back{font-size:13px;color:rgba(232,224,208,0.5);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--cream)}
+
+.page{max-width:800px;margin:0 auto;padding:120px 40px 80px}
+
+.case-label{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:16px}
+.case-title{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--cream);line-height:1.2;margin-bottom:8px}
+.case-sub{font-size:15px;color:rgba(232,224,208,0.5);margin-bottom:48px}
+
+.divider{height:1px;background:rgba(232,224,208,0.07);margin:48px 0}
+
+h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--cream);margin-bottom:16px;margin-top:48px}
+
+p{font-size:14px;color:rgba(232,224,208,0.75);line-height:1.9;margin-bottom:18px}
+
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:rgba(232,224,208,0.07);border:1px solid rgba(232,224,208,0.07);border-radius:8px;overflow:hidden;margin-bottom:48px}
+.meta-item{background:var(--black);padding:16px 20px}
+.meta-key{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,224,208,0.3);margin-bottom:6px}
+.meta-val{font-size:13px;color:var(--cream)}
+
+.contacts-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.contact-tag{background:rgba(232,224,208,0.05);border:1px solid rgba(232,224,208,0.1);border-radius:4px;padding:4px 10px;font-size:12px;color:rgba(232,224,208,0.6)}
+
+.table{width:100%;border-collapse:collapse;margin-bottom:18px}
+.table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(232,224,208,0.3);text-align:left;padding:8px 0;border-bottom:1px solid rgba(232,224,208,0.07)}
+.table td{font-size:13px;color:rgba(232,224,208,0.7);padding:10px 0;border-bottom:1px solid rgba(232,224,208,0.05);vertical-align:top}
+.table td:first-child{color:var(--cream);width:180px;padding-right:16px}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;margin:24px 0}
+.stat-box{background:#111;border:1px solid rgba(232,224,208,0.07);border-radius:8px;padding:20px}
+.stat-n{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--cream);margin-bottom:4px}
+.stat-l{font-size:11px;color:rgba(232,224,208,0.35);letter-spacing:0.5px}
+
+.learned-item{border-left:2px solid #2d4a2d;padding:4px 0 4px 20px;margin-bottom:20px}
+.learned-item strong{display:block;font-size:13px;color:var(--cream);margin-bottom:4px;font-weight:500}
+.learned-item p{margin:0;font-size:13px}
+
+.cta{margin-top:64px;padding:40px;background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;text-align:center}
+.cta p{color:rgba(232,224,208,0.5);font-size:13px;margin-bottom:20px}
+.cta a{display:inline-block;background:#2d4a2d;color:#e8e0d0;font-size:13px;font-weight:500;padding:12px 28px;border-radius:4px;text-decoration:none;letter-spacing:0.5px}
+.cta a:hover{background:#3d6a3d}
+
+footer{border-top:1px solid rgba(232,224,208,0.07);padding:32px 40px;text-align:center;font-size:12px;color:rgba(232,224,208,0.25);margin-top:80px}
+
+@media(max-width:600px){
+  .page{padding:100px 24px 60px}
+  nav{padding:0 24px}
+  .case-title{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Ardito</a>
+    <a href="/" class="nav-back">← Back</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="case-label">Case 002</div>
+  <h1 class="case-title">Omjine — Sweethearting</h1>
+  <p class="case-sub">The second campaign, built with the runway the first one didn't have.</p>
+
+  <div class="meta-grid">
+    <div class="meta-item"><div class="meta-key">Artist</div><div class="meta-val">Omjine</div></div>
+    <div class="meta-item"><div class="meta-key">Location</div><div class="meta-val">Seoul, South Korea</div></div>
+    <div class="meta-item"><div class="meta-key">Release date</div><div class="meta-val">10 July 2026</div></div>
+    <div class="meta-item"><div class="meta-key">Lead time</div><div class="meta-val">~5 weeks</div></div>
+    <div class="meta-item"><div class="meta-key">Sound</div><div class="meta-val">Yeah Yeah Yeahs, The xx</div></div>
+    <div class="meta-item"><div class="meta-key">Fee</div><div class="meta-val">Pro bono</div></div>
+  </div>
+
+  <h2>The Artist</h2>
+  <p>Omjine returned for her second release under Ardito's management, this time with a working relationship already in place. Precious One had given both sides a sense of what a campaign actually involves, what she's comfortable with content-wise, and where the gaps in her own setup were.</p>
+  <p>KOMCA registration was already sorted from the first campaign. This time the groundwork was pitching infrastructure and lead time, not artist admin.</p>
+
+  <div class="divider"></div>
+
+  <h2>The Brief</h2>
+  <p>Sweethearting is about being told you're too much by someone who keeps charming you anyway. The refrain, "how dramatic, sweethearting me," carries the whole idea, someone playing along with their own criticism because the attention is still worth it. Sonically it moves toward Yeah Yeah Yeahs and The xx, a shift from Precious One's more sparse, Cat Power-leaning sound.</p>
+  <p>Where Precious One was a two week stress test, this campaign had roughly five weeks of lead time. That gap is the throughline of everything that follows.</p>
+
+  <div class="divider"></div>
+
+  <h2>What Ardito Did</h2>
+
+  <p>Full pitches went out to UK radio and blogs, followed by individual Tuesday morning follow-ups rather than a single blast and silence. A separate Instagram DM push ran in parallel, direct outreach to radio stations and playlist curators who don't take email pitches. Around 40 posts went into UK-based Facebook music promotion groups, each one worded differently rather than copy-pasted.</p>
+
+  <p>Beyond the standard press list, outreach extended into Omjine's own academic network, old BIMM contacts, a former BIMM lecturer, and BIMM's alumni mailing list. Two Mailchimp sends went to her existing list, one pre-release, one on release day.</p>
+
+  <div class="contacts-list">
+    <span class="contact-tag">Amazing Radio</span>
+    <span class="contact-tag">BBC Introducing</span>
+    <span class="contact-tag">Soho Radio</span>
+    <span class="contact-tag">Radio Wigwam</span>
+    <span class="contact-tag">Fresh on the Net</span>
+    <span class="contact-tag">DIY</span>
+    <span class="contact-tag">Stereogum</span>
+    <span class="contact-tag">Crack</span>
+    <span class="contact-tag">Gigslutz</span>
+    <span class="contact-tag">Happy Mag</span>
+    <span class="contact-tag">ByteFM</span>
+    <span class="contact-tag">FBi Radio</span>
+    <span class="contact-tag">Gecko Radio</span>
+  </div>
+
+  <p>A Meta ads campaign was planned for the post-release window, £50 budget, Omjine funding it directly and paying, Ardito managing targeting and creative from her Meta Business account. Personal outreach to friends and family asking for streams and follows ran alongside everything else, a channel Precious One didn't lean on.</p>
+
+  <div class="divider"></div>
+
+  <h2>Platform Access</h2>
+
+  <table class="table">
+    <thead><tr><th>Platform</th><th>Access</th></tr></thead>
+    <tbody>
+      <tr><td>Spotify for Artists</td><td>Editor (Ardito)</td></tr>
+      <tr><td>Apple Music for Artists</td><td>Admin (Ardito)</td></tr>
+      <tr><td>YouTube</td><td>Manager</td></tr>
+      <tr><td>DistroKid</td><td>Direct — Omjine shared details</td></tr>
+      <tr><td>Mailchimp</td><td>Omjine added as user under Ardito account</td></tr>
+      <tr><td>Meta Business Suite</td><td>Laura added as second admin — Omjine owns the account and pays</td></tr>
+    </tbody>
+  </table>
+
+  <div class="divider"></div>
+
+  <h2>Results</h2>
+  <p>[Placeholder — drop in current streams, monthly listeners and save rate once the latest Spotify for Artists screenshot comes through. As of the most recent check, streams sat well below Spotify's 1,000-in-28-days threshold for display ads, which is its own result worth noting below.]</p>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-n">7</div><div class="stat-l">Confirmed press and radio wins</div></div>
+    <div class="stat-box"><div class="stat-n">UK · US · KR</div><div class="stat-l">Top listener countries</div></div>
+    <div class="stat-box"><div class="stat-n">~5wk</div><div class="stat-l">Lead time, vs 2wk last time</div></div>
+  </div>
+
+  <p>Unlike Precious One, this campaign landed real coverage. Amazing Radio gave it UK and USA airplay, a First Spin, and a top 3 place on the Audition Poll. Amazing Indie streamed it. BBC Introducing's upload was listened to by programming. Radio Wigwam, FBi Radio in Australia, and Gecko Radio all played it. A Korean Indie outlet ran a release-day feature, and ByteFM replied positively to a pitch written in German.</p>
+
+  <p>Listener geography also told its own story. London led the way, but Seoul, Kuala Lumpur, and Singapore all showed up in the top cities, a direct reflection of Omjine's own background rather than a generic UK indie audience.</p>
+
+  <div class="divider"></div>
+
+  <h2>What Ardito Learned</h2>
+
+  <div class="learned-item">
+    <strong>Lead time changes what's possible.</strong>
+    <p>Precious One's 15 pitches got zero replies. This campaign, run with roughly five weeks instead of two, landed seven confirmed wins across radio and press. Same artist, same pitching quality, different runway.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>Press photo is still the bottleneck, just a smaller one.</strong>
+    <p>Only Instagram photos were available this time round rather than a proper shoot. Workable, but not ideal, and confirmed early rather than discovered mid-campaign like last time.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>Follower count gates more than people expect.</strong>
+    <p>Spotify's display ad tools need 1,000 streams in 28 days and Marquee needs 5,000 monthly listeners. An artist at this stage simply can't access either yet, regardless of campaign quality. Meta ads, where spend and targeting are fully controllable, became the only paid channel actually available.</p>
+  </div>
+
+  <div class="learned-item">
+    <strong>Radio wins can happen with zero paid spend.</strong>
+    <p>Every confirmed placement on this campaign came from pitching, not advertising. The Meta ads budget is there to build on that momentum, not create it from nothing.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>What Comes Next</h2>
+  <p>Soundplate, BIRP, and Indiemono submissions are still pending, queued for once momentum from this write-up settles. The Meta ads campaign runs through the post-release window rather than stopping at release week, tracking the full 28-day algorithmic cycle rather than just the first few days.</p>
+
+  <div class="cta">
+    <p>Working on a release? This is what a properly managed campaign looks like.</p>
+    <a href="mailto:ardito.ldn@gmail.com?subject=I'd like to work with Ardito">Get in touch</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Ardito. London. <a href="/" style="color:rgba(232,224,208,0.3);text-decoration:none;margin-left:16px">ardito.co.uk</a></footer>
+
+</body>
+</html>
