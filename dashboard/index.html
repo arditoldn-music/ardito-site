@@ -242,7 +242,7 @@ textarea{resize:vertical;min-height:80px}
       <div class="ni" onclick="nav('ideas')" id="nav-ideas"><span class="ni-icon">💡</span>Post Ideas</div>
     </div>
     <div class="ns"><div class="nl">Intel</div><div class="ni" onclick="nav('news')" id="nav-news"><span class="ni-icon">📰</span>News Feed</div>
-      <div class="ni" onclick="nav('brain')" id="nav-brain"><span class="ni-icon">🧠</span>Ardito Brain</div>
+      <div class="ni" onclick="nav('brain')" id="nav-brain"><span class="ni-icon">🧠</span>Ardita</div>
     </div>
     <div class="ns"><div class="nl">Business</div>
       <div class="ni" onclick="nav('income')" id="nav-income"><span class="ni-icon">💷</span>Income Tracker</div>
@@ -329,7 +329,7 @@ textarea{resize:vertical;min-height:80px}
     <!-- BRAIN -->
     <div class="page" id="page-brain">
       <div class="ph">
-        <div><div class="pt">Ardito Brain</div><div class="ps">Independent thinking on what matters today</div></div>
+        <div><div class="pt">Ardita</div><div class="ps">Independent thinking on what matters today</div></div>
         <button class="btn bg" onclick="runBrain()" id="brain-run-btn">Refresh</button>
       </div>
       <div id="brain-output">
@@ -407,6 +407,7 @@ textarea{resize:vertical;min-height:80px}
   <div class="md">
     <div class="mt" id="rmt">New release</div>
     <div class="fr"><div class="fg"><label class="fl">Release name</label><input type="text" id="r-name"></div><div class="fg"><label class="fl">Artist</label><select id="r-art"></select></div></div>
+    <div class="fg"><label class="fl">Tier</label><select id="r-tier"><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></select><div class="lerr" id="r-tier-note" style="display:none">Tier is locked once a release is created, since the task list is generated at creation time.</div></div>
     <div class="fr"><div class="fg"><label class="fl">Release date</label><input type="date" id="r-date"></div><div class="fg"><label class="fl">Campaign start</label><input type="date" id="r-cs"></div></div>
     <div class="fr"><div class="fg"><label class="fl">Distributor</label><input type="text" id="r-dist"></div><div class="fg"><label class="fl">ISRC</label><input type="text" id="r-isrc"></div></div>
     <div class="fr"><div class="fg"><label class="fl">Status</label><select id="r-stat"><option>In Progress</option><option>Released</option><option>On Hold</option></select></div><div class="fg"><label class="fl">Pre-save link</label><input type="text" id="r-pre"></div></div>
@@ -453,7 +454,7 @@ textarea{resize:vertical;min-height:80px}
 const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN',PW='ArditoIsTheBest';
 let cM=new Date().getMonth(),cY=new Date().getFullYear(),cvMode='cal';
 let eLib=null,eArt=null,eRel=null,eIdea=null;
-let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[];
+let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[];
 let ePay=null;
 
 const RW=[
@@ -466,6 +467,53 @@ const RW=[
   {k:'rw',l:'Release Week — Go live + monitor',tasks:[{k:'release_day_content',l:'Post release day content across all channels'},{k:'monitor_streams',l:'Monitor streams + saves in Spotify for Artists'},{k:'engage_comments',l:'Engage with every comment, share and tag'},{k:'check_radar',l:'Check Release Radar delivery to followers'},{k:'thank_supporters',l:'Thank supporters publicly'},{k:'daily_content',l:'Post at least one piece of content every day this week'}]},
   {k:'post',l:'Post-release — Follow through',tasks:[{k:'apple_editorial',l:'Pitch to Apple Music editorial via Apple Music for Artists'},{k:'amazon_playlists',l:'Submit to Amazon Music playlists'},{k:'spotify_data',l:'Review Spotify for Artists data — saves, skip rate, listener locations'},{k:'check_dsps_paid',l:'Check all DSPs have paid out correctly'},{k:'followup_press',l:'Follow up with press or curator leads that haven\'t responded'},{k:'next_release',l:'Schedule next release to maintain momentum'}]}
 ];
+
+const EP_TASKS=[
+  {k:'w12',l:'12 weeks out — Foundation',days:84,tasks:[{k:'ep_tracklist_confirmed',l:'Confirm final tracklist, 4-5 tracks minimum for EP designation'},{k:'ep_press_photo_booked',l:'Book press photo shoot with a specific date'},{k:'ep_masters_finalised',l:'Masters finalised and signed off by the artist'},{k:'ep_artwork_single1',l:'Artwork for single 1 done, consistent with EP visual identity'},{k:'ep_pro_registered',l:'PRO registration for every track in the project'},{k:'ep_onesheet',l:'Draft the one-sheet: bio, sound reference, photo, 2-3 line concept per track'},{k:'ep_release_day_set',l:'Decide the EP release day'}]},
+  {k:'w9',l:'9 weeks out — Single 1',days:63,tasks:[{k:'ep_single1_uploaded',l:'Upload single 1 to distributor, 4 week minimum lead time'},{k:'ep_single1_isrc',l:'Lock the ISRC for single 1, must carry over to the EP later'},{k:'ep_single1_presave',l:'Set up HyperFollow or presave link for single 1'},{k:'ep_single1_pitchlist',l:'Build the radio and blog pitch list for single 1'},{k:'ep_single1_released',l:'Single 1 goes live'},{k:'ep_single1_posts',l:'Artist posts across IG, TikTok, YouTube on release day'},{k:'ep_single1_saves',l:'Encourage saves explicitly in captions and stories'}]},
+  {k:'w6',l:'6 weeks out — Single 1 tail / Single 2',days:42,tasks:[{k:'ep_single1_pitches',l:'Radio and blog pitches out for single 1, Tuesday mornings'},{k:'ep_single1_playlists',l:'Playlist submissions live once single 1 confirmed on Spotify, free platforms first'},{k:'ep_single1_content',l:'TikTok and IG content plan running throughout'},{k:'ep_single2_uploaded',l:'Upload single 2 to distributor, same 4 week lead time'},{k:'ep_single2_isrc',l:'Lock ISRC for single 2, same rule as single 1'},{k:'ep_single2_presave',l:'Presave link live for single 2'}]},
+  {k:'w4',l:'4 weeks out — Single 2 / EP press starts',days:28,tasks:[{k:'ep_single2_released',l:'Single 2 goes live, minimum 4 weeks after single 1'},{k:'ep_single2_push',l:'Same release day push as single 1: posts, saves ask, playlist submissions once live'},{k:'ep_press_list_started',l:'Start the EP-specific press list, different angle to the singles'},{k:'ep_artwork_tracklist',l:'Confirm EP artwork and full tracklist metadata'},{k:'ep_full_uploaded',l:'Upload the full EP to distributor, longer lead time needed'}]},
+  {k:'w2',l:'2 weeks out — Final run-up',days:14,tasks:[{k:'ep_longlead_pitches',l:'Send EP pitches to blogs and radio with longer lead times first'},{k:'ep_bio_updated',l:'Update bio and presave link across all platforms to point at the EP'},{k:'ep_content_drafted',l:'Draft release day content in advance'}]},
+  {k:'w1',l:'1 week out — Final push',days:7,tasks:[{k:'ep_daily_presave',l:'Daily presave push across stories'},{k:'ep_personal_outreach',l:'Personal outreach: artist asks friends and followers to save/follow on release day'},{k:'ep_assets_ready',l:'Confirm all release day assets are ready: reel, TikTok, YouTube upload, stories'}]},
+  {k:'rw',l:'Release week',days:0,tasks:[{k:'ep_live_platforms',l:'Artist posts across all platforms: IG reel, TikTok, YouTube, stories with link'},{k:'ep_playlists_full',l:'Playlist submissions for the full EP go live, post-release only'},{k:'ep_ardito_post',l:'Ardito IG release day post'},{k:'ep_meta_ads',l:'Meta ads live if budget allows, post-release not before'}]},
+  {k:'post',l:'Post-release',days:-7,tasks:[{k:'ep_continue_posting',l:'Continue posting for a minimum of 2 weeks past release'},{k:'ep_monitor_saves',l:'Monitor Spotify for Artists weekly, saves-to-streams ratio is the number that matters'},{k:'ep_screenshot_placements',l:'Screenshot and post any playlist placements immediately'},{k:'ep_followup_pitches',l:'Follow up unanswered pitches at the 2 week mark'},{k:'ep_deepcuts',l:'Deep cuts get their own moment in weeks 2-4'}]}
+];
+
+const ALBUM_TASKS=[
+  {k:'w16',l:'16 weeks out — Foundation',days:112,tasks:[{k:'alb_tracklist',l:'Confirm final tracklist and running order'},{k:'alb_singles_count',l:'Decide how many pre-release singles, 2 is usually enough'},{k:'alb_press_photo',l:'Book press photography with a specific date, may need more than one look'},{k:'alb_masters',l:'Masters finalised and signed off by the artist'},{k:'alb_artwork',l:'Album artwork done, consistent visual identity across every single and the cover'},{k:'alb_pro',l:'PRO registration for every track on the album'},{k:'alb_epk',l:'Build the full EPK: bio, milestones, photos, sound reference, whole-album story'},{k:'alb_physical',l:'If physical formats are planned, confirm manufacturer and lead time separately'}]},
+  {k:'w14',l:'14 weeks out — Single 1 era',days:98,tasks:[{k:'alb_single1_uploaded',l:'Upload single 1 to distributor, 4 week lead time'},{k:'alb_single1_isrc',l:'Lock the ISRC for single 1, carries over to the album later'},{k:'alb_single1_released',l:'Single 1 goes live, standard release day push'},{k:'alb_single1_pitches',l:'Radio and blog pitches out, Tuesday mornings'},{k:'alb_single1_playlists',l:'Playlist submissions live once confirmed, post-release only'},{k:'alb_single1_saves',l:'Encourage saves explicitly'},{k:'alb_single1_content',l:'Content plan running throughout the 4 week window'}]},
+  {k:'w10',l:'10 weeks out — Single 2 era',days:70,tasks:[{k:'alb_single2_uploaded',l:'Upload single 2, ISRC locked, same as single 1'},{k:'alb_single2_released',l:'Single 2 goes live, same push as single 1'},{k:'alb_single2_promo',l:'Run the full promo window the same as single 1'},{k:'alb_press_list_started',l:'Start the album press list now, print and magazine features want a 3 month lead time'}]},
+  {k:'w6',l:'6 weeks out — Album press push',days:42,tasks:[{k:'alb_full_uploaded',l:'Upload the full album to distributor now, longest lead time of the whole campaign'},{k:'alb_longlead_press',l:'Send to any print or long-lead features first, press wants 6-8 weeks minimum'},{k:'alb_editorial_playlists',l:'Pitch editorial playlist curators, they want 4-6 weeks lead time'}]},
+  {k:'w4',l:'4 weeks out — Blog embargo pitches',days:28,tasks:[{k:'alb_embargo_pitches',l:'Send blog pitches with a clearly stated embargo date, 3-4 weeks notice'},{k:'alb_outlets_followup',l:'Confirm which outlets have committed, follow up on anything unanswered'}]},
+  {k:'w2',l:'2 weeks out — Final run-up',days:14,tasks:[{k:'alb_bio_updated',l:'Update bio and presave link across all platforms to point at the album'},{k:'alb_content_drafted',l:'Draft release day content in advance, cover the full tracklist not just the singles'},{k:'alb_show_confirmed',l:'Confirm any release show or live moment tied to the album'}]},
+  {k:'rw',l:'Release week',days:0,tasks:[{k:'alb_live_platforms',l:'Artist posts across all platforms, full album, not just lead single'},{k:'alb_playlists_full',l:'Playlist submissions for the full album go live, post-release only'},{k:'alb_ardito_post',l:'Ardito release day post'},{k:'alb_meta_ads',l:'Meta ads live if budget allows, post-release not before'}]},
+  {k:'post',l:'Post-release',days:-14,tasks:[{k:'alb_continue_posting',l:'Continue posting for a minimum of 3-4 weeks past release'},{k:'alb_deepcuts',l:'Give deep cuts their own moment across weeks 2-6'},{k:'alb_monitor_saves',l:'Monitor saves-to-streams ratio weekly across every track'},{k:'alb_screenshot',l:'Screenshot and post any playlist placements or press coverage as it lands'},{k:'alb_show_promoted',l:'If a release show is planned, promote it and turn streaming momentum into ticket sales'}]}
+];
+
+function wkGeneric(phases,d){
+  if(d===null)return null;
+  if(d>phases[0].days)return null;
+  for(let i=0;i<phases.length;i++){
+    const lower=i+1<phases.length?phases[i+1].days:-Infinity;
+    if(d>lower)return phases[i].k;
+  }
+  return phases[phases.length-1].k;
+}
+
+async function seedReleaseTasks(releaseId,tier){
+  const template=tier==='ep'?EP_TASKS:tier==='album'?ALBUM_TASKS:null;
+  if(!template)return;
+  const rows=[];
+  template.forEach(phase=>{
+    phase.tasks.forEach(t=>{
+      rows.push({release_id:releaseId,phase_key:phase.k,phase_label:phase.l,phase_days:phase.days,task_key:t.k,task_label:t.l,sort_order:rows.length,done:false});
+    });
+  });
+  try{
+    const inserted=await db('release_tasks','POST',rows);
+    if(Array.isArray(inserted))aRelTasks=aRelTasks.concat(inserted);
+  }catch(e){console.error('Could not seed release tasks:',e);}
+}
 
 async function db(t,m='GET',b=null,id=null,ex=''){
   const u=`${SB}/rest/v1/${t}${id?`?id=eq.${id}`:''}${ex}`;
@@ -481,11 +529,11 @@ function login(){
 function logout(){sessionStorage.removeItem('aa');location.reload();}
 
 async function init(){
-  aLib=[];aArt=[];aRel=[];aIdeas=[];
+  aLib=[];aArt=[];aRel=[];aIdeas=[];aRelTasks=[];
   setG();
   try{
-    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc')]);
-    [aLib,aArt,aRel,aIdeas]=results.map(r=>Array.isArray(r)?r:[]);
+    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc'),db('release_tasks','GET',null,null,'?order=sort_order.asc')]);
+    [aLib,aArt,aRel,aIdeas,aRelTasks]=results.map(r=>Array.isArray(r)?r:[]);
     const bad=results.find(r=>!Array.isArray(r));
     if(bad)console.error('Ardito dashboard: unexpected response from Supabase',bad);
   }catch(e){
@@ -772,6 +820,7 @@ async function delLog(logId,artId){
 }
 
 function buildRelCard(r,inDetail,startOpen){
+  if(r.tier==='ep'||r.tier==='album')return buildTierRelCard(r,inDetail,startOpen);
   const now=new Date();
   const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
   const d=rd?Math.ceil((rd-now)/86400000):null;
@@ -810,6 +859,60 @@ function buildRelCard(r,inDetail,startOpen){
       }).join('')}
     </div>
   </div>`;
+}
+
+function buildTierRelCard(r,inDetail,startOpen){
+  const now=new Date();
+  const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
+  const d=rd?Math.ceil((rd-now)/86400000):null;
+  const myTasks=aRelTasks.filter(t=>t.release_id===r.id).sort((a,b)=>a.sort_order-b.sort_order);
+  const phaseMap=new Map();
+  myTasks.forEach(t=>{
+    if(!phaseMap.has(t.phase_key))phaseMap.set(t.phase_key,{key:t.phase_key,label:t.phase_label,days:t.phase_days,tasks:[]});
+    phaseMap.get(t.phase_key).tasks.push(t);
+  });
+  const phases=[...phaseMap.values()];
+  const wKey=d!==null&&phases.length?wkGeneric(phases,d):null;
+  const done=myTasks.filter(t=>t.done).length;
+  const pct=myTasks.length?Math.round(done/myTasks.length*100):0;
+  const a=aArt.find(x=>x.id===r.artist_id);
+  const isOpen=startOpen!==false;
+  const tierColor=r.tier==='album'?'#b5651d':'#6b7a3a';
+  const tierLabel=r.tier==='album'?'Album':'EP';
+  return`<div class="rc" id="rc-${r.id}">
+    <div class="rch ${isOpen?'open':''}" onclick="togRel('${r.id}')">
+      <div>
+        <div class="rn">${r.release_name}<span class="rc-toggle">▾</span></div>
+        <div class="ran">${inDetail?'':(a?.name||'Unknown')+' · '}${rd?rd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''} ${r.status?'· '+r.status:''}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag" style="background:${tierColor};color:#0d0d0d;font-weight:600">${tierLabel}</span>${wKey&&phaseMap.get(wKey)?`<span class="tag ta">${phaseMap.get(wKey).label}</span>`:''}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0" onclick="event.stopPropagation()">
+        <span class="tag ${r.status==='Released'?'tg':'ta'}">${r.status}</span>
+        <button class="btn bg bsm" onclick="openRM('${r.id}')">Edit</button>
+      </div>
+    </div>
+    <div class="rc-body ${isOpen?'open':''}">
+      ${myTasks.length?`<div class="rp"><div class="rpl"><span>Campaign progress</span><span>${done}/${myTasks.length} · ${pct}%</span></div><div class="rpb"><div class="rpf" style="width:${pct}%"></div></div></div>`:'<div class="empty" style="padding:1rem 0">No tasks found for this release, tasks are only generated when a release is first created with this tier selected.</div>'}
+      ${phases.map(p=>{
+        const isCur=p.key===wKey;
+        return`<div class="rw ${isCur?'':'wclosed'}" id="rw-${r.id}-${p.key}">
+          <div class="rwh" onclick="togWeek('${r.id}','${p.key}')">
+            <span class="wl">${p.label}</span>
+            ${isCur?'<span class="wc">You are here</span>':''}
+            <span class="w-tog">▾</span>
+          </div>
+          <div class="cl">${p.tasks.map(t=>`<div class="ci ${t.done?'done':''}" onclick="toggleTierTask('${t.id}',${!!t.done},'${r.id}','${inDetail?r.artist_id:''}')"><div class="cc2">${t.done?'✓':''}</div><span class="ct">${t.task_label}</span></div>`).join('')}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+async function toggleTierTask(taskId,cur,rid,artId){
+  await db('release_tasks','PATCH',{done:!cur},taskId);
+  aRelTasks=aRelTasks.map(t=>t.id===taskId?{...t,done:!cur}:t);
+  if(artId&&document.getElementById('adv').style.display!=='none')showAD(artId);
+  else renderReleases();
 }
 
 function togRel(rid){
@@ -1448,6 +1551,9 @@ function openRM(id){
   document.getElementById('r-isrc').value=r?.isrc||'';document.getElementById('r-stat').value=r?.status||'In Progress';
   document.getElementById('r-pre').value=r?.presave_link||'';document.getElementById('r-str').value=r?.streaming_link||'';
   document.getElementById('r-notes').value=r?.notes||'';
+  document.getElementById('r-tier').value=r?.tier||'single';
+  document.getElementById('r-tier').disabled=!!r;
+  document.getElementById('r-tier-note').style.display=r?'block':'none';
   document.getElementById('r-art').innerHTML=aArt.map(a=>`<option value="${a.id}" ${r?.artist_id===a.id?'selected':''}>${a.name}</option>`).join('');
   document.getElementById('rmod').classList.add('open');
 }
@@ -1455,9 +1561,17 @@ function openRMFA(aid){openRM(null);document.getElementById('r-art').value=aid;}
 async function saveRelease(){
   const d={release_name:document.getElementById('r-name').value,artist_id:document.getElementById('r-art').value,release_date:document.getElementById('r-date').value||null,campaign_start:document.getElementById('r-cs').value||null,distributor:document.getElementById('r-dist').value,isrc:document.getElementById('r-isrc').value,status:document.getElementById('r-stat').value,presave_link:document.getElementById('r-pre').value,streaming_link:document.getElementById('r-str').value,notes:document.getElementById('r-notes').value};
   if(!d.release_name)return alert('Release name required');
+  const tier=document.getElementById('r-tier').value;
   let artId=d.artist_id;
   if(eRel){await db('releases','PATCH',d,eRel);aRel=aRel.map(r=>r.id===eRel?{...r,...d}:r);}
-  else{const r=await db('releases','POST',d);if(r&&r[0]){aRel.unshift(r[0]);artId=r[0].artist_id;}}
+  else{
+    d.tier=tier;
+    const r=await db('releases','POST',d);
+    if(r&&r[0]){
+      aRel.unshift(r[0]);artId=r[0].artist_id;
+      if(tier==='ep'||tier==='album')await seedReleaseTasks(r[0].id,tier);
+    }
+  }
   closeM('rmod');
   if(document.getElementById('adv').style.display!=='none')showAD(artId);
   else renderReleases();
