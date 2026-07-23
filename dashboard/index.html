@@ -458,34 +458,34 @@ let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[];
 let ePay=null;
 
 const RW=[
-  {k:'w6',l:'Week 6 — Admin setup',tasks:[{k:'track_mixed',l:'Track professionally mixed and mastered'},{k:'distrokid_upload',l:'Upload to DistroKid (or distributor of choice)'},{k:'isrc_done',l:'Assign ISRC codes'},{k:'artwork_done',l:'Finalise and upload artwork (3000x3000px)'},{k:'release_date_set',l:'Set release date — no major competing releases that day'},{k:'metadata_done',l:'Confirm all metadata (title, credits, genre tags, splits)'},{k:'royalty_splits',l:'Confirm royalty splits with collaborators in writing'},{k:'prs_registered',l:'Register song with PRS (UK) / ASCAP / BMI'}]},
-  {k:'w5',l:'Week 5 — Pre-save + Spotify pitch',tasks:[{k:'presave_link',l:'Set up pre-save link (Feature.fm or Toneden)'},{k:'spotify_pitch_done',l:'Submit Spotify editorial pitch (4 weeks before release)'},{k:'spotify_canvas_done',l:'Set up Spotify Canvas (8-second looping vertical video)'},{k:'apple_music_done',l:'Update Apple Music for Artists profile'},{k:'amazon_music',l:'Update Amazon Music for Artists profile'},{k:'epk_updated',l:'Update EPK, website and bio with release info'},{k:'presave_socials',l:'Start pushing pre-save on socials'},{k:'presave_bio',l:'Pin pre-save link in bio across all platforms'}]},
-  {k:'w4',l:'Week 4 — Content plan locked',tasks:[{k:'content_calendar_locked',l:'Lock content calendar for release week'},{k:'clips_filmed',l:'Film minimum 10-15 short-form clips'},{k:'first_prerelease',l:'Post first piece of pre-release content'},{k:'spotify_playlist',l:'Create a themed Spotify playlist featuring your track + similar artists'}]},
-  {k:'w3',l:'Week 3 — Press + blog outreach',tasks:[{k:'blog_outreach_done',l:'Submit to SubmitHub (blogs + playlist curators)'},{k:'playlist_pitch_done',l:'Identify 5-10 independent playlist curators to pitch directly'},{k:'personal_outreach',l:'Send personal outreach emails / DMs to key contacts'},{k:'pr_done',l:'Write and distribute a music press release'},{k:'youtube_shorts',l:'Plan YouTube Shorts strategy'}]},
-  {k:'w2',l:'Week 2 — Content ramp up',tasks:[{k:'posting_frequency',l:'Increase posting frequency across all channels'},{k:'presave_push',l:'Push pre-save link harder — stories, posts, DMs'},{k:'independent_curators',l:'Pitch directly to independent playlist curators'},{k:'email_announcement',l:'Send email newsletter / mailing list announcement'},{k:'release_assets',l:'Prepare all release day social assets'}]},
-  {k:'w1',l:'Week 1 — Release day prep',tasks:[{k:'track_live_dsps',l:'Confirm track is live and correctly delivered to all DSPs'},{k:'release_posts_scheduled',l:'Schedule all release day posts in advance'},{k:'brief_close_contacts',l:'Brief close contacts to SAVE (not just stream) on release day'},{k:'story_content',l:'Prepare story content for release day'},{k:'paid_promo',l:'Set up any paid promotion / boost if budget allows'}]},
-  {k:'rw',l:'Release Week — Go live + monitor',tasks:[{k:'release_day_content',l:'Post release day content across all channels'},{k:'monitor_streams',l:'Monitor streams + saves in Spotify for Artists'},{k:'engage_comments',l:'Engage with every comment, share and tag'},{k:'check_radar',l:'Check Release Radar delivery to followers'},{k:'thank_supporters',l:'Thank supporters publicly'},{k:'daily_content',l:'Post at least one piece of content every day this week'}]},
+  {k:'w6',l:'6 weeks before release — Admin setup',tasks:[{k:'track_mixed',l:'Track professionally mixed and mastered'},{k:'distrokid_upload',l:'Upload to DistroKid (or distributor of choice)'},{k:'isrc_done',l:'Assign ISRC codes'},{k:'artwork_done',l:'Finalise and upload artwork (3000x3000px)'},{k:'release_date_set',l:'Set release date — no major competing releases that day'},{k:'metadata_done',l:'Confirm all metadata (title, credits, genre tags, splits)'},{k:'royalty_splits',l:'Confirm royalty splits with collaborators in writing'},{k:'prs_registered',l:'Register song with PRS (UK) / ASCAP / BMI'}]},
+  {k:'w5',l:'5 weeks before release — Pre-save + Spotify pitch',tasks:[{k:'presave_link',l:'Set up pre-save link (Feature.fm or Toneden)'},{k:'spotify_pitch_done',l:'Submit Spotify editorial pitch (4 weeks before release)'},{k:'spotify_canvas_done',l:'Set up Spotify Canvas (8-second looping vertical video)'},{k:'apple_music_done',l:'Update Apple Music for Artists profile'},{k:'amazon_music',l:'Update Amazon Music for Artists profile'},{k:'epk_updated',l:'Update EPK, website and bio with release info'},{k:'presave_socials',l:'Start pushing pre-save on socials'},{k:'presave_bio',l:'Pin pre-save link in bio across all platforms'}]},
+  {k:'w4',l:'4 weeks before release — Content plan locked',tasks:[{k:'content_calendar_locked',l:'Lock content calendar for release week'},{k:'clips_filmed',l:'Film minimum 10-15 short-form clips'},{k:'first_prerelease',l:'Post first piece of pre-release content'},{k:'spotify_playlist',l:'Create a themed Spotify playlist featuring your track + similar artists'}]},
+  {k:'w3',l:'3 weeks before release — Press + blog outreach',tasks:[{k:'blog_outreach_done',l:'Submit to SubmitHub (blogs + playlist curators)'},{k:'playlist_pitch_done',l:'Identify 5-10 independent playlist curators to pitch directly'},{k:'personal_outreach',l:'Send personal outreach emails / DMs to key contacts'},{k:'pr_done',l:'Write and distribute a music press release'},{k:'youtube_shorts',l:'Plan YouTube Shorts strategy'}]},
+  {k:'w2',l:'2 weeks before release — Content ramp up',tasks:[{k:'posting_frequency',l:'Increase posting frequency across all channels'},{k:'presave_push',l:'Push pre-save link harder — stories, posts, DMs'},{k:'independent_curators',l:'Pitch directly to independent playlist curators'},{k:'email_announcement',l:'Send email newsletter / mailing list announcement'},{k:'release_assets',l:'Prepare all release day social assets'}]},
+  {k:'w1',l:'1 week before release — Release day prep',tasks:[{k:'track_live_dsps',l:'Confirm track is live and correctly delivered to all DSPs'},{k:'release_posts_scheduled',l:'Schedule all release day posts in advance'},{k:'brief_close_contacts',l:'Brief close contacts to SAVE (not just stream) on release day'},{k:'story_content',l:'Prepare story content for release day'},{k:'paid_promo',l:'Set up any paid promotion / boost if budget allows'}]},
+  {k:'rw',l:'Release day — Go live + monitor',tasks:[{k:'release_day_content',l:'Post release day content across all channels'},{k:'monitor_streams',l:'Monitor streams + saves in Spotify for Artists'},{k:'engage_comments',l:'Engage with every comment, share and tag'},{k:'check_radar',l:'Check Release Radar delivery to followers'},{k:'thank_supporters',l:'Thank supporters publicly'},{k:'daily_content',l:'Post at least one piece of content every day this week'}]},
   {k:'post',l:'Post-release — Follow through',tasks:[{k:'apple_editorial',l:'Pitch to Apple Music editorial via Apple Music for Artists'},{k:'amazon_playlists',l:'Submit to Amazon Music playlists'},{k:'spotify_data',l:'Review Spotify for Artists data — saves, skip rate, listener locations'},{k:'check_dsps_paid',l:'Check all DSPs have paid out correctly'},{k:'followup_press',l:'Follow up with press or curator leads that haven\'t responded'},{k:'next_release',l:'Schedule next release to maintain momentum'}]}
 ];
 
 const EP_TASKS=[
-  {k:'w12',l:'12 weeks out — Foundation',days:84,tasks:[{k:'ep_tracklist_confirmed',l:'Confirm final tracklist, 4-5 tracks minimum for EP designation'},{k:'ep_press_photo_booked',l:'Book press photo shoot with a specific date'},{k:'ep_masters_finalised',l:'Masters finalised and signed off by the artist'},{k:'ep_artwork_single1',l:'Artwork for single 1 done, consistent with EP visual identity'},{k:'ep_pro_registered',l:'PRO registration for every track in the project'},{k:'ep_onesheet',l:'Draft the one-sheet: bio, sound reference, photo, 2-3 line concept per track'},{k:'ep_release_day_set',l:'Decide the EP release day'}]},
-  {k:'w9',l:'9 weeks out — Single 1',days:63,tasks:[{k:'ep_single1_uploaded',l:'Upload single 1 to distributor, 4 week minimum lead time'},{k:'ep_single1_isrc',l:'Lock the ISRC for single 1, must carry over to the EP later'},{k:'ep_single1_presave',l:'Set up HyperFollow or presave link for single 1'},{k:'ep_single1_pitchlist',l:'Build the radio and blog pitch list for single 1'},{k:'ep_single1_released',l:'Single 1 goes live'},{k:'ep_single1_posts',l:'Artist posts across IG, TikTok, YouTube on release day'},{k:'ep_single1_saves',l:'Encourage saves explicitly in captions and stories'}]},
-  {k:'w6',l:'6 weeks out — Single 1 tail / Single 2',days:42,tasks:[{k:'ep_single1_pitches',l:'Radio and blog pitches out for single 1, Tuesday mornings'},{k:'ep_single1_playlists',l:'Playlist submissions live once single 1 confirmed on Spotify, free platforms first'},{k:'ep_single1_content',l:'TikTok and IG content plan running throughout'},{k:'ep_single2_uploaded',l:'Upload single 2 to distributor, same 4 week lead time'},{k:'ep_single2_isrc',l:'Lock ISRC for single 2, same rule as single 1'},{k:'ep_single2_presave',l:'Presave link live for single 2'}]},
-  {k:'w4',l:'4 weeks out — Single 2 / EP press starts',days:28,tasks:[{k:'ep_single2_released',l:'Single 2 goes live, minimum 4 weeks after single 1'},{k:'ep_single2_push',l:'Same release day push as single 1: posts, saves ask, playlist submissions once live'},{k:'ep_press_list_started',l:'Start the EP-specific press list, different angle to the singles'},{k:'ep_artwork_tracklist',l:'Confirm EP artwork and full tracklist metadata'},{k:'ep_full_uploaded',l:'Upload the full EP to distributor, longer lead time needed'}]},
-  {k:'w2',l:'2 weeks out — Final run-up',days:14,tasks:[{k:'ep_longlead_pitches',l:'Send EP pitches to blogs and radio with longer lead times first'},{k:'ep_bio_updated',l:'Update bio and presave link across all platforms to point at the EP'},{k:'ep_content_drafted',l:'Draft release day content in advance'}]},
-  {k:'w1',l:'1 week out — Final push',days:7,tasks:[{k:'ep_daily_presave',l:'Daily presave push across stories'},{k:'ep_personal_outreach',l:'Personal outreach: artist asks friends and followers to save/follow on release day'},{k:'ep_assets_ready',l:'Confirm all release day assets are ready: reel, TikTok, YouTube upload, stories'}]},
+  {k:'w12',l:'12 weeks before release — Foundation',days:84,tasks:[{k:'ep_tracklist_confirmed',l:'Confirm final tracklist, 4-5 tracks minimum for EP designation'},{k:'ep_press_photo_booked',l:'Book press photo shoot with a specific date'},{k:'ep_masters_finalised',l:'Masters finalised and signed off by the artist'},{k:'ep_artwork_single1',l:'Artwork for single 1 done, consistent with EP visual identity'},{k:'ep_pro_registered',l:'PRO registration for every track in the project'},{k:'ep_onesheet',l:'Draft the one-sheet: bio, sound reference, photo, 2-3 line concept per track'},{k:'ep_release_day_set',l:'Decide the EP release day'}]},
+  {k:'w9',l:'9 weeks before release — Single 1',days:63,tasks:[{k:'ep_single1_uploaded',l:'Upload single 1 to distributor, 4 week minimum lead time'},{k:'ep_single1_isrc',l:'Lock the ISRC for single 1, must carry over to the EP later'},{k:'ep_single1_presave',l:'Set up HyperFollow or presave link for single 1'},{k:'ep_single1_pitchlist',l:'Build the radio and blog pitch list for single 1'},{k:'ep_single1_released',l:'Single 1 goes live'},{k:'ep_single1_posts',l:'Artist posts across IG, TikTok, YouTube on release day'},{k:'ep_single1_saves',l:'Encourage saves explicitly in captions and stories'}]},
+  {k:'w6',l:'6 weeks before release — Single 1 tail / Single 2',days:42,tasks:[{k:'ep_single1_pitches',l:'Radio and blog pitches out for single 1, Tuesday mornings'},{k:'ep_single1_playlists',l:'Playlist submissions live once single 1 confirmed on Spotify, free platforms first'},{k:'ep_single1_content',l:'TikTok and IG content plan running throughout'},{k:'ep_single2_uploaded',l:'Upload single 2 to distributor, same 4 week lead time'},{k:'ep_single2_isrc',l:'Lock ISRC for single 2, same rule as single 1'},{k:'ep_single2_presave',l:'Presave link live for single 2'}]},
+  {k:'w4',l:'4 weeks before release — Single 2 / EP press starts',days:28,tasks:[{k:'ep_single2_released',l:'Single 2 goes live, minimum 4 weeks after single 1'},{k:'ep_single2_push',l:'Same release day push as single 1: posts, saves ask, playlist submissions once live'},{k:'ep_press_list_started',l:'Start the EP-specific press list, different angle to the singles'},{k:'ep_artwork_tracklist',l:'Confirm EP artwork and full tracklist metadata'},{k:'ep_full_uploaded',l:'Upload the full EP to distributor, longer lead time needed'}]},
+  {k:'w2',l:'2 weeks before release — Final run-up',days:14,tasks:[{k:'ep_longlead_pitches',l:'Send EP pitches to blogs and radio with longer lead times first'},{k:'ep_bio_updated',l:'Update bio and presave link across all platforms to point at the EP'},{k:'ep_content_drafted',l:'Draft release day content in advance'}]},
+  {k:'w1',l:'1 week before release — Final push',days:7,tasks:[{k:'ep_daily_presave',l:'Daily presave push across stories'},{k:'ep_personal_outreach',l:'Personal outreach: artist asks friends and followers to save/follow on release day'},{k:'ep_assets_ready',l:'Confirm all release day assets are ready: reel, TikTok, YouTube upload, stories'}]},
   {k:'rw',l:'Release week',days:0,tasks:[{k:'ep_live_platforms',l:'Artist posts across all platforms: IG reel, TikTok, YouTube, stories with link'},{k:'ep_playlists_full',l:'Playlist submissions for the full EP go live, post-release only'},{k:'ep_ardito_post',l:'Ardito IG release day post'},{k:'ep_meta_ads',l:'Meta ads live if budget allows, post-release not before'}]},
   {k:'post',l:'Post-release',days:-7,tasks:[{k:'ep_continue_posting',l:'Continue posting for a minimum of 2 weeks past release'},{k:'ep_monitor_saves',l:'Monitor Spotify for Artists weekly, saves-to-streams ratio is the number that matters'},{k:'ep_screenshot_placements',l:'Screenshot and post any playlist placements immediately'},{k:'ep_followup_pitches',l:'Follow up unanswered pitches at the 2 week mark'},{k:'ep_deepcuts',l:'Deep cuts get their own moment in weeks 2-4'}]}
 ];
 
 const ALBUM_TASKS=[
-  {k:'w16',l:'16 weeks out — Foundation',days:112,tasks:[{k:'alb_tracklist',l:'Confirm final tracklist and running order'},{k:'alb_singles_count',l:'Decide how many pre-release singles, 2 is usually enough'},{k:'alb_press_photo',l:'Book press photography with a specific date, may need more than one look'},{k:'alb_masters',l:'Masters finalised and signed off by the artist'},{k:'alb_artwork',l:'Album artwork done, consistent visual identity across every single and the cover'},{k:'alb_pro',l:'PRO registration for every track on the album'},{k:'alb_epk',l:'Build the full EPK: bio, milestones, photos, sound reference, whole-album story'},{k:'alb_physical',l:'If physical formats are planned, confirm manufacturer and lead time separately'}]},
-  {k:'w14',l:'14 weeks out — Single 1 era',days:98,tasks:[{k:'alb_single1_uploaded',l:'Upload single 1 to distributor, 4 week lead time'},{k:'alb_single1_isrc',l:'Lock the ISRC for single 1, carries over to the album later'},{k:'alb_single1_released',l:'Single 1 goes live, standard release day push'},{k:'alb_single1_pitches',l:'Radio and blog pitches out, Tuesday mornings'},{k:'alb_single1_playlists',l:'Playlist submissions live once confirmed, post-release only'},{k:'alb_single1_saves',l:'Encourage saves explicitly'},{k:'alb_single1_content',l:'Content plan running throughout the 4 week window'}]},
-  {k:'w10',l:'10 weeks out — Single 2 era',days:70,tasks:[{k:'alb_single2_uploaded',l:'Upload single 2, ISRC locked, same as single 1'},{k:'alb_single2_released',l:'Single 2 goes live, same push as single 1'},{k:'alb_single2_promo',l:'Run the full promo window the same as single 1'},{k:'alb_press_list_started',l:'Start the album press list now, print and magazine features want a 3 month lead time'}]},
-  {k:'w6',l:'6 weeks out — Album press push',days:42,tasks:[{k:'alb_full_uploaded',l:'Upload the full album to distributor now, longest lead time of the whole campaign'},{k:'alb_longlead_press',l:'Send to any print or long-lead features first, press wants 6-8 weeks minimum'},{k:'alb_editorial_playlists',l:'Pitch editorial playlist curators, they want 4-6 weeks lead time'}]},
-  {k:'w4',l:'4 weeks out — Blog embargo pitches',days:28,tasks:[{k:'alb_embargo_pitches',l:'Send blog pitches with a clearly stated embargo date, 3-4 weeks notice'},{k:'alb_outlets_followup',l:'Confirm which outlets have committed, follow up on anything unanswered'}]},
-  {k:'w2',l:'2 weeks out — Final run-up',days:14,tasks:[{k:'alb_bio_updated',l:'Update bio and presave link across all platforms to point at the album'},{k:'alb_content_drafted',l:'Draft release day content in advance, cover the full tracklist not just the singles'},{k:'alb_show_confirmed',l:'Confirm any release show or live moment tied to the album'}]},
+  {k:'w16',l:'16 weeks before release — Foundation',days:112,tasks:[{k:'alb_tracklist',l:'Confirm final tracklist and running order'},{k:'alb_singles_count',l:'Decide how many pre-release singles, 2 is usually enough'},{k:'alb_press_photo',l:'Book press photography with a specific date, may need more than one look'},{k:'alb_masters',l:'Masters finalised and signed off by the artist'},{k:'alb_artwork',l:'Album artwork done, consistent visual identity across every single and the cover'},{k:'alb_pro',l:'PRO registration for every track on the album'},{k:'alb_epk',l:'Build the full EPK: bio, milestones, photos, sound reference, whole-album story'},{k:'alb_physical',l:'If physical formats are planned, confirm manufacturer and lead time separately'}]},
+  {k:'w14',l:'14 weeks before release — Single 1 era',days:98,tasks:[{k:'alb_single1_uploaded',l:'Upload single 1 to distributor, 4 week lead time'},{k:'alb_single1_isrc',l:'Lock the ISRC for single 1, carries over to the album later'},{k:'alb_single1_released',l:'Single 1 goes live, standard release day push'},{k:'alb_single1_pitches',l:'Radio and blog pitches out, Tuesday mornings'},{k:'alb_single1_playlists',l:'Playlist submissions live once confirmed, post-release only'},{k:'alb_single1_saves',l:'Encourage saves explicitly'},{k:'alb_single1_content',l:'Content plan running throughout the 4 week window'}]},
+  {k:'w10',l:'10 weeks before release — Single 2 era',days:70,tasks:[{k:'alb_single2_uploaded',l:'Upload single 2, ISRC locked, same as single 1'},{k:'alb_single2_released',l:'Single 2 goes live, same push as single 1'},{k:'alb_single2_promo',l:'Run the full promo window the same as single 1'},{k:'alb_press_list_started',l:'Start the album press list now, print and magazine features want a 3 month lead time'}]},
+  {k:'w6',l:'6 weeks before release — Album press push',days:42,tasks:[{k:'alb_full_uploaded',l:'Upload the full album to distributor now, longest lead time of the whole campaign'},{k:'alb_longlead_press',l:'Send to any print or long-lead features first, press wants 6-8 weeks minimum'},{k:'alb_editorial_playlists',l:'Pitch editorial playlist curators, they want 4-6 weeks lead time'}]},
+  {k:'w4',l:'4 weeks before release — Blog embargo pitches',days:28,tasks:[{k:'alb_embargo_pitches',l:'Send blog pitches with a clearly stated embargo date, 3-4 weeks notice'},{k:'alb_outlets_followup',l:'Confirm which outlets have committed, follow up on anything unanswered'}]},
+  {k:'w2',l:'2 weeks before release — Final run-up',days:14,tasks:[{k:'alb_bio_updated',l:'Update bio and presave link across all platforms to point at the album'},{k:'alb_content_drafted',l:'Draft release day content in advance, cover the full tracklist not just the singles'},{k:'alb_show_confirmed',l:'Confirm any release show or live moment tied to the album'}]},
   {k:'rw',l:'Release week',days:0,tasks:[{k:'alb_live_platforms',l:'Artist posts across all platforms, full album, not just lead single'},{k:'alb_playlists_full',l:'Playlist submissions for the full album go live, post-release only'},{k:'alb_ardito_post',l:'Ardito release day post'},{k:'alb_meta_ads',l:'Meta ads live if budget allows, post-release not before'}]},
   {k:'post',l:'Post-release',days:-14,tasks:[{k:'alb_continue_posting',l:'Continue posting for a minimum of 3-4 weeks past release'},{k:'alb_deepcuts',l:'Give deep cuts their own moment across weeks 2-6'},{k:'alb_monitor_saves',l:'Monitor saves-to-streams ratio weekly across every track'},{k:'alb_screenshot',l:'Screenshot and post any playlist placements or press coverage as it lands'},{k:'alb_show_promoted',l:'If a release show is planned, promote it and turn streaming momentum into ticket sales'}]}
 ];
@@ -836,7 +836,13 @@ function buildRelCard(r,inDetail,startOpen){
       <div>
         <div class="rn">${r.release_name}<span class="rc-toggle">▾</span></div>
         <div class="ran">${inDetail?'':(a?.name||'Unknown')+' · '}${rd?rd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''} ${r.status?'· '+r.status:''}</div>
-        ${wObj?`<div style="margin-top:6px"><span class="tag ta">${wObj.l}</span></div>`:''}
+        <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          ${wObj?`<span class="tag ta">${wObj.l}</span>`:''}
+          <div style="display:flex;align-items:center;gap:8px;min-width:140px">
+            <div class="rpb" style="width:100px"><div class="rpf" id="rpf-${r.id}" style="width:${pct}%"></div></div>
+            <span style="font-size:11px;color:var(--cdim)" id="rpn-${r.id}">${done}/${allT.length} · ${pct}%</span>
+          </div>
+        </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-shrink:0" onclick="event.stopPropagation()">
         <span class="tag ${r.status==='Released'?'tg':'ta'}">${r.status}</span>
@@ -844,7 +850,6 @@ function buildRelCard(r,inDetail,startOpen){
       </div>
     </div>
     <div class="rc-body ${isOpen?'open':''}">
-      <div class="rp"><div class="rpl"><span>Campaign progress</span><span>${done}/${allT.length} · ${pct}%</span></div><div class="rpb"><div class="rpf" style="width:${pct}%"></div></div></div>
       ${RW.map(w=>{
         const isCur=w.k===wKey;
         const wOpen=isCur||false;
@@ -854,7 +859,7 @@ function buildRelCard(r,inDetail,startOpen){
             ${isCur?'<span class="wc">You are here</span>':''}
             <span class="w-tog">▾</span>
           </div>
-          <div class="cl">${w.tasks.map(t=>`<div class="ci ${r[t.k]?'done':''}" onclick="togT('${r.id}','${t.k}',${!!r[t.k]},'${inDetail?r.artist_id:''}')"><div class="cc2">${r[t.k]?'✓':''}</div><span class="ct">${t.l}</span></div>`).join('')}</div>
+          <div class="cl">${w.tasks.map(t=>`<div class="ci ${r[t.k]?'done':''}" id="ci-${r.id}-${t.k}" onclick="togT('${r.id}','${t.k}',${!!r[t.k]},'${inDetail?r.artist_id:''}')"><div class="cc2">${r[t.k]?'✓':''}</div><span class="ct">${t.l}</span></div>`).join('')}</div>
         </div>`;
       }).join('')}
     </div>
@@ -884,7 +889,14 @@ function buildTierRelCard(r,inDetail,startOpen){
       <div>
         <div class="rn">${r.release_name}<span class="rc-toggle">▾</span></div>
         <div class="ran">${inDetail?'':(a?.name||'Unknown')+' · '}${rd?rd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''} ${r.status?'· '+r.status:''}</div>
-        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="tag" style="background:${tierColor};color:#0d0d0d;font-weight:600">${tierLabel}</span>${wKey&&phaseMap.get(wKey)?`<span class="tag ta">${phaseMap.get(wKey).label}</span>`:''}</div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="tag" style="background:${tierColor};color:#0d0d0d;font-weight:600">${tierLabel}</span>
+          ${wKey&&phaseMap.get(wKey)?`<span class="tag ta">${phaseMap.get(wKey).label}</span>`:''}
+          ${myTasks.length?`<div style="display:flex;align-items:center;gap:8px;min-width:140px">
+            <div class="rpb" style="width:100px"><div class="rpf" id="rpf-${r.id}" style="width:${pct}%"></div></div>
+            <span style="font-size:11px;color:var(--cdim)" id="rpn-${r.id}">${done}/${myTasks.length} · ${pct}%</span>
+          </div>`:''}
+        </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-shrink:0" onclick="event.stopPropagation()">
         <span class="tag ${r.status==='Released'?'tg':'ta'}">${r.status}</span>
@@ -892,7 +904,7 @@ function buildTierRelCard(r,inDetail,startOpen){
       </div>
     </div>
     <div class="rc-body ${isOpen?'open':''}">
-      ${myTasks.length?`<div class="rp"><div class="rpl"><span>Campaign progress</span><span>${done}/${myTasks.length} · ${pct}%</span></div><div class="rpb"><div class="rpf" style="width:${pct}%"></div></div></div>`:'<div class="empty" style="padding:1rem 0">No tasks found for this release, tasks are only generated when a release is first created with this tier selected.</div>'}
+      ${!myTasks.length?'<div class="empty" style="padding:1rem 0">No tasks found for this release, tasks are only generated when a release is first created with this tier selected.</div>':''}
       ${phases.map(p=>{
         const isCur=p.key===wKey;
         return`<div class="rw ${isCur?'':'wclosed'}" id="rw-${r.id}-${p.key}">
@@ -901,7 +913,7 @@ function buildTierRelCard(r,inDetail,startOpen){
             ${isCur?'<span class="wc">You are here</span>':''}
             <span class="w-tog">▾</span>
           </div>
-          <div class="cl">${p.tasks.map(t=>`<div class="ci ${t.done?'done':''}" onclick="toggleTierTask('${t.id}',${!!t.done},'${r.id}','${inDetail?r.artist_id:''}')"><div class="cc2">${t.done?'✓':''}</div><span class="ct">${t.task_label}</span></div>`).join('')}</div>
+          <div class="cl">${p.tasks.map(t=>`<div class="ci ${t.done?'done':''}" id="ti-${t.id}" onclick="toggleTierTask('${t.id}',${!!t.done},'${r.id}','${inDetail?r.artist_id:''}')"><div class="cc2">${t.done?'✓':''}</div><span class="ct">${t.task_label}</span></div>`).join('')}</div>
         </div>`;
       }).join('')}
     </div>
@@ -911,8 +923,14 @@ function buildTierRelCard(r,inDetail,startOpen){
 async function toggleTierTask(taskId,cur,rid,artId){
   await db('release_tasks','PATCH',{done:!cur},taskId);
   aRelTasks=aRelTasks.map(t=>t.id===taskId?{...t,done:!cur}:t);
-  if(artId&&document.getElementById('adv').style.display!=='none')showAD(artId);
-  else renderReleases();
+  const ti=document.getElementById(`ti-${taskId}`);
+  if(ti){ti.classList.toggle('done');ti.querySelector('.cc2').textContent=!cur?'✓':'';}
+  const myTasks=aRelTasks.filter(t=>t.release_id===rid);
+  const doneCt=myTasks.filter(t=>t.done).length;
+  const pct=myTasks.length?Math.round(doneCt/myTasks.length*100):0;
+  const rpn=document.getElementById(`rpn-${rid}`),rpf=document.getElementById(`rpf-${rid}`);
+  if(rpn)rpn.textContent=`${doneCt}/${myTasks.length} · ${pct}%`;
+  if(rpf)rpf.style.width=pct+'%';
 }
 
 function togRel(rid){
@@ -936,8 +954,15 @@ function renderReleases(){
 async function togT(rid,k,cur,artId){
   await db('releases','PATCH',{[k]:!cur},rid);
   aRel=aRel.map(r=>r.id===rid?{...r,[k]:!cur}:r);
-  if(artId&&document.getElementById('adv').style.display!=='none')showAD(artId);
-  else renderReleases();
+  const r=aRel.find(x=>x.id===rid);
+  const ci=document.getElementById(`ci-${rid}-${k}`);
+  if(ci){ci.classList.toggle('done');ci.querySelector('.cc2').textContent=r[k]?'✓':'';}
+  const allT=RW.flatMap(w=>w.tasks);
+  const doneCt=allT.filter(t=>r[t.k]).length;
+  const pct=Math.round(doneCt/allT.length*100);
+  const rpn=document.getElementById(`rpn-${rid}`),rpf=document.getElementById(`rpf-${rid}`);
+  if(rpn)rpn.textContent=`${doneCt}/${allT.length} · ${pct}%`;
+  if(rpf)rpf.style.width=pct+'%';
 }
 
 // LIBRARY
