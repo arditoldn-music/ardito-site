@@ -56,6 +56,10 @@ textarea{resize:vertical;min-height:80px}
 .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;letter-spacing:.05em}
 .tg{background:rgba(74,124,74,.2);color:var(--gtext)}
 .ta{background:var(--abg);color:var(--atext)}
+.tc{background:rgba(74,124,74,.1);color:#a8d4a8}
+.tr{background:var(--rbg);color:var(--rtext)}
+.tx{background:rgba(90,55,40,.2);color:#a8806e}
+.rlist{display:flex;flex-direction:column}
 .tr{background:var(--rbg);color:var(--rtext)}
 .tb{background:var(--bbg);color:var(--btext)}
 .td{background:rgba(232,224,208,.06);color:var(--cmid)}
@@ -293,7 +297,7 @@ textarea{resize:vertical;min-height:80px}
     <div class="page" id="page-roster">
       <div id="rlv">
         <div class="ph"><div><div class="pt">Artist Roster</div><div class="ps">Pipeline and active artists</div></div><button class="btn bp" onclick="openAM()">+ Add artist</button></div>
-        <div class="rg" id="rgrid"></div>
+        <div class="rlist" id="rgrid"></div>
       </div>
       <div id="adv" style="display:none">
         <button class="back" onclick="showRL()">← Back to roster</button>
@@ -391,7 +395,7 @@ textarea{resize:vertical;min-height:80px}
   <div class="md">
     <div class="mt" id="amt">Add artist</div>
     <div class="fr"><div class="fg"><label class="fl">Name</label><input type="text" id="a-name"></div><div class="fg"><label class="fl">Location</label><input type="text" id="a-loc"></div></div>
-    <div class="fr"><div class="fg"><label class="fl">Stage</label><select id="a-stage"><option>Spotted</option><option>First Contact</option><option>In Conversation</option><option>Active</option><option>Paused</option><option>Alumni</option></select></div>
+    <div class="fr"><div class="fg"><label class="fl">Stage</label><select id="a-stage"><option>Watching</option><option>In Conversation</option><option>Active</option><option>Paused</option><option>Alumni</option><option>Fell Through</option></select></div>
     <div class="fg"><label class="fl">Priority</label><select id="a-pri"><option>This week</option><option>Watching</option><option>On hold</option></select></div></div>
     <div class="fr"><div class="fg"><label class="fl">Email</label><input type="email" id="a-email"></div><div class="fg"><label class="fl">Instagram</label><input type="text" id="a-ig" placeholder="@handle"></div></div>
     <div class="fr"><div class="fg"><label class="fl">Spotify URL</label><input type="text" id="a-spot"></div><div class="fg"><label class="fl">Last contact</label><input type="date" id="a-lc"></div></div>
@@ -704,39 +708,32 @@ function togArt(id){
   body.style.display=open?'none':'block';
   if(tog)tog.style.transform=open?'rotate(0deg)':'rotate(180deg)';
 }
+const STAGE_ORDER={Active:0,'In Conversation':1,Watching:2,Paused:3,Alumni:4,'Fell Through':5};
+const STAGE_TAG={Watching:'ta','In Conversation':'tc',Active:'tg',Paused:'tr',Alumni:'td','Fell Through':'tx'};
+
 function renderRoster(){
   const g=document.getElementById('rgrid');
   if(!aArt.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">🎤</div><div>No artists yet</div><br><button class="btn bp" onclick="openAM()">Add your first artist</button></div>';return;}
-  const st={Spotted:'td','First Contact':'td','In Conversation':'ta',Active:'tg',Paused:'ta',Alumni:'tb'};
-  g.innerHTML=aArt.map(a=>{
+  const sorted=[...aArt].sort((a,b)=>{
+    const oa=STAGE_ORDER[a.stage]??99,ob=STAGE_ORDER[b.stage]??99;
+    if(oa!==ob)return oa-ob;
+    const da=a.last_contact?new Date(a.last_contact):new Date(a.created_at||0);
+    const db=b.last_contact?new Date(b.last_contact):new Date(b.created_at||0);
+    return db-da;
+  });
+  g.innerHTML=sorted.map(a=>{
     const ini=a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
     const ds=l?Math.floor((new Date()-l)/86400000):null;
     const ov=ds&&ds>14;
-    return`<div class="ac">
-      <div class="act" onclick="togArt('${a.id}')" style="cursor:pointer">
-        <div class="ach">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div class="av">${ini}</div>
-            <div><div class="an">${a.name}</div><div class="al">${a.location||''}</div></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="tag ${st[a.stage]||'td'}">${a.stage}</span>
-            <span id="at-${a.id}" style="font-size:11px;color:var(--cdim);transition:transform .2s">▾</span>
-          </div>
-        </div>
+    return`<div class="li" style="cursor:pointer" onclick="showAD('${a.id}')">
+      <div class="av">${ini}</div>
+      <div style="flex:1;min-width:0">
+        <div class="an">${a.name}</div>
+        <div class="al">${a.location||''}${l?' · Last contact '+l.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):' · No contact logged'}${ov?`<span class="of"> · ${ds}d ago</span>`:''}</div>
       </div>
-      <div id="ab-${a.id}" style="display:none">
-        <div class="acb">
-          <div class="amr"><span class="aml">Last contact</span><span class="amv">${l?l.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):' —'}${ov?`<span class="of"> · ${ds}d ago</span>`:''}</span></div>
-          ${a.next_step?`<div class="ans">${a.next_step}</div>`:''}
-          <div style="display:flex;gap:8px;margin-top:12px">
-            <button class="btn bp bsm" onclick="showAD('${a.id}')">View</button>
-            <button class="btn bg bsm" onclick="openAM('${a.id}')">Edit</button>
-            <button class="btn bg bsm" onclick="openLogM('${a.id}')">+ Note</button>
-          </div>
-        </div>
-      </div>
+      <span class="tag ${STAGE_TAG[a.stage]||'td'}">${a.stage||'—'}</span>
+      <button class="btn bg bsm" onclick="event.stopPropagation();openAM('${a.id}')">Edit</button>
     </div>`;
   }).join('');
 }
@@ -747,7 +744,7 @@ function showAD(id){
   document.getElementById('adv').style.display='block';
   const rels=aRel.filter(r=>r.artist_id===id);
   const ini=a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const st={Spotted:'td','First Contact':'td','In Conversation':'ta',Active:'tg',Paused:'ta',Alumni:'tb'};
+  const st=STAGE_TAG;
   const l=a.last_contact?new Date(a.last_contact+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):' —';
   const rHtml=rels.length?rels.map((r,i)=>buildRelCard(r,true,i===0)).join(''):`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No releases yet. <button class="btn bg bsm" onclick="openRMFA('${id}')">Add one</button></div>`;
   document.getElementById('adcont').innerHTML=`
@@ -1550,7 +1547,7 @@ function openAM(id){
   document.getElementById('amt').textContent=a?'Edit artist':'Add artist';
   document.getElementById('adel').style.display=a?'inline-flex':'none';
   document.getElementById('a-name').value=a?.name||'';document.getElementById('a-loc').value=a?.location||'';
-  document.getElementById('a-stage').value=a?.stage||'First Contact';document.getElementById('a-pri').value=a?.priority||'Watching';
+  document.getElementById('a-stage').value=a?.stage||'In Conversation';document.getElementById('a-pri').value=a?.priority||'Watching';
   document.getElementById('a-email').value=a?.email||'';document.getElementById('a-ig').value=a?.instagram||'';
   document.getElementById('a-spot').value=a?.spotify_url||'';document.getElementById('a-lc').value=a?.last_contact||'';
   document.getElementById('a-hf').value=a?.how_found||'';document.getElementById('a-ns').value=a?.next_step||'';
