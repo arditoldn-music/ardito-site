@@ -1039,11 +1039,28 @@ function copyTmpl(i){
 async function runBrain(){
   const btn=document.getElementById('brain-run-btn');
   const out=document.getElementById('brain-output');
-  btn.textContent='Thinking...';
   btn.disabled=true;
-  out.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--cdim)"><div style="font-size:1.5rem;margin-bottom:1rem">🧠</div><div style="font-size:13px">Reading the news and pulling your data...</div></div>`;
+  out.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--cdim)"><div style="font-size:1.5rem;margin-bottom:1rem">🧠</div><div style="font-size:13px">Checking today's briefing...</div></div>`;
 
   const now=new Date();
+  const today=now.toISOString().slice(0,10);
+
+  // Check cache first — this is the whole cost-control mechanism
+  let cached=null;
+  try{
+    const existing=await db('ardita_briefings','GET',null,null,`?date=eq.${today}`);
+    if(Array.isArray(existing)&&existing.length)cached=existing[0];
+  }catch(e){}
+
+  if(cached){
+    renderBrainOutput(cached.content,now,true);
+    btn.disabled=false;
+    runAutoScout();
+    return;
+  }
+
+  btn.textContent='Thinking...';
+  out.innerHTML=`<div style="text-align:center;padding:3rem;color:var(--cdim)"><div style="font-size:1.5rem;margin-bottom:1rem">🧠</div><div style="font-size:13px">Reading the news and pulling your data...</div></div>`;
 
   // Fetch RSS news
   const feeds=[{n:'Music Ally',u:'https://musically.com/feed/'},{n:'MBW',u:'https://www.musicbusinessworldwide.com/feed/'},{n:'Pitchfork',u:'https://pitchfork.com/rss/news/feed.rnss'},{n:'Billboard',u:'https://www.billboard.com/feed/'},{n:'Stereogum',u:'https://www.stereogum.com/feed/'}];
@@ -1100,7 +1117,7 @@ CURRENT TOOLS FOR SALE:
 - Full Management (bespoke)
 
 ACTIVE CLIENT:
-Omjine — Seoul-based singer-songwriter, debut single "Precious One" released 10 April 2026. Cat Power / The xx sound refs. Running as learning exercise, not charging. Post-release campaign ongoing. Spotify artist ID: 5sLym4ZG6UZ35kUeuQpKET.
+Omjine — Seoul-based singer-songwriter, debut single "Precious One" released 10 April 2026, second single "Sweethearting" released 10 July 2026. Cat Power / The xx / Yeah Yeah Yeahs sound refs. Running as learning exercise, not charging. Post-release campaign ongoing. Spotify artist ID: 5sLym4ZG6UZ35kUeuQpKET.
 
 OUTREACH RULES:
 - Playlist curators: SubmitHub or Groover only, never email
@@ -1142,11 +1159,11 @@ ${newsSummary||'Could not load news feeds'}
 Give me today's briefing.`;
 
   try{
-    const response=await fetch('https://api.anthropic.com/v1/messages',{
+    const response=await fetch('https://ardito-ardita.ardito-ldn.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-haiku-4-5-20251001',
         max_tokens:1000,
         system:systemPrompt,
         messages:[{role:'user',content:userMsg}]
@@ -1155,31 +1172,10 @@ Give me today's briefing.`;
     const data=await response.json();
     const text=data.content?.[0]?.text||'No response received.';
 
-    // Parse into sections for nicer rendering
-    const sectionDefs=['ROSTER PULSE','CONTENT THIS WEEK','RELEASE HEALTH','ONE BIG MOVE'];
-    const icons={'ROSTER PULSE':'🎤','CONTENT THIS WEEK':'📲','RELEASE HEALTH':'🚀','ONE BIG MOVE':'⚡'};
-    let html=`<div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim);margin-bottom:1.5rem">Briefing — ${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div>`;
+    // Save today's briefing so it's never regenerated again today
+    try{await db('ardita_briefings','POST',{date:today,content:text});}catch(e){console.error('Could not cache briefing:',e);}
 
-    let remaining=text;
-    sectionDefs.forEach((sec,i)=>{
-      const nextSec=sectionDefs[i+1];
-      const start=remaining.indexOf(sec);
-      if(start===-1)return;
-      const end=nextSec?remaining.indexOf(nextSec):remaining.length;
-      const content=remaining.slice(start+sec.length,end>-1?end:undefined).trim();
-      html+=`<div style="background:var(--s2);border-radius:8px;padding:1.25rem;margin-bottom:1rem;border-left:3px solid var(--gbright)">
-        <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gtext);margin-bottom:10px">${icons[sec]||''} ${sec}</div>
-        <div style="font-size:13px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${content}</div>
-      </div>`;
-    });
-
-    // Fallback if sections not found
-    if(!html.includes('border-left')){
-      html+=`<div style="background:var(--s2);border-radius:8px;padding:1.25rem;font-size:13px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${text}</div>`;
-    }
-
-    html+=`<button class="btn bg" style="font-size:11px;margin-top:1rem" onclick="runBrain()">Refresh briefing</button>`;
-    out.innerHTML=html;
+    renderBrainOutput(text,now,false);
 
   }catch(e){
     out.innerHTML=`<div style="color:var(--rtext);font-size:13px;padding:1rem">Something went wrong: ${e.message}</div>`;
@@ -1188,6 +1184,37 @@ Give me today's briefing.`;
   btn.textContent='Run briefing';
   btn.disabled=false;
   runAutoScout();
+}
+
+function renderBrainOutput(text,now,fromCache){
+  const out=document.getElementById('brain-output');
+  const sectionDefs=['ROSTER PULSE','CONTENT THIS WEEK','RELEASE HEALTH','ONE BIG MOVE'];
+  const icons={'ROSTER PULSE':'🎤','CONTENT THIS WEEK':'📲','RELEASE HEALTH':'🚀','ONE BIG MOVE':'⚡'};
+  let html=`<div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim);margin-bottom:1.5rem">Briefing — ${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}${fromCache?' · already generated today':''}</div>`;
+
+  let remaining=text;
+  sectionDefs.forEach((sec,i)=>{
+    const nextSec=sectionDefs[i+1];
+    const start=remaining.indexOf(sec);
+    if(start===-1)return;
+    const end=nextSec?remaining.indexOf(nextSec):remaining.length;
+    const content=remaining.slice(start+sec.length,end>-1?end:undefined).trim();
+    html+=`<div style="background:var(--s2);border-radius:8px;padding:1.25rem;margin-bottom:1rem;border-left:3px solid var(--gbright)">
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gtext);margin-bottom:10px">${icons[sec]||''} ${sec}</div>
+      <div style="font-size:13px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${content}</div>
+    </div>`;
+  });
+
+  if(!html.includes('border-left')){
+    html+=`<div style="background:var(--s2);border-radius:8px;padding:1.25rem;font-size:13px;color:var(--cmid);line-height:1.8;white-space:pre-wrap">${text}</div>`;
+  }
+
+  if(fromCache){
+    html+=`<div style="font-size:11px;color:var(--cdim);margin-top:0.5rem">Today's briefing already ran once. It won't regenerate again until tomorrow, that's by design, not a bug.</div>`;
+  }else{
+    html+=`<button class="btn bg" style="font-size:11px;margin-top:1rem" onclick="runBrain()">Refresh</button>`;
+  }
+  out.innerHTML=html;
 }
 
 async function runAutoScout(){
