@@ -1170,7 +1170,15 @@ Give me today's briefing.`;
       })
     });
     const data=await response.json();
-    const text=data.content?.[0]?.text||'No response received.';
+    const text=data.content?.[0]?.text;
+
+    if(!text){
+      console.error('Ardita: no usable content in response',data);
+      out.innerHTML=`<div style="color:var(--rtext);font-size:13px;padding:1rem">Didn't get a proper response back. Nothing was cached, so you can try again right away.<br><br>Details: ${data.error?.message||JSON.stringify(data).slice(0,300)}</div>`;
+      btn.textContent='Run briefing';
+      btn.disabled=false;
+      return;
+    }
 
     // Save today's briefing so it's never regenerated again today
     try{await db('ardita_briefings','POST',{date:today,content:text});}catch(e){console.error('Could not cache briefing:',e);}
