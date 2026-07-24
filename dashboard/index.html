@@ -458,7 +458,7 @@ textarea{resize:vertical;min-height:80px}
 const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN',PW='ArditoIsTheBest';
 let cM=new Date().getMonth(),cY=new Date().getFullYear(),cvMode='cal';
 let eLib=null,eArt=null,eRel=null,eIdea=null;
-let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[];
+let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[],aOnboard=[];
 let ePay=null;
 
 const RW=[
@@ -518,6 +518,67 @@ async function seedReleaseTasks(releaseId,tier){
   }catch(e){console.error('Could not seed release tasks:',e);}
 }
 
+const ONBOARD_TASKS=[
+  {gk:'legal',gl:'Legal & money',cat:'artist',tasks:[{k:'pro_confirmed',l:'PRO registration confirmed, and which one'},{k:'soundexchange',l:'SoundExchange registered, if US airplay is likely'},{k:'splits_written',l:'Splits confirmed in writing'}]},
+  {gk:'distro',gl:'Distribution',cat:'artist',tasks:[{k:'distrokid_confirmed',l:'DistroKid (or equivalent) account confirmed as theirs'}]},
+  {gk:'assets',gl:'Assets',cat:'artist',tasks:[{k:'assets_received',l:'Artwork, press photo, master and instrumental received'},{k:'mailing_list_checked',l:'Existing mailing list checked, if they have one'},{k:'press_relationships_checked',l:'Existing press or blog relationships checked'}]},
+  {gk:'standard_invites',gl:'Standard invites',cat:'invite',tasks:[{k:'spotify_invite',l:'Spotify for Artists — invited as Editor'},{k:'apple_invite',l:'Apple Music for Artists — invited as Admin'}]},
+  {gk:'conditional_access',gl:'Conditional access',cat:'invite',tasks:[{k:'youtube_access',l:'YouTube — Manager, only if handling uploads'},{k:'meta_access',l:'Meta Business Suite — second Admin, only if running ads'}]},
+  {gk:'mailchimp',gl:'Mailchimp',cat:'invite',tasks:[{k:'mailchimp_decided',l:'Mailchimp ownership decided, ideally Ardito invited into their account'}]},
+  {gk:'built',gl:'Built by Ardito',cat:'ardito',tasks:[{k:'pitch_list_built',l:'Pitch list built'},{k:'epk_built',l:'EPK assembled from collected assets'},{k:'contact_method_agreed',l:'Fastest contact method agreed'}]},
+  {gk:'routes',gl:'Confirmed before pitching',cat:'ardito',tasks:[{k:'submission_routes_confirmed',l:'Submission route confirmed per outlet'}]},
+  {gk:'received',gl:'Received, not generated',cat:'ardito',tasks:[{k:'isrc_hyperfollow_received',l:'ISRC, HyperFollow link and release date received'}]},
+  {gk:'flagged',gl:'Worth flagging to the artist',cat:'ardito',tasks:[{k:'content_id_flagged',l:'YouTube Content ID / fingerprinting discussed'}]}
+];
+
+async function seedOnboardingTasks(artistId){
+  const rows=[];
+  ONBOARD_TASKS.forEach(g=>{
+    g.tasks.forEach(t=>{
+      rows.push({artist_id:artistId,category:g.cat,group_key:g.gk,group_label:g.gl,task_key:t.k,task_label:t.l,sort_order:rows.length,done:false});
+    });
+  });
+  try{
+    const inserted=await db('artist_onboarding_tasks','POST',rows);
+    if(Array.isArray(inserted))aOnboard=aOnboard.concat(inserted);
+  }catch(e){console.error('Could not seed onboarding tasks:',e);}
+}
+
+const ONBOARD_CAT_COLOR={artist:'#c9a227',invite:'#6b7a3a',ardito:'#b5651d'};
+
+function buildOnboardSection(artistId){
+  const tasks=aOnboard.filter(t=>t.artist_id===artistId).sort((a,b)=>a.sort_order-b.sort_order);
+  if(!tasks.length)return '<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No onboarding checklist found for this artist, it\'s generated automatically the moment a new artist is added.</div>';
+  const done=tasks.filter(t=>t.done).length;
+  const pct=Math.round(done/tasks.length*100);
+  const groups=new Map();
+  tasks.forEach(t=>{
+    if(!groups.has(t.group_key))groups.set(t.group_key,{key:t.group_key,label:t.group_label,category:t.category,tasks:[]});
+    groups.get(t.group_key).tasks.push(t);
+  });
+  return `<div class="rp"><div class="rpl"><span>Onboarding progress</span><span id="opn-${artistId}">${done}/${tasks.length} · ${pct}%</span></div><div class="rpb"><div class="rpf" id="opf-${artistId}" style="width:${pct}%"></div></div></div>
+    ${[...groups.values()].map(g=>`<div class="rw" id="rw-${artistId}-og-${g.key}">
+      <div class="rwh" onclick="togWeek('${artistId}','og-${g.key}')">
+        <span class="wl"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${ONBOARD_CAT_COLOR[g.category]};margin-right:7px"></span>${g.label}</span>
+        <span class="w-tog">▾</span>
+      </div>
+      <div class="cl">${g.tasks.map(t=>`<div class="ci ${t.done?'done':''}" id="oi-${t.id}" onclick="toggleOnboardTask('${t.id}',${!!t.done},'${artistId}')"><div class="cc2">${t.done?'✓':''}</div><span class="ct">${t.task_label}</span></div>`).join('')}</div>
+    </div>`).join('')}`;
+}
+
+async function toggleOnboardTask(taskId,cur,artistId){
+  await db('artist_onboarding_tasks','PATCH',{done:!cur},taskId);
+  aOnboard=aOnboard.map(t=>t.id===taskId?{...t,done:!cur}:t);
+  const oi=document.getElementById(`oi-${taskId}`);
+  if(oi){oi.classList.toggle('done');oi.querySelector('.cc2').textContent=!cur?'✓':'';}
+  const tasks=aOnboard.filter(t=>t.artist_id===artistId);
+  const doneCt=tasks.filter(t=>t.done).length;
+  const pct=tasks.length?Math.round(doneCt/tasks.length*100):0;
+  const opn=document.getElementById(`opn-${artistId}`),opf=document.getElementById(`opf-${artistId}`);
+  if(opn)opn.textContent=`${doneCt}/${tasks.length} · ${pct}%`;
+  if(opf)opf.style.width=pct+'%';
+}
+
 async function db(t,m='GET',b=null,id=null,ex=''){
   const u=`${SB}/rest/v1/${t}${id?`?id=eq.${id}`:''}${ex}`;
   const r=await fetch(u,{method:m,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':m==='POST'?'return=representation':m==='PATCH'?'return=representation':''},body:b?JSON.stringify(b):undefined});
@@ -532,11 +593,11 @@ function login(){
 function logout(){sessionStorage.removeItem('aa');location.reload();}
 
 async function init(){
-  aLib=[];aArt=[];aRel=[];aIdeas=[];aRelTasks=[];
+  aLib=[];aArt=[];aRel=[];aIdeas=[];aRelTasks=[];aOnboard=[];
   setG();
   try{
-    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc'),db('release_tasks','GET',null,null,'?order=sort_order.asc')]);
-    [aLib,aArt,aRel,aIdeas,aRelTasks]=results.map(r=>Array.isArray(r)?r:[]);
+    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc'),db('release_tasks','GET',null,null,'?order=sort_order.asc'),db('artist_onboarding_tasks','GET',null,null,'?order=sort_order.asc')]);
+    [aLib,aArt,aRel,aIdeas,aRelTasks,aOnboard]=results.map(r=>Array.isArray(r)?r:[]);
     const bad=results.find(r=>!Array.isArray(r));
     if(bad)console.error('Ardito dashboard: unexpected response from Supabase',bad);
   }catch(e){
@@ -771,6 +832,8 @@ function showAD(id){
         ${a.notes?`<div style="margin-top:12px;font-size:12px;color:var(--cdim);line-height:1.6;padding:10px;background:var(--s2);border-radius:6px">${a.notes}</div>`:''}
       </div>
     </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Onboarding</h3></div>
+    <div id="obcont-${id}" style="margin-bottom:2rem">${buildOnboardSection(id)}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
     <div id="logcont-${id}" style="margin-bottom:2rem"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Releases</h3><button class="btn bp bsm" onclick="openRMFA('${id}')">+ New release</button></div>
@@ -1522,7 +1585,7 @@ async function saveArtist(){
   const d={name:document.getElementById('a-name').value,location:document.getElementById('a-loc').value,stage:document.getElementById('a-stage').value,priority:document.getElementById('a-pri').value,email:document.getElementById('a-email').value,instagram:document.getElementById('a-ig').value,spotify_url:document.getElementById('a-spot').value,last_contact:document.getElementById('a-lc').value||null,how_found:document.getElementById('a-hf').value,next_step:document.getElementById('a-ns').value,notes:document.getElementById('a-notes').value};
   if(!d.name)return alert('Name required');
   if(eArt){await db('artists','PATCH',d,eArt);aArt=aArt.map(a=>a.id===eArt?{...a,...d}:a);}
-  else{const r=await db('artists','POST',d);if(r&&r[0])aArt.push(r[0]);}
+  else{const r=await db('artists','POST',d);if(r&&r[0]){aArt.push(r[0]);await seedOnboardingTasks(r[0].id);}}
   closeM('amod');renderRoster();renderHome();
   if(document.getElementById('adv').style.display!=='none'&&eArt)showAD(eArt);
 }
