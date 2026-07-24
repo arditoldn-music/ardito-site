@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ardito — Command Centre</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link rel="apple-touch-icon" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0a;--surface:#141414;--s2:#1a1a1a;--cream:#e8e0d0;--cmid:#b8afa0;--cdim:#706860;--green:#1e3a1e;--gmid:#2d4a2d;--gbright:#4a7c4a;--gtext:#8dc48d;--amber:#c8890a;--abg:rgba(200,137,10,0.12);--atext:#d4a040;--rbg:rgba(139,32,32,0.12);--rtext:#c06060;--bbg:rgba(26,45,74,0.5);--btext:#7aaad4;--b1:rgba(232,224,208,0.08);--b2:rgba(232,224,208,0.14);--b3:rgba(232,224,208,0.22)}
@@ -30,6 +32,16 @@ body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;fo
 .lo{font-size:11px;color:var(--cdim);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s}
 .lo:hover{color:var(--cmid)}
 .main{margin-left:200px;min-height:100vh}
+
+.mobile-menu-btn{display:none;position:fixed;top:14px;right:14px;z-index:200;background:var(--surface);border:1px solid var(--b1);color:var(--cream);font-size:13px;padding:8px 14px;border-radius:6px;cursor:pointer}
+
+@media (max-width:780px){
+  .mobile-menu-btn{display:block}
+  .sb{left:auto;right:14px;top:56px;width:220px;height:auto;max-height:75vh;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5);transform:scaleY(0);transform-origin:top right;opacity:0;pointer-events:none;transition:transform .15s,opacity .15s}
+  .sb.mobile-open{transform:scaleY(1);opacity:1;pointer-events:auto}
+  .main{margin-left:0}
+  .fr{grid-template-columns:1fr}
+}
 .page{display:none;padding:2rem 2.5rem}
 .page.active{display:block}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--b1)}
@@ -236,7 +248,8 @@ textarea{resize:vertical;min-height:80px}
 </div>
 
 <div id="app">
-  <nav class="sb">
+  <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu</button>
+  <nav class="sb" id="main-sb">
     <div class="sb-brand"><div class="sb-wm">Ardito</div><div class="sb-tg">Command Centre</div></div>
     <div class="ns"><div class="nl">Overview</div><div class="ni active" onclick="nav('home')" id="nav-home"><span class="ni-icon">◈</span>This Week</div></div>
     <div class="ns"><div class="nl">Releases</div>
@@ -556,7 +569,7 @@ function buildOnboardSection(artistId){
     if(!groups.has(t.group_key))groups.set(t.group_key,{key:t.group_key,label:t.group_label,category:t.category,tasks:[]});
     groups.get(t.group_key).tasks.push(t);
   });
-  return `${[...groups.values()].map(g=>`<div class="rw" id="rw-${artistId}-og-${g.key}">
+  return `${[...groups.values()].map(g=>`<div class="rw wclosed" id="rw-${artistId}-og-${g.key}">
       <div class="rwh" onclick="togWeek('${artistId}','og-${g.key}')">
         <span class="wl"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${ONBOARD_CAT_COLOR[g.category]};margin-right:7px"></span>${g.label}</span>
         <span class="w-tog">▾</span>
@@ -641,12 +654,17 @@ function setG(){
   document.getElementById('gdate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
+function toggleMobileMenu(){
+  document.getElementById('main-sb').classList.toggle('mobile-open');
+}
+
 function nav(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.getElementById('nav-'+p).classList.add('active');
   sessionStorage.setItem('ap',p);
+  document.getElementById('main-sb').classList.remove('mobile-open');
   if(p==='home')renderHome();
   if(p==='calendar')renderCal();
   if(p==='roster'){showRL();renderRoster();}
@@ -796,14 +814,6 @@ function renderListV(){
 
 // ROSTER
 function showRL(){document.getElementById('rlv').style.display='block';document.getElementById('adv').style.display='none';}
-function togArt(id){
-  const body=document.getElementById(`ab-${id}`);
-  const tog=document.getElementById(`at-${id}`);
-  if(!body)return;
-  const open=body.style.display!=='none';
-  body.style.display=open?'none':'block';
-  if(tog)tog.style.transform=open?'rotate(0deg)':'rotate(180deg)';
-}
 const STAGE_ORDER={Active:0,'In Conversation':1,Watching:2,Paused:3,Alumni:4,'Fell Through':5};
 const STAGE_TAG={Watching:'ta','In Conversation':'tc',Active:'tg',Paused:'tr',Alumni:'td','Fell Through':'tx'};
 
@@ -964,7 +974,7 @@ function buildTierRelCard(r,inDetail,startOpen){
       ${!myTasks.length?'<div class="empty" style="padding:1rem 0">No tasks found for this release, tasks are only generated when a release is first created with this tier selected.</div>':''}
       ${phases.map(p=>{
         const isCur=p.key===wKey;
-        return`<div class="rw ${isCur?'':'wclosed'}" id="rw-${r.id}-${p.key}">
+        return`<div class="rw wclosed" id="rw-${r.id}-${p.key}">
           <div class="rwh" onclick="togWeek('${r.id}','${p.key}')">
             <span class="wl">${p.label}</span>
             ${isCur?'<span class="wc">You are here</span>':''}
