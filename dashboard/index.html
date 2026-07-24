@@ -842,7 +842,7 @@ function showAD(id){
   const ini=a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const st=STAGE_TAG;
   const l=a.last_contact?new Date(a.last_contact+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):' —';
-  const rHtml=rels.length?rels.map((r,i)=>buildRelCard(r,true,i===0)).join(''):`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No releases yet. <button class="btn bg bsm" onclick="openRMFA('${id}')">Add one</button></div>`;
+  const rHtml=rels.length?rels.map((r,i)=>buildRelCard(r,true,false)).join(''):`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No releases yet. <button class="btn bg bsm" onclick="openRMFA('${id}')">Add one</button></div>`;
   document.getElementById('adcont').innerHTML=`
     <div class="adh"><div class="ada">${ini}</div><div><h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream)">${a.name}</h2><div style="font-size:13px;color:var(--cdim);margin-top:2px">${a.location||''} ${a.stage?'· <span class="tag '+st[a.stage]+'">'+a.stage+'</span>':''}</div></div><button class="btn bg bsm" style="margin-left:auto" onclick="openAM('${a.id}')">Edit</button></div>
     <div class="adg">
