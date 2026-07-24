@@ -187,6 +187,9 @@ textarea{resize:vertical;min-height:80px}
 .cl{display:flex;flex-direction:column;gap:4px}
 .rw.wclosed .cl{display:none}
 .ci{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;border:1px solid var(--b1);background:var(--s2);cursor:pointer;transition:all .15s;user-select:none}
+.field-input{width:100%;background:rgba(232,224,208,0.03);border:1px solid var(--b1);border-radius:6px;padding:6px 10px;font-size:11.5px;color:var(--cream);font-family:'DM Sans',sans-serif;margin:3px 0 8px;outline:none}
+.field-input:focus{border-color:var(--gbright)}
+.field-input::placeholder{color:var(--cdim)}
 .ci:hover{border-color:var(--b2)}
 .ci.done{background:rgba(74,124,74,.1);border-color:rgba(74,124,74,.2)}
 .cc2{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--b3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .15s}
@@ -519,15 +522,14 @@ async function seedReleaseTasks(releaseId,tier){
 }
 
 const ONBOARD_TASKS=[
-  {gk:'legal',gl:'Legal & money',cat:'artist',tasks:[{k:'pro_confirmed',l:'PRO registration confirmed, and which one'},{k:'soundexchange',l:'SoundExchange registered, if US airplay is likely'},{k:'splits_written',l:'Splits confirmed in writing'}]},
-  {gk:'distro',gl:'Distribution',cat:'artist',tasks:[{k:'distrokid_confirmed',l:'DistroKid (or equivalent) account confirmed as theirs'}]},
-  {gk:'assets',gl:'Assets',cat:'artist',tasks:[{k:'assets_received',l:'Artwork, press photo, master and instrumental received'},{k:'mailing_list_checked',l:'Existing mailing list checked, if they have one'},{k:'press_relationships_checked',l:'Existing press or blog relationships checked'}]},
-  {gk:'standard_invites',gl:'Standard invites',cat:'invite',tasks:[{k:'spotify_invite',l:'Spotify for Artists — invited as Editor'},{k:'apple_invite',l:'Apple Music for Artists — invited as Admin'}]},
-  {gk:'conditional_access',gl:'Conditional access',cat:'invite',tasks:[{k:'youtube_access',l:'YouTube — Manager, only if handling uploads'},{k:'meta_access',l:'Meta Business Suite — second Admin, only if running ads'}]},
-  {gk:'mailchimp',gl:'Mailchimp',cat:'invite',tasks:[{k:'mailchimp_decided',l:'Mailchimp ownership decided, ideally Ardito invited into their account'}]},
-  {gk:'built',gl:'Built by Ardito',cat:'ardito',tasks:[{k:'pitch_list_built',l:'Pitch list built'},{k:'epk_built',l:'EPK assembled from collected assets'},{k:'contact_method_agreed',l:'Fastest contact method agreed'}]},
+  {gk:'legal',gl:'Legal & money',cat:'artist',tasks:[{k:'pro_confirmed',l:'PRO registration confirmed, and which one',field:'Which PRO (e.g. PRS, KOMCA, ASCAP)'},{k:'soundexchange',l:'SoundExchange registered, if US airplay is likely',conditional:true},{k:'splits_written',l:'Splits confirmed in writing',field:'Where this is stored (link or note)'}]},
+  {gk:'distro',gl:'Distribution',cat:'artist',tasks:[{k:'distrokid_confirmed',l:'DistroKid (or equivalent) account confirmed as theirs',field:'Account email, only if different from their main contact'}]},
+  {gk:'assets',gl:'Assets',cat:'artist',tasks:[{k:'assets_received',l:'Artwork, press photo, master and instrumental received',field:'Link to shared assets'},{k:'mailing_list_checked',l:'Existing mailing list checked, if they have one',field:'Platform and rough size'},{k:'press_relationships_checked',l:'Existing press or blog relationships checked',field:'Who'}]},
+  {gk:'standard_invites',gl:'Standard invites',cat:'invite',tasks:[{k:'spotify_invite',l:'Spotify for Artists — invited as Editor',field:'Spotify artist link'},{k:'apple_invite',l:'Apple Music for Artists — invited as Admin',field:'Apple Music artist link'}]},
+  {gk:'conditional_access',gl:'Conditional access',cat:'invite',tasks:[{k:'youtube_access',l:'YouTube — Manager, only if handling uploads',field:'YouTube channel link',conditional:true},{k:'meta_access',l:'Meta Business Suite — second Admin, only if running ads',field:'Ad account name',conditional:true}]},
+  {gk:'mailchimp',gl:'Mailchimp',cat:'invite',tasks:[{k:'mailchimp_decided',l:'Mailchimp ownership decided, ideally Ardito invited into their account',field:'Whose account it lives in'}]},
+  {gk:'built',gl:'Built by Ardito',cat:'ardito',tasks:[{k:'pitch_list_built',l:'Pitch list built'},{k:'epk_built',l:'EPK assembled from collected assets',field:'Link to EPK'},{k:'contact_method_agreed',l:'Fastest contact method agreed',field:'Method (email, WhatsApp, etc.)'}]},
   {gk:'routes',gl:'Confirmed before pitching',cat:'ardito',tasks:[{k:'submission_routes_confirmed',l:'Submission route confirmed per outlet'}]},
-  {gk:'received',gl:'Received, not generated',cat:'ardito',tasks:[{k:'isrc_hyperfollow_received',l:'ISRC, HyperFollow link and release date received'}]},
   {gk:'flagged',gl:'Worth flagging to the artist',cat:'ardito',tasks:[{k:'content_id_flagged',l:'YouTube Content ID / fingerprinting discussed'}]}
 ];
 
@@ -535,7 +537,7 @@ async function seedOnboardingTasks(artistId){
   const rows=[];
   ONBOARD_TASKS.forEach(g=>{
     g.tasks.forEach(t=>{
-      rows.push({artist_id:artistId,category:g.cat,group_key:g.gk,group_label:g.gl,task_key:t.k,task_label:t.l,sort_order:rows.length,done:false});
+      rows.push({artist_id:artistId,category:g.cat,group_key:g.gk,group_label:g.gl,task_key:t.k,task_label:t.l,field_prompt:t.field||null,conditional:!!t.conditional,sort_order:rows.length,done:false});
     });
   });
   try{
@@ -549,21 +551,41 @@ const ONBOARD_CAT_COLOR={artist:'#c9a227',invite:'#6b7a3a',ardito:'#b5651d'};
 function buildOnboardSection(artistId){
   const tasks=aOnboard.filter(t=>t.artist_id===artistId).sort((a,b)=>a.sort_order-b.sort_order);
   if(!tasks.length)return '<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No onboarding checklist found for this artist, it\'s generated automatically the moment a new artist is added.</div>';
-  const done=tasks.filter(t=>t.done).length;
-  const pct=Math.round(done/tasks.length*100);
   const groups=new Map();
   tasks.forEach(t=>{
     if(!groups.has(t.group_key))groups.set(t.group_key,{key:t.group_key,label:t.group_label,category:t.category,tasks:[]});
     groups.get(t.group_key).tasks.push(t);
   });
-  return `<div class="rp"><div class="rpl"><span>Onboarding progress</span><span id="opn-${artistId}">${done}/${tasks.length} · ${pct}%</span></div><div class="rpb"><div class="rpf" id="opf-${artistId}" style="width:${pct}%"></div></div></div>
-    ${[...groups.values()].map(g=>`<div class="rw" id="rw-${artistId}-og-${g.key}">
+  return `${[...groups.values()].map(g=>`<div class="rw" id="rw-${artistId}-og-${g.key}">
       <div class="rwh" onclick="togWeek('${artistId}','og-${g.key}')">
         <span class="wl"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${ONBOARD_CAT_COLOR[g.category]};margin-right:7px"></span>${g.label}</span>
         <span class="w-tog">▾</span>
       </div>
-      <div class="cl">${g.tasks.map(t=>`<div class="ci ${t.done?'done':''}" id="oi-${t.id}" onclick="toggleOnboardTask('${t.id}',${!!t.done},'${artistId}')"><div class="cc2">${t.done?'✓':''}</div><span class="ct">${t.task_label}</span></div>`).join('')}</div>
+      <div class="cl">${g.tasks.map(t=>`<div class="ci ${t.done?'done':''}" id="oi-${t.id}" style="${t.na?'opacity:.4':''}"><div style="display:flex;align-items:center;gap:10px;flex:1;cursor:${t.na?'default':'pointer'}" onclick="${t.na?'':`toggleOnboardTask('${t.id}',${!!t.done},'${artistId}')`}"><div class="cc2">${t.done?'✓':''}</div><span class="ct">${t.na?'Not applicable — '+t.task_label:t.task_label}</span></div>${t.conditional?`<span onclick="event.stopPropagation();toggleOnboardNA('${t.id}',${!!t.na},'${artistId}')" style="font-size:10px;color:var(--gbright);cursor:pointer;white-space:nowrap;padding-left:8px">${t.na?'Undo N/A':'Mark N/A'}</span>`:''}</div>${t.field_prompt&&!t.na?`<input type="text" class="field-input" placeholder="${t.field_prompt}" value="${t.value?t.value.replace(/"/g,'&quot;'):''}" onblur="saveOnboardValue('${t.id}',this.value)">`:''}`).join('')}</div>
     </div>`).join('')}`;
+}
+
+function buildOnboardHeader(artistId){
+  const tasks=aOnboard.filter(t=>t.artist_id===artistId&&!t.na);
+  const done=tasks.filter(t=>t.done).length;
+  const pct=tasks.length?Math.round(done/tasks.length*100):0;
+  return {done,total:tasks.length,pct};
+}
+
+async function toggleOnboardNA(taskId,cur,artistId){
+  await db('artist_onboarding_tasks','PATCH',{na:!cur},taskId);
+  aOnboard=aOnboard.map(t=>t.id===taskId?{...t,na:!cur}:t);
+  document.getElementById(`obcont-${artistId}`).innerHTML=buildOnboardSection(artistId);
+  const h=buildOnboardHeader(artistId);
+  const opn=document.getElementById(`opn-${artistId}`);
+  if(opn)opn.textContent=h.total?`${h.done}/${h.total} · ${h.pct}%`:'Not started';
+}
+
+function togOnboard(id){
+  const h=document.querySelector(`#ob-card-${id} .rch`);
+  const b=document.querySelector(`#ob-card-${id} .rc-body`);
+  h.classList.toggle('open');
+  b.classList.toggle('open');
 }
 
 async function toggleOnboardTask(taskId,cur,artistId){
@@ -571,12 +593,17 @@ async function toggleOnboardTask(taskId,cur,artistId){
   aOnboard=aOnboard.map(t=>t.id===taskId?{...t,done:!cur}:t);
   const oi=document.getElementById(`oi-${taskId}`);
   if(oi){oi.classList.toggle('done');oi.querySelector('.cc2').textContent=!cur?'✓':'';}
-  const tasks=aOnboard.filter(t=>t.artist_id===artistId);
+  const tasks=aOnboard.filter(t=>t.artist_id===artistId&&!t.na);
   const doneCt=tasks.filter(t=>t.done).length;
   const pct=tasks.length?Math.round(doneCt/tasks.length*100):0;
   const opn=document.getElementById(`opn-${artistId}`),opf=document.getElementById(`opf-${artistId}`);
   if(opn)opn.textContent=`${doneCt}/${tasks.length} · ${pct}%`;
   if(opf)opf.style.width=pct+'%';
+}
+
+async function saveOnboardValue(taskId,val){
+  await db('artist_onboarding_tasks','PATCH',{value:val||null},taskId);
+  aOnboard=aOnboard.map(t=>t.id===taskId?{...t,value:val||null}:t);
 }
 
 async function db(t,m='GET',b=null,id=null,ex=''){
@@ -666,7 +693,8 @@ function renderHome(){
   const ht=document.getElementById('h-tasks');
   ht.innerHTML=tasks.length?tasks.slice(0,5).map(t=>`<div class="bi"><div class="pd ${t.u?'dr':'da'}"></div><div class="bit"><div class="bit-t">${t.l}</div><div class="bit-s">${t.s}</div></div></div>`).join(''):'<div class="bem">No urgent release tasks</div>';
   // followups
-  const fu=aArt.map(a=>{const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
+  const CHASE_STAGES=['Active','In Conversation'];
+  const fu=aArt.filter(a=>CHASE_STAGES.includes(a.stage)).map(a=>{const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
   document.getElementById('h-followups').innerHTML=fu.length?fu.slice(0,5).map(a=>`<div class="bi"><div class="pd ${a.ds>21?'dr':'da'}"></div><div class="bit"><div class="bit-t">${a.name}${a.ds>21?' · overdue':''}</div><div class="bit-s">${a.next_step||a.stage}${a.ds<999?' · '+a.ds+'d since contact':''}</div></div></div>`).join(''):'<div class="bem">All artists up to date</div>';
   // posts
   const wp=aLib.filter(p=>{if(!p.post_date)return false;const d=new Date(p.post_date+'T12:00:00');return d>=now&&d<=we;});
@@ -832,8 +860,13 @@ function showAD(id){
         ${a.notes?`<div style="margin-top:12px;font-size:12px;color:var(--cdim);line-height:1.6;padding:10px;background:var(--s2);border-radius:6px">${a.notes}</div>`:''}
       </div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Onboarding</h3></div>
-    <div id="obcont-${id}" style="margin-bottom:2rem">${buildOnboardSection(id)}</div>
+    <div class="rc" id="ob-card-${id}" style="margin-bottom:2rem">
+      <div class="rch" onclick="togOnboard('${id}')">
+        <div class="rn">Onboarding<span class="rc-toggle">▾</span></div>
+        <span id="opn-${id}" style="font-size:12px;color:var(--cdim)">${(()=>{const h=buildOnboardHeader(id);return h.total?`${h.done}/${h.total} · ${h.pct}%`:'Not started';})()}</span>
+      </div>
+      <div class="rc-body" id="obcont-${id}">${buildOnboardSection(id)}</div>
+    </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
     <div id="logcont-${id}" style="margin-bottom:2rem"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Releases</h3><button class="btn bp bsm" onclick="openRMFA('${id}')">+ New release</button></div>
@@ -1289,12 +1322,25 @@ ONE BIG MOVE
 
 Under CONTENT THIS WEEK, use the real news headlines provided to find one specific story or trend worth turning into an Ardito post. Name the story, say which series it fits, and give a one-line caption angle.
 
+Under ROSTER PULSE, only flag time-since-last-contact as a problem for artists whose stage is Active or In Conversation, those are the two stages where an ongoing cadence actually matters. Watching means scouted but not yet approached, Paused means deliberately inactive right now, and Alumni or Fell Through are closed. None of those four should ever be described as overdue or needing a follow-up just because it's been a while, that's expected, not a gap.
+
 Keep it tight. Be direct. Sound like a smart colleague, not a report. No em dashes anywhere.`;
+
+  const onboardSummary=aArt.map(a=>{
+    const tasks=aOnboard.filter(t=>t.artist_id===a.id);
+    if(!tasks.length)return null;
+    const missing=tasks.filter(t=>!t.done&&!t.na);
+    if(!missing.length)return null;
+    return `- ${a.name}: still missing ${missing.slice(0,3).map(t=>t.task_label.split(',')[0]).join(', ')}${missing.length>3?`, plus ${missing.length-3} more`:''}.`;
+  }).filter(Boolean).join('\n');
 
   const userMsg=`Today is ${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}.
 
 CURRENT ROSTER:
 ${artistSummary||'No artists on roster'}
+
+ONBOARDING GAPS (only mention if genuinely worth flagging, don't force it into every briefing):
+${onboardSummary||'Nothing outstanding'}
 
 ACTIVE RELEASES:
 ${relSummary||'No releases'}
