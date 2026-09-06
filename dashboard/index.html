@@ -235,6 +235,95 @@ textarea{resize:vertical;min-height:80px}
 .ei{font-size:2rem;margin-bottom:1rem;opacity:.5}
 .back{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--cdim);cursor:pointer;margin-bottom:1.5rem;transition:color .15s;background:none;border:none;font-family:'DM Sans',sans-serif;padding:0}
 .back:hover{color:var(--cmid)}
+
+/* PRESS KIT WORKSPACE */
+.pk-workspace{display:none}
+.pk-workspace.open{display:block}
+.pk-back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--cmid);font:12px 'DM Sans',sans-serif;cursor:pointer;margin-bottom:1.25rem;padding:0}
+.pk-back:hover{color:var(--cream)}
+.pk-layout{display:grid;grid-template-columns:minmax(390px,470px) minmax(0,1fr);gap:1.25rem;align-items:start}
+.pk-editor,.pk-preview-wrap{background:var(--surface);border:1px solid var(--b1);border-radius:10px;overflow:hidden}
+.pk-editor-head,.pk-preview-head{padding:1rem 1.25rem;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pk-editor-head h3,.pk-preview-head h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700}
+.pk-editor-body{padding:1.25rem;max-height:calc(100vh - 210px);overflow:auto}
+.pk-section{padding:1rem 0;border-bottom:1px solid var(--b1)}
+.pk-section:first-child{padding-top:0}
+.pk-section:last-child{border-bottom:0}
+.pk-section-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--cdim);margin-bottom:12px}
+.pk-actions{display:flex;gap:8px;flex-wrap:wrap}
+.pk-template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pk-template{border:1px solid var(--b2);background:var(--s2);border-radius:7px;padding:12px;cursor:pointer;transition:.15s}
+.pk-template:hover{border-color:var(--b3);transform:translateY(-1px)}
+.pk-template.active{border-color:var(--gbright);box-shadow:0 0 0 1px rgba(74,124,74,.25) inset}
+.pk-template-swatch{height:44px;border-radius:5px;margin-bottom:8px;border:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-end;padding:6px;gap:4px}
+.pk-template-swatch i{display:block;width:24px;height:6px;border-radius:3px;background:currentColor;opacity:.8}
+.pk-template-name{font-size:11px;color:var(--cream)}
+.pk-template-key{font-size:9px;color:var(--cdim);margin-top:2px}
+.pk-template-badge{font-size:9px;color:var(--gtext);margin-top:7px}
+.pk-color-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pk-color-field{display:flex;align-items:center;gap:8px}
+.pk-color-field input[type=color]{width:38px;height:34px;padding:2px;border-radius:5px;cursor:pointer;flex:0 0 auto}
+.pk-color-field input[type=text]{min-width:0}
+.pk-preview-shell{padding:1.25rem;background:#eee;min-height:720px;overflow:auto}
+.pk-preview-device{max-width:900px;margin:0 auto}
+.pk-live-card{max-width:780px;margin:0 auto;min-height:700px;box-shadow:0 16px 50px rgba(0,0,0,.18);overflow:hidden}
+.pk-live-hero{padding:52px 46px 34px}
+.pk-live-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.72}
+.pk-live-name{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,5vw,4.6rem);line-height:.98;margin-top:10px}
+.pk-live-meta{font-size:12px;margin-top:14px;opacity:.7}
+.pk-live-image{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.pk-live-body{padding:38px 46px}
+.pk-live-section{margin-top:34px}
+.pk-live-section:first-child{margin-top:0}
+.pk-live-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-bottom:9px}
+.pk-live-short{font-size:15px;line-height:1.65}
+.pk-live-bio{font-family:'Playfair Display',serif;font-size:1.25rem;line-height:1.52}
+.pk-live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px}
+.pk-live-link{display:block;padding:10px 0;border-bottom:1px solid currentColor;font-size:12px;text-decoration:none;opacity:.8}
+.pk-live-release{padding:11px 0;border-bottom:1px solid currentColor;font-size:12px;opacity:.82}
+.pk-live-quote{margin-top:30px;padding:22px;border-left:3px solid currentColor;font-family:'Playfair Display',serif;font-size:1.15rem;font-style:italic}
+.pk-live-highlights{font-size:12px;line-height:1.8}
+.pk-live-footer{padding:22px 46px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.55}
+.pk-layout-spec-sheet .pk-live-card{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid currentColor;box-shadow:none}
+.pk-layout-spec-sheet .pk-live-name{font-family:inherit;font-weight:700;letter-spacing:-.06em}
+.pk-layout-spec-sheet .pk-live-hero{border-bottom:1px solid currentColor}
+.pk-layout-zine-collage .pk-live-card{transform:rotate(-.3deg);box-shadow:8px 14px 0 rgba(0,0,0,.13)}
+.pk-layout-zine-collage .pk-live-hero{border-bottom:0!important}
+.pk-layout-zine-collage .pk-live-name{font-family:Georgia,serif;font-style:italic}
+.pk-layout-now-playing .pk-live-card{border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.pk-layout-now-playing .pk-live-name{letter-spacing:-.04em}
+.pk-layout-radial-vinyl .pk-live-card{border-radius:50%;aspect-ratio:1/1;min-height:780px;display:flex;flex-direction:column;justify-content:center}
+.pk-layout-radial-vinyl .pk-live-image{aspect-ratio:1/1;width:52%;border-radius:50%;margin:0 auto;order:0}
+.pk-layout-radial-vinyl .pk-live-hero{order:1;text-align:center;padding:28px 46px 14px}
+.pk-layout-radial-vinyl .pk-live-body{order:2;padding:20px 46px;text-align:center}
+.pk-layout-radial-vinyl .pk-live-footer{order:3;text-align:center}
+.pk-layout-letterhead-memo .pk-live-card{border:1px solid currentColor;box-shadow:none}
+.pk-layout-letterhead-memo .pk-live-hero{padding:30px 46px 18px}
+.pk-layout-letterhead-memo .pk-live-name{font-family:Georgia,serif;font-size:2.8rem}
+.pk-layout-index-dossier .pk-live-card,.pk-layout-ledger-sheet .pk-live-card{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid currentColor;box-shadow:none}
+.pk-layout-index-dossier .pk-live-name,.pk-layout-ledger-sheet .pk-live-name{font-family:inherit;font-weight:700;font-size:3.2rem}
+.pk-layout-press-one-sheet .pk-live-card{border-left:10px solid currentColor}
+.pk-layout-staggered-sheet .pk-live-name{font-size:5rem;max-width:8ch}
+.pk-layout-staggered-sheet .pk-live-body{padding-left:76px}
+.pk-layout-sunbleached .pk-live-card{border-radius:0 0 36px 36px}
+.pk-layout-warm-paper .pk-live-card{border-radius:2px;box-shadow:6px 10px 0 rgba(0,0,0,.08)}
+.pk-layout-quiet-editorial .pk-live-card{box-shadow:none;border:1px solid currentColor}
+.pk-layout-night-bloom .pk-live-card{box-shadow:0 18px 60px rgba(0,0,0,.4)}
+.pk-layout-ardito-signature .pk-live-name{letter-spacing:-.04em}
+.pk-section-sort{display:grid;gap:6px}
+.pk-sort-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--b1);background:var(--s2);border-radius:6px;cursor:grab;font-size:11px;color:var(--cream)}
+.pk-sort-item:active{cursor:grabbing}
+.pk-sort-item.dragging{opacity:.45}
+.pk-sort-grip{color:var(--cdim);font-size:13px}
+.pk-section-help{font-size:10px;color:var(--cdim);margin-top:8px;line-height:1.5}
+.pk-save-state{font-size:10px;color:var(--gtext);min-height:15px}
+.pk-preview-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pk-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--b1);border-radius:999px;font-size:10px;color:var(--cdim)}
+.pk-empty-preview{display:grid;place-items:center;min-height:600px;color:#777;font-size:13px;text-align:center;padding:40px}
+.pk-export-note{font-size:10px;color:var(--cdim);line-height:1.5;margin-top:8px}
+@media(max-width:1100px){.pk-layout{grid-template-columns:1fr}.pk-editor-body{max-height:none}.pk-preview-shell{min-height:500px}}
+@media(max-width:600px){.page{padding:1.25rem}.pk-template-grid,.pk-color-row,.pk-live-grid{grid-template-columns:1fr}.pk-live-hero,.pk-live-body,.pk-live-footer{padding-left:24px;padding-right:24px}.pk-layout-radial-vinyl .pk-live-card{border-radius:24px;aspect-ratio:auto;min-height:0}.pk-layout-radial-vinyl .pk-live-image{width:100%;border-radius:0}.pk-layout-staggered-sheet .pk-live-name{font-size:3.4rem}.pk-layout-staggered-sheet .pk-live-body{padding-left:24px}}
+
 </style>
 </head>
 <body>
@@ -331,8 +420,14 @@ textarea{resize:vertical;min-height:80px}
 
     <!-- PRESS KITS -->
     <div class="page" id="page-presskits">
-      <div class="ph"><div><div class="pt">Press Kits</div><div class="ps">Status per artist — click through to build or edit one</div></div></div>
-      <div class="rlist" id="pkgrid"></div>
+      <div id="pk-list-view">
+        <div class="ph"><div><div class="pt">Press Kits</div><div class="ps">Choose an artist to build, edit, preview and publish their EPK.</div></div></div>
+        <div class="rlist" id="pkgrid"></div>
+      </div>
+      <div id="pk-workspace" class="pk-workspace">
+        <button class="pk-back" onclick="closePressKitEditor()">← Back to all press kits</button>
+        <div id="pk-editor-root"></div>
+      </div>
     </div>
 
     <!-- LIBRARY -->
@@ -570,112 +665,131 @@ async function seedOnboardingTasks(artistId){
 const ONBOARD_CAT_COLOR={artist:'#c9a227',invite:'#6b7a3a',ardito:'#b5651d'};
 
 const EPK_TEMPLATES=[
-  {key:'ardito-signature',label:'Ardito Signature'},
-  {key:'quiet-editorial',label:'Quiet Editorial'},
-  {key:'night-bloom',label:'Night Bloom'},
-  {key:'sunbleached',label:'Sunbleached'},
-  {key:'warm-paper',label:'Warm Paper'},
-  {key:'spec-sheet',label:'Spec Sheet'},
-  {key:'zine-collage',label:'Zine Collage'},
-  {key:'now-playing',label:'Now Playing'},
-  {key:'radial-vinyl',label:'Radial Vinyl'},
-  {key:'letterhead-memo',label:'Letterhead Memo'},
-  {key:'index-dossier',label:'Index Dossier'},
-  {key:'ledger-sheet',label:'Ledger Sheet'},
-  {key:'press-one-sheet',label:'Press One-Sheet'},
-  {key:'staggered-sheet',label:'Staggered Sheet'}
+  {key:'ardito-signature',label:'Ardito Signature',kind:'Editorial / premium'},
+  {key:'quiet-editorial',label:'Quiet Editorial',kind:'Minimal / magazine'},
+  {key:'night-bloom',label:'Night Bloom',kind:'Dark / nightlife'},
+  {key:'sunbleached',label:'Sunbleached',kind:'Warm / organic'},
+  {key:'warm-paper',label:'Warm Paper',kind:'Analogue / tactile'},
+  {key:'spec-sheet',label:'Spec Sheet',kind:'Industry / technical'},
+  {key:'zine-collage',label:'Zine Collage',kind:'Experimental / cut-and-paste'},
+  {key:'now-playing',label:'Now Playing',kind:'Music-first / bold'},
+  {key:'radial-vinyl',label:'Radial Vinyl',kind:'Circular / art-led'},
+  {key:'letterhead-memo',label:'Letterhead Memo',kind:'Press / correspondence'},
+  {key:'index-dossier',label:'Index Dossier',kind:'Label / dossier'},
+  {key:'ledger-sheet',label:'Ledger Sheet',kind:'Clean / data-led'},
+  {key:'press-one-sheet',label:'Press One-Sheet',kind:'Classic / pitch-ready'},
+  {key:'staggered-sheet',label:'Staggered Sheet',kind:'Editorial / asymmetric'}
 ];
 function epkLabel(key){const t=EPK_TEMPLATES.find(x=>x.key===key);return t?t.label:key;}
 function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)||null;}
-
-const PK_STATUS_TAG={not_started:'td',in_progress:'ta',published:'tg'};
-const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',published:'Published'};
-
+const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
+const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
+const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',press_contact:'',press_email:'',releases:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements']};
+const PK_DEFAULT_COLORS={
+  'ardito-signature':{bg:'#F4F0E8',ink:'#171713',accent:'#4A7C4A'},'quiet-editorial':{bg:'#F7F5F0',ink:'#20201D',accent:'#8A8174'},'night-bloom':{bg:'#111116',ink:'#F1EBDD',accent:'#A66CFF'},'sunbleached':{bg:'#E9D8BA',ink:'#3D3227',accent:'#B76E3B'},'warm-paper':{bg:'#E9E0CF',ink:'#29251F',accent:'#9A6845'},'spec-sheet':{bg:'#E7ECE9',ink:'#15201C',accent:'#3C6E63'},'zine-collage':{bg:'#EFE8DD',ink:'#1D1713',accent:'#D04B32'},'now-playing':{bg:'#151515',ink:'#F5F2E9',accent:'#D9B65D'},'radial-vinyl':{bg:'#17191B',ink:'#EAE6DC',accent:'#8AB0A3'},'letterhead-memo':{bg:'#F2EFE7',ink:'#25231E',accent:'#7C6B55'},'index-dossier':{bg:'#E3E0D6',ink:'#1C1D1B',accent:'#596B5A'},'ledger-sheet':{bg:'#E8E2D4',ink:'#2A2A24',accent:'#68704B'},'press-one-sheet':{bg:'#F6F3EC',ink:'#24211C',accent:'#9B5D3B'},'staggered-sheet':{bg:'#EDE9E0',ink:'#201F1B',accent:'#756D61'}
+};
+function pkStorageKey(id){return 'ardito_epk_content_'+id;}
+function pkColorKey(key){return 'ardito_epk_colors_'+key;}
+function getPKRemoteContent(id){const pk=getPressKit(id);return pk&&pk.content&&typeof pk.content==='object'?pk.content:{};}
+function getPKContent(id){
+  try{return {...PK_DEFAULT_CONTENT,...getPKRemoteContent(id),...JSON.parse(localStorage.getItem(pkStorageKey(id))||'{}')};}
+  catch(e){return {...PK_DEFAULT_CONTENT,...getPKRemoteContent(id)};}
+}
+function savePKContentLocal(id,data){localStorage.setItem(pkStorageKey(id),JSON.stringify(data));}
+function getPKColors(key){
+  const d=PK_DEFAULT_COLORS[key]||PK_DEFAULT_COLORS['ardito-signature'],pk=aPressKits.find(x=>x.template===key),remote=pk&&pk.theme&&typeof pk.theme==='object'?pk.theme:{};
+  try{return {...d,...remote,...JSON.parse(localStorage.getItem(pkColorKey(key))||'{}')};}catch(e){return {...d,...remote};}
+}
+function savePKColors(key,data){localStorage.setItem(pkColorKey(key),JSON.stringify(data));}
+function escPK(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function nlPK(v){return escPK(v).replace(/\n/g,'<br>');}
+function getArtistPKSeed(a){const c=getPKContent(a.id);return {...c,headline:c.headline||a.name||'Artist Name',location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''};}
+function pkReleasesText(artistId){return aRel.filter(r=>r.artist_id===artistId).map(r=>[r.release_name,r.release_date?new Date(r.release_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'',r.streaming_link||''].filter(Boolean).join(' · ')).join('\n');}
+let pkPersistTimer=null;
+async function persistPKData(artistId){
+  const pk=getPressKit(artistId);if(!pk)return;
+  const content=getPKContent(artistId),theme=getPKColors(pk.template||'ardito-signature');
+  try{
+    const r=await db('press_kits','PATCH',{content,theme},pk.id);
+    if(r&&r[0])aPressKits=aPressKits.map(x=>x.id===pk.id?{...x,...r[0]}:x);
+    setPKSaveState('Saved to Supabase ✓');
+  }catch(e){console.warn('EPK content/theme columns are not available yet; using browser storage.',e);setPKSaveState('Saved in this browser · add Supabase columns to sync across devices');}
+}
+function queuePKPersist(artistId){clearTimeout(pkPersistTimer);setPKSaveState('Saving…');pkPersistTimer=setTimeout(()=>persistPKData(artistId),700);}
+function setPKSaveState(text){const el=document.getElementById('pk-save-state');if(el)el.textContent=text;}
 function renderPressKits(){
   const g=document.getElementById('pkgrid');
+  document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-workspace').classList.remove('open');
   if(!aArt.length){g.innerHTML='<div class="empty"><div class="ei">🗂️</div><div>Add an artist first, then build their press kit</div></div>';return;}
-  g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{
-    const pk=getPressKit(a.id);
-    const status=pk?.status||'not_started';
-    return`<div class="li" style="cursor:pointer" onclick="nav('roster');showAD('${a.id}')">
-      <div style="flex:1">
-        <div class="an">${a.name}</div>
-        <div class="al">${pk&&pk.template?epkLabel(pk.template):'No template chosen yet'}</div>
-      </div>
-      <span class="tag ${PK_STATUS_TAG[status]}">${PK_STATUS_LABEL[status]}</span>
-      ${pk?.url?`<a href="${pk.url}" target="_blank" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a>`:''}
-    </div>`;
-  }).join('');
+  g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{const pk=getPressKit(a.id),status=pk?.status||'not_started';return`<div class="li" style="cursor:pointer" onclick="openPressKitEditor('${a.id}')"><div style="flex:1;min-width:0"><div class="an">${escPK(a.name)}</div><div class="al">${pk?.template?epkLabel(pk.template):'No template chosen yet'}${pk?.url?' · Live URL set':''}</div></div><span class="tag ${PK_STATUS_TAG[status]||'td'}">${PK_STATUS_LABEL[status]||status}</span>${pk?.url?`<a href="${escPK(pk.url)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a>`:''}<button class="btn bg bsm" onclick="event.stopPropagation();openPressKitEditor('${a.id}')">${pk?.template?'Edit':'Build'}</button></div>`;}).join('');
+}
+function closePressKitEditor(){document.getElementById('pk-workspace').classList.remove('open');document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-editor-root').innerHTML='';renderPressKits();}
+function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKPreview(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
+function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);return`<div class="pk-section"><div class="pk-section-title">1 · Choose your design</div><div class="pk-template-grid">${EPK_TEMPLATES.map(t=>{const c=getPKColors(t.key);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate('${artistId}','${t.key}')"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></div>`;}
+function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="fg"><label class="fl">${escPK(label)}</label>${type==='textarea'?`<textarea id="${id}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">${escPK(value)}</textarea>`:`<input id="${id}" type="text" value="${escPK(value)}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">`}</div>`;}
+function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
+const PK_SECTION_LABELS={short_bio:'Short bio',bio:'Biography',quote:'Press quote',links:'Links & contact',releases:'Selected releases',achievements:'Highlights'};
+function buildPKOrderEditor(c){const order=Array.isArray(c.section_order)&&c.section_order.length?c.section_order:PK_DEFAULT_CONTENT.section_order;return`<div class="pk-section"><div class="pk-section-title">6 · Arrange your sections</div><div class="pk-section-sort" id="pk-section-sort">${order.filter(k=>PK_SECTION_LABELS[k]).map(k=>`<div class="pk-sort-item" draggable="true" data-section="${k}" ondragstart="pkDragStart(event)" ondragover="pkDragOver(event)" ondrop="pkDrop(event)" ondragend="pkDragEnd(event)"><span class="pk-sort-grip">☷</span>${PK_SECTION_LABELS[k]}</div>`).join('')}</div><div class="pk-section-help">Drag the sections into the order you want. The preview updates instantly.</div></div>`;}
+function buildPKEditor(artistId){
+  const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId),c=getArtistPKSeed(a);
+  const status=pk?.status||'not_started',tpl=pk?.template||'',colors=tpl?getPKColors(tpl):PK_DEFAULT_COLORS['ardito-signature'];
+  let head='<div class="ph" style="margin-bottom:1rem"><div><div class="pt">'+escPK(a.name)+' · EPK Studio</div><div class="ps">Edit once, switch designs freely, preview live and publish when ready.</div></div><div class="pk-actions"><span class="tag '+(PK_STATUS_TAG[status]||'td')+'">'+escPK(PK_STATUS_LABEL[status]||status)+'</span>';
+  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button>';
+  head+='</div></div>';
+  if(!tpl)return head+buildPKTemplatePicker(artistId)+'<div class="bc" style="padding:1.5rem"><div style="font-family:\'Playfair Display\',serif;font-size:1.1rem;margin-bottom:8px">Start with a template</div><div class="pk-note">Pick a design above. Your editor, live preview and HEX controls will appear immediately.</div></div>';
+  let identity='<div class="pk-section"><div class="pk-section-title">2 · Identity</div>';
+  identity+=pkField('pk-eyebrow','Eyebrow',c.eyebrow,'PRESS KIT','updatePKField');
+  identity+=pkField('pk-headline','Artist / headline',c.headline,'Artist name','updatePKField');
+  identity+='<div class="fr">'+pkField('pk-location','Location',c.location,'London, UK','updatePKField')+pkField('pk-genre','Genre / sound',c.genre,'Electronic · Alt Pop','updatePKField')+'</div>';
+  identity+=pkField('pk-short','Short bio',c.short_bio,'One or two strong lines','updatePKField');
+  identity+=pkField('pk-bio','Full bio',c.bio,'The longer artist biography','updatePKField','textarea');
+  identity+=pkField('pk-quote','Press / artist quote',c.quote,'A quote worth putting in front of a journalist','updatePKField','textarea')+'</div>';
+  let visual='<div class="pk-section"><div class="pk-section-title">3 · Visual identity</div>';
+  visual+=pkField('pk-image','Hero / press photo URL',c.image_url,'https://…','updatePKField');
+  visual+='<div class="pk-note">For now this accepts a direct image URL. The EPK structure is ready for a Supabase Storage uploader later.</div></div>';
+  let links='<div class="pk-section"><div class="pk-section-title">4 · Links & contact</div>';
+  links+=pkField('pk-website','Website',c.website,'https://…','updatePKField');
+  links+='<div class="fr">'+pkField('pk-email','Artist email',c.email,'artist@example.com','updatePKField')+pkField('pk-press-contact','Press contact',c.press_contact,'Name / company','updatePKField')+'</div>';
+  links+=pkField('pk-press-email','Press email',c.press_email,'press@example.com','updatePKField');
+  links+='<div class="fr">'+pkField('pk-instagram','Instagram',c.instagram,'@handle','updatePKField')+pkField('pk-spotify','Spotify',c.spotify,'https://open.spotify.com/…','updatePKField')+'</div>';
+  links+='<div class="fr">'+pkField('pk-apple','Apple Music',c.apple_music,'https://music.apple.com/…','updatePKField')+pkField('pk-soundcloud','SoundCloud',c.soundcloud,'https://soundcloud.com/…','updatePKField')+'</div>';
+  links+='<div class="fr">'+pkField('pk-youtube','YouTube',c.youtube,'https://youtube.com/…','updatePKField')+pkField('pk-tiktok','TikTok',c.tiktok,'@handle','updatePKField')+'</div></div>';
+  let story='<div class="pk-section"><div class="pk-section-title">5 · Story & catalogue</div>';
+  story+=pkField('pk-releases','Selected releases',c.releases||pkReleasesText(artistId),'Release · date · link, one per line','updatePKField','textarea');
+  story+=pkField('pk-achievements','Highlights / achievements',c.achievements,'Festival support, radio, press, awards…','updatePKField','textarea');
+  story+=pkField('pk-notes','Internal notes',c.notes,'Not shown in preview','updatePKField','textarea')+'</div>';
+  let statusHtml='<div class="pk-section"><div class="pk-section-title">7 · Status & publishing</div><div class="fg"><label class="fl">Status</label><select id="pk-status" onchange="updatePKStatus(\''+artistId+'\',this.value)"><option value="not_started" '+(status==='not_started'?'selected':'')+'>Not started</option><option value="in_progress" '+(status==='in_progress'?'selected':'')+'>In progress</option><option value="ready" '+(status==='ready'?'selected':'')+'>Ready to publish</option><option value="published" '+(status==='published'?'selected':'')+'>Published</option></select></div>';
+  statusHtml+='<div class="fg"><label class="fl">Live URL</label><input id="pk-url" type="text" value="'+escPK(pk?.url||'')+'" placeholder="https://…" onblur="updatePKUrl(\''+artistId+'\',this.value)"></div>';
+  statusHtml+='<div class="pk-actions"><button class="btn bp" onclick="savePKNow(\''+artistId+'\')">Save EPK</button><button class="btn bg" onclick="previewPK(\''+artistId+'\')">Open preview ↗</button></div><div class="pk-export-note">“Export HTML” creates a standalone file you can upload to <code>dashboard/epk/</code> when you want a static public EPK page.</div></div>';
+  const colours='<div class="pk-section"><div class="pk-section-title">8 · Template colours</div><div class="pk-color-row">'+pkColorField('pk-bg','Background',colors.bg)+pkColorField('pk-ink','Text',colors.ink)+pkColorField('pk-accent','Accent',colors.accent)+'</div><div class="pk-actions" style="margin-top:10px"><button class="btn bg bsm" onclick="resetPKColors(\''+artistId+'\')">Reset template colours</button></div><div class="pk-section-help">HEX values are editable. Change the colour picker or type any valid six-digit HEX code.</div></div>';
+  const editor=head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
+  return editor;
 }
 
-function togPK(id){
-  const h=document.querySelector(`#pk-card-${id} .rch`);
-  const b=document.querySelector(`#pk-card-${id} .rc-body`);
-  h.classList.toggle('open');
-  b.classList.toggle('open');
-}
+function updatePKField(el){const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-releases','pk-achievements','pk-notes'],keys=['eyebrow','headline','location','genre','short_bio','bio','quote','image_url','website','email','press_contact','press_email','instagram','spotify','apple_music','soundcloud','youtube','tiktok','releases','achievements','notes'],map={};ids.forEach((id,i)=>{const x=document.getElementById(id);if(x)map[keys[i]]=x.value;});savePKContentLocal(artistId,{...getPKContent(artistId),...map});updatePKPreview(artistId);queuePKPersist(artistId);}
+function getPKOrder(artistId){const c=getPKContent(artistId);return Array.isArray(c.section_order)&&c.section_order.length?c.section_order:[...PK_DEFAULT_CONTENT.section_order];}
+let pkDragged=null;
+function pkDragStart(e){pkDragged=e.currentTarget;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function pkDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function pkDrop(e){e.preventDefault();const target=e.currentTarget;if(!pkDragged||pkDragged===target)return;const wrap=target.parentNode;const items=[...wrap.children],from=items.indexOf(pkDragged),to=items.indexOf(target);if(from<to)wrap.insertBefore(pkDragged,target.nextSibling);else wrap.insertBefore(pkDragged,target);const order=[...wrap.children].map(x=>x.dataset.section);const artistId=window.currentPKArtistId;savePKContentLocal(artistId,{...getPKContent(artistId),section_order:order});queuePKPersist(artistId);updatePKPreview(artistId);}
+function pkDragEnd(e){e.currentTarget.classList.remove('dragging');pkDragged=null;}
+async function choosePKTemplate(artistId,templateKey){window.currentPKArtistId=artistId;const existing=getPressKit(artistId);try{if(existing){const r=await db('press_kits','PATCH',{template:templateKey,status:'in_progress'},existing.id);aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,...(r&&r[0]?r[0]:{}),template:templateKey,status:'in_progress'}:p);}else{const r=await db('press_kits','POST',{artist_id:artistId,template:templateKey,status:'in_progress'});if(r&&r[0])aPressKits.push(r[0]);}}catch(e){console.error(e);alert('Could not save the template selection. Check your Supabase connection.');return;}const c=getPKContent(artistId),a=aArt.find(x=>x.id===artistId);savePKContentLocal(artistId,{...c,headline:c.headline||a.name,location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''});await persistPKData(artistId);openPressKitEditor(artistId);}
+async function resetPKTemplate(artistId){const pk=getPressKit(artistId);if(!pk)return;if(!confirm('Change template? Your EPK content, section order and colours will be preserved.'))return;try{const r=await db('press_kits','PATCH',{template:null,status:'not_started'},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),template:null,status:'not_started'}:p);}catch(e){alert('Could not change template.');return;}openPressKitEditor(artistId);}
+async function updatePKStatus(artistId,status){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{status},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),status}:p);}catch(e){console.error(e);}}
+async function updatePKUrl(artistId,url){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{url:url||null},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),url:url||null}:p);}catch(e){console.error(e);}}
+function updatePKColor(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg'?'bg':el.id==='pk-ink'?'ink':'accent',v=el.value,c={...getPKColors(pk.template),[key]:v};savePKColors(pk.template,c);const text=document.getElementById(el.id+'-text');if(text)text.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
+function updatePKColorText(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg-text'?'bg':el.id==='pk-ink-text'?'ink':'accent';let v=el.value.trim();if(!/^#[0-9a-fA-F]{6}$/.test(v))return;const c={...getPKColors(pk.template),[key]:v};savePKColors(pk.template,c);const color=document.getElementById(el.id.replace('-text',''));if(color)color.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
+function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template)return;if(!confirm('Reset this template to its default colours?'))return;localStorage.removeItem(pkColorKey(pk.template));persistPKData(artistId);openPressKitEditor(artistId);}
+function savePKNow(artistId){const c=getPKContent(artistId);savePKContentLocal(artistId,c);persistPKData(artistId);setPKSaveState('Saved ✓');}
+function pkLink(label,url){if(!url)return'';const href=/^https?:\/\//i.test(url)?url:'https://'+url.replace(/^@/,'');return`<a class="pk-live-link" href="${escPK(href)}" target="_blank" rel="noopener">${escPK(label)} ↗</a>`;}
+function pkSectionHtml(key,c,artistId){if(key==='short_bio'&&c.short_bio)return`<section class="pk-live-section"><div class="pk-live-short">${nlPK(c.short_bio)}</div></section>`;if(key==='bio'&&c.bio)return`<section class="pk-live-section"><div class="pk-live-label">Biography</div><div class="pk-live-bio">${nlPK(c.bio)}</div></section>`;if(key==='quote'&&c.quote)return`<section class="pk-live-section"><div class="pk-live-quote">${nlPK(c.quote)}</div></section>`;if(key==='links'){const links=[pkLink('Website',c.website),pkLink('Email',c.email),pkLink('Instagram',c.instagram),pkLink('Spotify',c.spotify),pkLink('Apple Music',c.apple_music),pkLink('SoundCloud',c.soundcloud),pkLink('YouTube',c.youtube),pkLink('TikTok',c.tiktok)].join('');return links?`<section class="pk-live-section"><div class="pk-live-label">Listen / connect</div><div class="pk-live-grid">${links}</div></section>`:'';}if(key==='releases'){const rels=(c.releases||pkReleasesText(artistId)).split('\n').filter(Boolean);return rels.length?`<section class="pk-live-section"><div class="pk-live-label">Selected releases</div>${rels.map(r=>`<div class="pk-live-release">${nlPK(r)}</div>`).join('')}</section>`:'';}if(key==='achievements'&&c.achievements)return`<section class="pk-live-section"><div class="pk-live-label">Highlights</div><div class="pk-live-highlights">${nlPK(c.achievements)}</div></section>`;return'';}
+function buildPKPreview(artistId){const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return'<div class="pk-empty-preview">Choose a template to preview this EPK.</div>';const c=getArtistPKSeed(a),col=getPKColors(pk.template),image=c.image_url?`<img class="pk-live-image" src="${escPK(c.image_url)}" alt="${escPK(c.headline)}">`:'';const sections=getPKOrder(artistId).map(k=>pkSectionHtml(k,c,artistId)).join('');return`<div class="pk-layout-${escPK(pk.template)}"><div class="pk-live-card" style="background:${escPK(col.bg)};color:${escPK(col.ink)}"><div class="pk-live-hero" style="border-bottom:4px solid ${escPK(col.accent)}"><div class="pk-live-kicker" style="color:${escPK(col.accent)}">${escPK(c.eyebrow||'PRESS KIT')}</div><div class="pk-live-name">${escPK(c.headline||a.name)}</div><div class="pk-live-meta">${escPK([c.location,c.genre].filter(Boolean).join(' · '))}</div></div>${image}<div class="pk-live-body">${sections}</div><div class="pk-live-footer" style="border-top:1px solid currentColor">Ardito · Press Kit${c.press_contact||c.press_email?' · '+escPK(c.press_contact||c.press_email):''}</div></div></div>`;}
+function updatePKPreview(artistId){window.currentPKArtistId=artistId;const el=document.getElementById('pk-preview-'+artistId);if(el)el.innerHTML=buildPKPreview(artistId);}
+function previewPK(artistId){const html=buildPKPreview(artistId);if(!html)return;const win=window.open('','_blank');if(!win){alert('Your browser blocked the preview window. Please allow pop-ups for this page.');return;}win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escPK(getArtistPKSeed(aArt.find(x=>x.id===artistId)).headline)} · Press Kit</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font-family:Arial,sans-serif;background:#ddd;padding:24px}*{box-sizing:border-box}.pk-live-card{max-width:780px;margin:0 auto;min-height:90vh}.pk-live-hero{padding:52px 44px 34px}.pk-live-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase}.pk-live-name{font:700 clamp(2rem,6vw,4.5rem)/1.02 Georgia,serif;margin-top:10px}.pk-live-meta{font-size:12px;margin-top:12px;opacity:.7}.pk-live-image{width:100%;max-height:500px;object-fit:cover;display:block}.pk-live-body{padding:38px 44px}.pk-live-section{margin-top:30px}.pk-live-section:first-child{margin-top:0}.pk-live-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-bottom:8px}.pk-live-short{font-size:14px;line-height:1.6}.pk-live-bio{font:1.25rem/1.5 Georgia,serif}.pk-live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.pk-live-link{display:block;padding:9px 0;border-bottom:1px solid currentColor;text-decoration:none;color:inherit;font-size:12px}.pk-live-release{padding:10px 0;border-bottom:1px solid currentColor;font-size:12px}.pk-live-quote{padding:22px;border-left:3px solid currentColor;font:italic 1.15rem Georgia,serif}.pk-live-footer{padding:22px 44px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.55}@media(max-width:600px){body{padding:0}.pk-live-grid{grid-template-columns:1fr}.pk-live-hero,.pk-live-body,.pk-live-footer{padding-left:24px;padding-right:24px}}</style></head><body>${html}</body></html>`);win.document.close();}
+function exportPKHtml(artistId){const html=buildPKPreview(artistId),a=aArt.find(x=>x.id===artistId);if(!html||!a)return;const doc=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escPK(a.name)} · EPK</title><style>body{margin:0;background:#ddd;padding:24px;font-family:Arial,sans-serif}*{box-sizing:border-box}.pk-live-card{max-width:780px;margin:0 auto;min-height:90vh}.pk-live-hero{padding:52px 44px 34px}.pk-live-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase}.pk-live-name{font:700 clamp(2rem,6vw,4.5rem)/1.02 Georgia,serif;margin-top:10px}.pk-live-meta{font-size:12px;margin-top:12px;opacity:.7}.pk-live-image{width:100%;max-height:500px;object-fit:cover;display:block}.pk-live-body{padding:38px 44px}.pk-live-section{margin-top:30px}.pk-live-section:first-child{margin-top:0}.pk-live-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.55;margin-bottom:8px}.pk-live-short{font-size:14px;line-height:1.6}.pk-live-bio{font:1.25rem/1.5 Georgia,serif}.pk-live-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.pk-live-link{display:block;padding:9px 0;border-bottom:1px solid currentColor;text-decoration:none;color:inherit;font-size:12px}.pk-live-release{padding:10px 0;border-bottom:1px solid currentColor;font-size:12px}.pk-live-quote{padding:22px;border-left:3px solid currentColor;font:italic 1.15rem Georgia,serif}.pk-live-footer{padding:22px 44px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.55}@media(max-width:600px){body{padding:0}.pk-live-grid{grid-template-columns:1fr}.pk-live-hero,.pk-live-body,.pk-live-footer{padding-left:24px;padding-right:24px}}</style></head><body>${html}</body></html>`;const blob=new Blob([doc],{type:'text/html'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download=(a.name||'artist').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-epk.html';document.body.appendChild(aEl);aEl.click();aEl.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function buildPressKitSection(artistId){const pk=getPressKit(artistId),label=pk?.template?epkLabel(pk.template):'No template chosen';return`<div style="padding:.9rem 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><div style="font-size:12px;color:var(--cream)">${escPK(label)}</div><div style="font-size:11px;color:var(--cdim);margin-top:4px">${pk?.template?'Open EPK Studio to edit the content, layout and colours.':'Choose a template to start building this artist’s EPK.'}</div></div><button class="btn bg bsm" onclick="nav('presskits');setTimeout(()=>openPressKitEditor('${artistId}'),0)">${pk?.template?'Edit EPK':'Build EPK'} ↗</button></div></div>`;}
+function togPK(id){const h=document.querySelector(`#pk-card-${id} .rch`),b=document.querySelector(`#pk-card-${id} .rc-body`);if(h&&b){h.classList.toggle('open');b.classList.toggle('open');}}
 
-function buildPressKitSection(artistId){
-  const pk=getPressKit(artistId);
-  if(!pk||!pk.template){
-    return`<div style="padding:1rem 0">
-      <div style="font-size:12px;color:var(--cdim);margin-bottom:12px">Pick a template to start this artist's press kit.</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
-        ${EPK_TEMPLATES.map(t=>`<div class="ci" onclick="choosePKTemplate('${artistId}','${t.key}')" style="justify-content:center;text-align:center">${t.label}</div>`).join('')}
-      </div>
-    </div>`;
-  }
-  return`<div style="padding:1rem 0">
-    <div class="dr2"><span class="dk">Template</span><span class="dv">${epkLabel(pk.template)} · <a href="javascript:void(0)" onclick="resetPKTemplate('${artistId}')">change</a></span></div>
-    <div class="fg" style="margin-top:12px"><label class="fl">Status</label>
-      <select onchange="updatePKStatus('${artistId}',this.value)">
-        <option value="not_started" ${pk.status==='not_started'?'selected':''}>Not started</option>
-        <option value="in_progress" ${pk.status==='in_progress'?'selected':''}>In progress</option>
-        <option value="published" ${pk.status==='published'?'selected':''}>Published</option>
-      </select>
-    </div>
-    <div class="fg"><label class="fl">Live URL</label>
-      <input type="text" value="${pk.url||''}" placeholder="https://ardito.co.uk/press/artistname.html" onblur="updatePKUrl('${artistId}',this.value)">
-    </div>
-  </div>`;
-}
-
-async function choosePKTemplate(artistId,templateKey){
-  const existing=getPressKit(artistId);
-  if(existing){
-    await db('press_kits','PATCH',{template:templateKey,status:'in_progress'},existing.id);
-    aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,template:templateKey,status:'in_progress'}:p);
-  }else{
-    const r=await db('press_kits','POST',{artist_id:artistId,template:templateKey,status:'in_progress'});
-    if(r&&r[0])aPressKits.push(r[0]);
-  }
-  document.getElementById(`pkcont-${artistId}`).innerHTML=buildPressKitSection(artistId);
-  document.getElementById(`pkstat-${artistId}`).textContent=PK_STATUS_LABEL['in_progress'];
-}
-
-async function resetPKTemplate(artistId){
-  const pk=getPressKit(artistId);
-  if(!pk)return;
-  if(!confirm('Change template? This clears the current template choice.'))return;
-  await db('press_kits','PATCH',{template:null,status:'not_started'},pk.id);
-  aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,template:null,status:'not_started'}:p);
-  document.getElementById(`pkcont-${artistId}`).innerHTML=buildPressKitSection(artistId);
-  document.getElementById(`pkstat-${artistId}`).textContent=PK_STATUS_LABEL['not_started'];
-}
-
-async function updatePKStatus(artistId,status){
-  const pk=getPressKit(artistId);if(!pk)return;
-  await db('press_kits','PATCH',{status},pk.id);
-  aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,status}:p);
-  document.getElementById(`pkstat-${artistId}`).textContent=PK_STATUS_LABEL[status];
-}
-
-async function updatePKUrl(artistId,url){
-  const pk=getPressKit(artistId);if(!pk)return;
-  await db('press_kits','PATCH',{url:url||null},pk.id);
-  aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,url:url||null}:p);
-}
-  
 function buildOnboardSection(artistId){
   const tasks=aOnboard.filter(t=>t.artist_id===artistId).sort((a,b)=>a.sort_order-b.sort_order);
   if(!tasks.length)return '<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No onboarding checklist found for this artist, it\'s generated automatically the moment a new artist is added.</div>';
