@@ -687,7 +687,7 @@ function epkLabel(key){const t=epkTemplate(key);return t?t.label:key;}
 function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)||null;}
 const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
-const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'2026',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements']};
+const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'2026',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements']};
 const PK_DEFAULT_COLORS={
   'ardito-signature':{bg:'#0d0d0d',ink:'#e8e0d0',accent:'#2d4a2d'},'quiet-editorial':{bg:'#f2f0ea',ink:'#171717',accent:'#7a2f2f'},'night-bloom':{bg:'#241b2e',ink:'#f2ead9',accent:'#b8873b'},'sunbleached':{bg:'#2b3a4a',ink:'#f1ece0',accent:'#c99a3c'},'warm-paper':{bg:'#ece7dd',ink:'#1c2430',accent:'#a8503f'},'spec-sheet':{bg:'#e8e8f0',ink:'#141420',accent:'#3d2bff'},'zine-collage':{bg:'#fff6ea',ink:'#212121',accent:'#ff4d6d'},'now-playing':{bg:'#1b2a4a',ink:'#fff3d0',accent:'#e4572e'},'radial-vinyl':{bg:'#d3a24c',ink:'#101010',accent:'#c85a3d'},'letterhead-memo':{bg:'#e9e7e4',ink:'#26241f',accent:'#6f7263'},'index-dossier':{bg:'#eceeec',ink:'#23262b',accent:'#5c6470'},'ledger-sheet':{bg:'#e6e2dc',ink:'#1c1b19',accent:'#8a7b6c'},'press-one-sheet':{bg:'#f2ede1',ink:'#111111',accent:'#e8352b'},'staggered-sheet':{bg:'#0a0a0f',ink:'#f5f3ee',accent:'#00e5ff'}
 };
@@ -744,6 +744,24 @@ function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="
 function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
 const PK_SECTION_LABELS={short_bio:'Short bio',bio:'Biography',quote:'Press quote',links:'Links & contact',releases:'Selected releases',achievements:'Highlights'};
 function buildPKOrderEditor(c){const order=Array.isArray(c.section_order)&&c.section_order.length?c.section_order:PK_DEFAULT_CONTENT.section_order;return`<div class="pk-section"><div class="pk-section-title">6 · Arrange your sections</div><div class="pk-section-sort" id="pk-section-sort">${order.filter(k=>PK_SECTION_LABELS[k]).map(k=>`<div class="pk-sort-item" draggable="true" data-section="${k}" ondragstart="pkDragStart(event)" ondragover="pkDragOver(event)" ondrop="pkDrop(event)" ondragend="pkDragEnd(event)"><span class="pk-sort-grip">☷</span>${PK_SECTION_LABELS[k]}</div>`).join('')}</div><div class="pk-section-help">Drag the sections into the order you want. The preview updates instantly.</div></div>`;}
+async function uploadPKImage(artistId,input){
+  const file=input&&input.files&&input.files[0];if(!file)return;
+  if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){alert('Please choose a JPG, PNG, WebP or GIF image.');input.value='';return;}
+  if(file.size>8*1024*1024){alert('Please keep the press photo under 8 MB.');input.value='';return;}
+  const safeName=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-');
+  const path=`${artistId}/${Date.now()}-${safeName}`;
+  const bucket='epk-assets';
+  setPKSaveState('Uploading photo…');
+  try{
+    const r=await fetch(`${SB}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':file.type,'x-upsert':'true'},body:file});
+    const tx=await r.text();if(!r.ok)throw new Error(tx||r.statusText);
+    const publicUrl=`${SB}/storage/v1/object/public/${bucket}/${path}`;
+    const c=getPKContent(artistId);savePKContentLocal(artistId,{...c,image_url:publicUrl});
+    const inputEl=document.getElementById('pk-image');if(inputEl)inputEl.value=publicUrl;
+    updatePKPreview(artistId);await persistPKData(artistId);setPKSaveState('Photo uploaded · saved ✓');
+  }catch(e){console.error('EPK photo upload failed:',e);setPKSaveState('Upload failed');alert('Photo upload failed. The Supabase Storage bucket "epk-assets" may need to be created and given upload/public policies. Your existing EPK data has not been changed.');}
+  finally{input.value='';}
+}
 function buildPKEditor(artistId){
   const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId),c=getArtistPKSeed(a);
   const status=pk?.status||'not_started',tpl=pk?.template||'',colors=tpl?getPKColors(artistId):PK_DEFAULT_COLORS['ardito-signature'];
@@ -760,15 +778,17 @@ function buildPKEditor(artistId){
   identity+=pkField('pk-quote','Press / artist quote',c.quote,'A quote worth putting in front of a journalist','updatePKField','textarea');
   identity+=pkField('pk-quote-source','Quote source',c.quote_source,'Publication / journalist','updatePKField')+'</div>';
   let visual='<div class="pk-section"><div class="pk-section-title">3 · Visual identity</div>';
+  visual+='<div class="fg"><label class="fl">Hero / press photo</label><input id="pk-image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadPKImage(\''+artistId+'\',this)"><div class="pk-note" style="margin-top:6px">Upload a photo directly, or use the URL field below if the image is already hosted.</div></div>';
   visual+=pkField('pk-image','Hero / press photo URL',c.image_url,'https://…','updatePKField');
-  visual+='<div class="pk-note">Use a direct public image URL. Supabase Storage is recommended for the final setup.</div></div>';
+  visual+='</div>';
   let links='<div class="pk-section"><div class="pk-section-title">4 · Links & contact</div>';
   links+=pkField('pk-website','Website',c.website,'https://…','updatePKField');
   links+='<div class="fr">'+pkField('pk-email','Artist email',c.email,'artist@example.com','updatePKField')+pkField('pk-press-contact','Press contact',c.press_contact,'Name / company','updatePKField')+'</div>';
   links+=pkField('pk-press-email','Press email',c.press_email,'press@example.com','updatePKField');
   links+='<div class="fr">'+pkField('pk-instagram','Instagram',c.instagram,'@handle','updatePKField')+pkField('pk-spotify','Spotify',c.spotify,'https://open.spotify.com/…','updatePKField')+'</div>';
   links+='<div class="fr">'+pkField('pk-apple','Apple Music',c.apple_music,'https://music.apple.com/…','updatePKField')+pkField('pk-soundcloud','SoundCloud',c.soundcloud,'https://soundcloud.com/…','updatePKField')+'</div>';
-  links+='<div class="fr">'+pkField('pk-youtube','YouTube',c.youtube,'https://youtube.com/…','updatePKField')+pkField('pk-tiktok','TikTok',c.tiktok,'@handle','updatePKField')+'</div></div>';
+  links+='<div class="fr">'+pkField('pk-youtube','YouTube',c.youtube,'https://youtube.com/…','updatePKField')+pkField('pk-tiktok','TikTok',c.tiktok,'@handle','updatePKField')+'</div>';
+  links+=pkField('pk-hyperfollow','Hyperfollow / DistroKid',c.hyperfollow,'https://…','updatePKField')+'</div>';
   let story='<div class="pk-section"><div class="pk-section-title">5 · Story & catalogue</div>';
   story+=pkField('pk-track-title','Featured track',c.track_title,'Track title','updatePKField');
   story+='<div class="fr">'+pkField('pk-track-year','Track year',c.track_year||'2026','2026','updatePKField')+pkField('pk-pdf','Press kit PDF URL',c.press_kit_pdf_url,'https://…/press-kit.pdf','updatePKField')+'</div>';
@@ -784,8 +804,8 @@ function buildPKEditor(artistId){
 
 function updatePKField(el){
   const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
-  const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-notes'];
-  const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','notes'];
+  const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-notes'];
+  const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','hyperfollow','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','notes'];
   const map={};ids.forEach((id,i)=>{const x=document.getElementById(id);if(x)map[keys[i]]=x.value;});
   savePKContentLocal(artistId,{...getPKContent(artistId),...map});updatePKPreview(artistId);queuePKPersist(artistId);
 }
@@ -836,6 +856,8 @@ function buildPKTemplateDocument(artistId){
   let html=pkTemplateSource(artistId);if(!html)return'';
   const c=getArtistPKSeed(a),col=getPKColors(artistId),track=pkFirstReleaseTrack(c),year=c.track_year||new Date().getFullYear(),quoteSource=c.quote_source||c.press_contact||'Press';
   const image=pkSafeUrl(c.image_url), spotify=pkSafeUrl(c.spotify), apple=pkSafeUrl(c.apple_music), soundcloud=pkSafeUrl(c.soundcloud), website=pkSafeUrl(c.website), youtube=pkSafeUrl(c.youtube), tiktok=pkSafeUrl(c.tiktok);
+  const spotifyEmbed=spotify?spotify.replace('open.spotify.com/','open.spotify.com/embed/').replace(/\/embed\/embed\//g,'/embed/') : '';
+  const hyperfollow=pkSafeUrl(c.hyperfollow||c.distrokid||'');
   const textMap={
     'Artist Name':c.headline||a.name||'Artist Name','ARTIST NAME':String(c.headline||a.name||'Artist Name').toUpperCase(),
     'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'Your one-line hook lives here.',
@@ -848,8 +870,8 @@ function buildPKTemplateDocument(artistId){
   html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,escPK(c.headline||a.name||'Artist Name'));
   Object.entries(textMap).forEach(([from,to])=>{if(from.includes('['))return;html=html.split(from).join(escPK(to));});
   const repl={
-    '[PRESS PHOTO URL]':image,'[PRESS PHOTO OR SINGLE ARTWORK URL]':image,'[SPOTIFY URL]':spotify,'[APPLE MUSIC URL]':apple,'[SOUNDCLOUD URL]':soundcloud,'[YOUTUBE URL]':youtube,'[TIKTOK URL]':tiktok,
-    '[DISTROKID / HYPERFOLLOW URL]':website,'[PRESS KIT PDF URL]':pkSafeUrl(c.press_kit_pdf_url)
+    '[PRESS PHOTO URL]':image,'[PRESS PHOTO OR SINGLE ARTWORK URL]':image,'[SPOTIFY URL]':spotify,'[SPOTIFY EMBED URL]':spotifyEmbed,'[APPLE MUSIC URL]':apple,'[SOUNDCLOUD URL]':soundcloud,'[YOUTUBE URL]':youtube,'[TIKTOK URL]':tiktok,
+    '[DISTROKID / HYPERFOLLOW URL]':hyperfollow,'[PRESS KIT PDF URL]':pkSafeUrl(c.press_kit_pdf_url)
   };
   Object.entries(repl).forEach(([from,to])=>{html=html.split(from).join(escPK(to));});
   // Remove photo blocks cleanly when no photo is supplied, since several supplied designs mark photography as optional.
@@ -857,6 +879,18 @@ function buildPKTemplateDocument(artistId){
     html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');
     html=html.replace(/<img[^>]+src=""[^>]*>\s*/gi,'');
   }
+  // Never send the artist's website into the DistroKid / Hyperfollow slot. If no explicit Hyperfollow URL exists, remove that link.
+  if(!hyperfollow){
+    html=html.replace(/<a[^>]+href=""[^>]*>\s*DistroKid\s*<\/a>/gi,'');
+    html=html.replace(/<a[^>]+href=""[^>]*>\s*DistroKid\s*<\/a>/gi,'');
+  }
+  // Replace template-owner contact/branding placeholders with the artist's contact details where supplied.
+  const contactEmail=pkSafeUrl(c.press_email||c.email||'');
+  const artistWebsite=website||'';
+  html=html.split('mailto:ardito.ldn@gmail.com').join(contactEmail?('mailto:'+contactEmail.replace(/^mailto:/i,'')):'mailto:');
+  html=html.split('ardito.ldn@gmail.com').join(c.press_email||c.email||'');
+  html=html.split('Ardito — ardito.co.uk').join(artistWebsite||'Press Kit');
+  html=html.split('ardito.co.uk').join(artistWebsite||'');
   // Apply the editor's three HEX controls to the real template CSS variables. Secondary colours, where a template has them, remain part of its original design.
   const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}</style>';
   html=html.replace('</head>',override+'</head>');
