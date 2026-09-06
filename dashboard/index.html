@@ -340,9 +340,11 @@ textarea{resize:vertical;min-height:80px}
 <div id="login">
   <div><div class="lw">Ardito</div><div class="ls">Command Centre</div></div>
   <div class="lbox">
-    <input type="password" id="pw" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
-    <p class="lerr" id="lerr">Incorrect password</p>
-    <button class="btn bp" onclick="login()" style="width:100%;padding:10px">Enter</button>
+    <input type="email" id="login-email" placeholder="Email address" autocomplete="username" onkeydown="if(event.key==='Enter')login()">
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+    <p class="lerr" id="lerr">Sign-in failed</p>
+    <button class="btn bp" onclick="login()" style="width:100%;padding:10px">Sign in</button>
+    <p style="font-size:10px;color:var(--cdim);margin-top:10px;line-height:1.5">Use your Ardito Supabase account.</p>
   </div>
 </div>
 
@@ -583,8 +585,11 @@ textarea{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN',PW='ArditoIsTheBest';
+const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN';
+const sbClient=window.supabase.createClient(SB,KEY,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+let currentSession=null,currentUser=null,initStarted=false;
 let cM=new Date().getMonth(),cY=new Date().getFullYear(),cvMode='cal';
 let eLib=null,eArt=null,eRel=null,eIdea=null;
 let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[],aOnboard=[],aPressKits=[];
@@ -764,7 +769,7 @@ async function uploadPKImage(artistId,input){
   const bucket='epk-assets';
   setPKSaveState('Uploading photo…');
   try{
-    const r=await fetch(`${SB}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':file.type,'x-upsert':'true'},body:file});
+    const r=await fetch(`${SB}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':`Bearer ${currentSession?.access_token||''}`,'Content-Type':file.type,'x-upsert':'true'},body:file});
     const tx=await r.text();if(!r.ok)throw new Error(tx||r.statusText);
     const publicUrl=`${SB}/storage/v1/object/public/${bucket}/${path}`;
     const c=getPKContent(artistId);savePKContentLocal(artistId,{...c,image_url:publicUrl});
@@ -1061,19 +1066,44 @@ async function saveOnboardValue(taskId,val){
 }
 
 async function db(t,m='GET',b=null,id=null,ex=''){
+  const {data:{session}}=await sbClient.auth.getSession();
+  if(!session) throw new Error('Not authenticated');
+  currentSession=session;
   const u=`${SB}/rest/v1/${t}${id?`?id=eq.${id}`:''}${ex}`;
-  const r=await fetch(u,{method:m,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':m==='POST'?'return=representation':m==='PATCH'?'return=representation':''},body:b?JSON.stringify(b):undefined});
+  const r=await fetch(u,{method:m,headers:{'apikey':KEY,'Authorization':`Bearer ${session.access_token}`,'Content-Type':'application/json','Prefer':m==='POST'?'return=representation':m==='PATCH'?'return=representation':''},body:b?JSON.stringify(b):undefined});
   const tx=await r.text();
   if(!r.ok)throw new Error(`Supabase ${r.status}: ${tx||r.statusText}`);
   if(m==='DELETE')return true;
   return tx?JSON.parse(tx):[];
 }
 
-function login(){
-  if(document.getElementById('pw').value===PW){sessionStorage.setItem('aa','1');document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';init();}
-  else document.getElementById('lerr').style.display='block';
+async function login(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const err=document.getElementById('lerr');
+  err.style.display='none';
+  if(!email||!password){err.textContent='Enter your email and password';err.style.display='block';return;}
+  try{
+    const {data,error}=await sbClient.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    currentSession=data.session; currentUser=data.user;
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    if(!initStarted){initStarted=true;await init();}
+  }catch(e){
+    console.error('Ardito sign-in failed:',e);
+    err.textContent='Sign-in failed. Check your email and password.';
+    err.style.display='block';
+  }
 }
-function logout(){sessionStorage.removeItem('aa');location.reload();}
+
+async function logout(){
+  try{await sbClient.auth.signOut({scope:'local'});}catch(e){console.error('Ardito sign-out failed:',e);}
+  currentSession=null; currentUser=null; initStarted=false;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login').style.display='block';
+  document.getElementById('login-password').value='';
+}
 
 async function init(){
   aLib=[];aArt=[];aRel=[];aIdeas=[];aRelTasks=[];aOnboard=[];aPressKits=[];
@@ -2154,7 +2184,31 @@ async function saveIdea(){
 }
 async function delIdea(){if(!confirm('Delete?'))return;await db('post_ideas','DELETE',null,eIdea);aIdeas=aIdeas.filter(i=>i.id!==eIdea);closeM('imod');renderIdeas();}
 
-if(sessionStorage.getItem('aa')){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block';init();}
+(async function bootAuth(){
+  try{
+    const {data:{session}}=await sbClient.auth.getSession();
+    currentSession=session||null; currentUser=session?.user||null;
+    if(session){
+      document.getElementById('login').style.display='none';
+      document.getElementById('app').style.display='block';
+      initStarted=true;
+      await init();
+    }
+    sbClient.auth.onAuthStateChange((event,sessionNow)=>{
+      currentSession=sessionNow||null; currentUser=sessionNow?.user||null;
+      if(event==='SIGNED_OUT'){
+        initStarted=false;
+        document.getElementById('app').style.display='none';
+        document.getElementById('login').style.display='block';
+      }
+    });
+  }catch(e){
+    console.error('Ardito auth boot failed:',e);
+    const err=document.getElementById('lerr');
+    err.textContent='Could not start secure sign-in. Refresh and try again.';
+    err.style.display='block';
+  }
+})();
 </script>
 </body>
 </html>
