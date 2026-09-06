@@ -665,22 +665,23 @@ async function seedOnboardingTasks(artistId){
 const ONBOARD_CAT_COLOR={artist:'#c9a227',invite:'#6b7a3a',ardito:'#b5651d'};
 
 const EPK_TEMPLATES=[
-  {key:'ardito-signature',label:'Ardito Signature',kind:'Editorial / premium'},
-  {key:'quiet-editorial',label:'Quiet Editorial',kind:'Minimal / magazine'},
-  {key:'night-bloom',label:'Night Bloom',kind:'Dark / nightlife'},
-  {key:'sunbleached',label:'Sunbleached',kind:'Warm / organic'},
-  {key:'warm-paper',label:'Warm Paper',kind:'Analogue / tactile'},
-  {key:'spec-sheet',label:'Spec Sheet',kind:'Industry / technical'},
-  {key:'zine-collage',label:'Zine Collage',kind:'Experimental / cut-and-paste'},
-  {key:'now-playing',label:'Now Playing',kind:'Music-first / bold'},
-  {key:'radial-vinyl',label:'Radial Vinyl',kind:'Circular / art-led'},
-  {key:'letterhead-memo',label:'Letterhead Memo',kind:'Press / correspondence'},
-  {key:'index-dossier',label:'Index Dossier',kind:'Label / dossier'},
-  {key:'ledger-sheet',label:'Ledger Sheet',kind:'Clean / data-led'},
-  {key:'press-one-sheet',label:'Press One-Sheet',kind:'Classic / pitch-ready'},
-  {key:'staggered-sheet',label:'Staggered Sheet',kind:'Editorial / asymmetric'}
+  {key:'ardito-signature',label:'Ardito Signature',kind:'Editorial / premium',file:'1-ardito-signature.html'},
+  {key:'quiet-editorial',label:'Quiet Editorial',kind:'Minimal / magazine',file:'2-quiet-editorial.html'},
+  {key:'night-bloom',label:'Night Bloom',kind:'Dark / nightlife',file:'3-night-bloom.html'},
+  {key:'sunbleached',label:'Sunbleached',kind:'Warm / organic',file:'4-sunbleached.html'},
+  {key:'warm-paper',label:'Warm Paper',kind:'Analogue / tactile',file:'5-warm-paper.html'},
+  {key:'spec-sheet',label:'Spec Sheet',kind:'Industry / technical',file:'6-spec-sheet.html'},
+  {key:'zine-collage',label:'Zine Collage',kind:'Experimental / cut-and-paste',file:'7-zine-collage.html'},
+  {key:'now-playing',label:'Now Playing',kind:'Music-first / bold',file:'8-now-playing.html'},
+  {key:'radial-vinyl',label:'Radial Vinyl',kind:'Circular / art-led',file:'9-radial-vinyl.html'},
+  {key:'letterhead-memo',label:'Letterhead Memo',kind:'Press / correspondence',file:'10-letterhead-memo.html'},
+  {key:'index-dossier',label:'Index Dossier',kind:'Label / dossier',file:'11-index-dossier.html'},
+  {key:'ledger-sheet',label:'Ledger Sheet',kind:'Clean / data-led',file:'12-ledger-sheet.html'},
+  {key:'press-one-sheet',label:'Press One-Sheet',kind:'Classic / pitch-ready',file:'13-press-one-sheet.html'},
+  {key:'staggered-sheet',label:'Staggered Sheet',kind:'Editorial / asymmetric',file:'14-staggered-sheet.html'}
 ];
-function epkLabel(key){const t=EPK_TEMPLATES.find(x=>x.key===key);return t?t.label:key;}
+function epkTemplate(key){return EPK_TEMPLATES.find(x=>x.key===key)||null;}
+function epkLabel(key){const t=epkTemplate(key);return t?t.label:key;}
 function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)||null;}
 const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
@@ -689,18 +690,21 @@ const PK_DEFAULT_COLORS={
   'ardito-signature':{bg:'#F4F0E8',ink:'#171713',accent:'#4A7C4A'},'quiet-editorial':{bg:'#F7F5F0',ink:'#20201D',accent:'#8A8174'},'night-bloom':{bg:'#111116',ink:'#F1EBDD',accent:'#A66CFF'},'sunbleached':{bg:'#E9D8BA',ink:'#3D3227',accent:'#B76E3B'},'warm-paper':{bg:'#E9E0CF',ink:'#29251F',accent:'#9A6845'},'spec-sheet':{bg:'#E7ECE9',ink:'#15201C',accent:'#3C6E63'},'zine-collage':{bg:'#EFE8DD',ink:'#1D1713',accent:'#D04B32'},'now-playing':{bg:'#151515',ink:'#F5F2E9',accent:'#D9B65D'},'radial-vinyl':{bg:'#17191B',ink:'#EAE6DC',accent:'#8AB0A3'},'letterhead-memo':{bg:'#F2EFE7',ink:'#25231E',accent:'#7C6B55'},'index-dossier':{bg:'#E3E0D6',ink:'#1C1D1B',accent:'#596B5A'},'ledger-sheet':{bg:'#E8E2D4',ink:'#2A2A24',accent:'#68704B'},'press-one-sheet':{bg:'#F6F3EC',ink:'#24211C',accent:'#9B5D3B'},'staggered-sheet':{bg:'#EDE9E0',ink:'#201F1B',accent:'#756D61'}
 };
 function pkStorageKey(id){return 'ardito_epk_content_'+id;}
-function pkColorKey(key){return 'ardito_epk_colors_'+key;}
+function pkColorKey(artistId){return 'ardito_epk_colors_'+artistId;}
 function getPKRemoteContent(id){const pk=getPressKit(id);return pk&&pk.content&&typeof pk.content==='object'?pk.content:{};}
 function getPKContent(id){
   try{return {...PK_DEFAULT_CONTENT,...getPKRemoteContent(id),...JSON.parse(localStorage.getItem(pkStorageKey(id))||'{}')};}
   catch(e){return {...PK_DEFAULT_CONTENT,...getPKRemoteContent(id)};}
 }
 function savePKContentLocal(id,data){localStorage.setItem(pkStorageKey(id),JSON.stringify(data));}
-function getPKColors(key){
-  const d=PK_DEFAULT_COLORS[key]||PK_DEFAULT_COLORS['ardito-signature'],pk=aPressKits.find(x=>x.template===key),remote=pk&&pk.theme&&typeof pk.theme==='object'?pk.theme:{};
-  try{return {...d,...remote,...JSON.parse(localStorage.getItem(pkColorKey(key))||'{}')};}catch(e){return {...d,...remote};}
+function getPKColors(artistId){
+  const pk=getPressKit(artistId),key=pk?.template||'ardito-signature';
+  const d=PK_DEFAULT_COLORS[key]||PK_DEFAULT_COLORS['ardito-signature'];
+  const remote=pk&&pk.theme&&typeof pk.theme==='object'?pk.theme:{};
+  try{return {...d,...remote,...JSON.parse(localStorage.getItem(pkColorKey(artistId))||'{}')};}
+  catch(e){return {...d,...remote};}
 }
-function savePKColors(key,data){localStorage.setItem(pkColorKey(key),JSON.stringify(data));}
+function savePKColors(artistId,data){localStorage.setItem(pkColorKey(artistId),JSON.stringify(data));}
 function escPK(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function nlPK(v){return escPK(v).replace(/\n/g,'<br>');}
 function getArtistPKSeed(a){const c=getPKContent(a.id);return {...c,headline:c.headline||a.name||'Artist Name',location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''};}
@@ -708,7 +712,7 @@ function pkReleasesText(artistId){return aRel.filter(r=>r.artist_id===artistId).
 let pkPersistTimer=null;
 async function persistPKData(artistId){
   const pk=getPressKit(artistId);if(!pk)return;
-  const content=getPKContent(artistId),theme=getPKColors(pk.template||'ardito-signature');
+  const content=getPKContent(artistId),theme=getPKColors(artistId);
   try{
     const r=await db('press_kits','PATCH',{content,theme},pk.id);
     if(r&&r[0])aPressKits=aPressKits.map(x=>x.id===pk.id?{...x,...r[0]}:x);
@@ -725,7 +729,7 @@ function renderPressKits(){
 }
 function closePressKitEditor(){document.getElementById('pk-workspace').classList.remove('open');document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-editor-root').innerHTML='';renderPressKits();}
 function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKPreview(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
-function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);return`<div class="pk-section"><div class="pk-section-title">1 · Choose your design</div><div class="pk-template-grid">${EPK_TEMPLATES.map(t=>{const c=getPKColors(t.key);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate('${artistId}','${t.key}')"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></div>`;}
+function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);return`<div class="pk-section"><div class="pk-section-title">1 · Choose your design</div><div class="pk-template-grid">${EPK_TEMPLATES.map(t=>{const c=(pk?.template===t.key)?getPKColors(artistId):(PK_DEFAULT_COLORS[t.key]||PK_DEFAULT_COLORS['ardito-signature']);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate('${artistId}','${t.key}')"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></div>`;}
 function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="fg"><label class="fl">${escPK(label)}</label>${type==='textarea'?`<textarea id="${id}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">${escPK(value)}</textarea>`:`<input id="${id}" type="text" value="${escPK(value)}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">`}</div>`;}
 function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
 const PK_SECTION_LABELS={short_bio:'Short bio',bio:'Biography',quote:'Press quote',links:'Links & contact',releases:'Selected releases',achievements:'Highlights'};
@@ -773,14 +777,36 @@ function pkDragStart(e){pkDragged=e.currentTarget;e.currentTarget.classList.add(
 function pkDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
 function pkDrop(e){e.preventDefault();const target=e.currentTarget;if(!pkDragged||pkDragged===target)return;const wrap=target.parentNode;const items=[...wrap.children],from=items.indexOf(pkDragged),to=items.indexOf(target);if(from<to)wrap.insertBefore(pkDragged,target.nextSibling);else wrap.insertBefore(pkDragged,target);const order=[...wrap.children].map(x=>x.dataset.section);const artistId=window.currentPKArtistId;savePKContentLocal(artistId,{...getPKContent(artistId),section_order:order});queuePKPersist(artistId);updatePKPreview(artistId);}
 function pkDragEnd(e){e.currentTarget.classList.remove('dragging');pkDragged=null;}
-async function choosePKTemplate(artistId,templateKey){window.currentPKArtistId=artistId;const existing=getPressKit(artistId);try{if(existing){const r=await db('press_kits','PATCH',{template:templateKey,status:'in_progress'},existing.id);aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,...(r&&r[0]?r[0]:{}),template:templateKey,status:'in_progress'}:p);}else{const r=await db('press_kits','POST',{artist_id:artistId,template:templateKey,status:'in_progress'});if(r&&r[0])aPressKits.push(r[0]);}}catch(e){console.error(e);alert('Could not save the template selection. Check your Supabase connection.');return;}const c=getPKContent(artistId),a=aArt.find(x=>x.id===artistId);savePKContentLocal(artistId,{...c,headline:c.headline||a.name,location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''});await persistPKData(artistId);openPressKitEditor(artistId);}
+async function choosePKTemplate(artistId,templateKey){
+  window.currentPKArtistId=artistId;
+  const template=epkTemplate(templateKey);
+  if(!template){alert('Template not found.');return;}
+  const existing=getPressKit(artistId);
+  try{
+    if(existing){
+      const r=await db('press_kits','PATCH',{template:templateKey,status:'in_progress'},existing.id);
+      aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,...(r&&r[0]?r[0]:{}),template:templateKey,status:'in_progress'}:p);
+    }else{
+      const r=await db('press_kits','POST',{artist_id:artistId,template:templateKey,status:'in_progress'});
+      if(r&&r[0])aPressKits.push(r[0]);
+    }
+    const c=getPKContent(artistId),a=aArt.find(x=>x.id===artistId);
+    if(a){
+      savePKContentLocal(artistId,{...c,headline:c.headline||a.name,location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''});
+    }
+    openPressKitEditor(artistId);
+  }catch(e){
+    console.error('EPK template selection failed:',e);
+    alert('Could not save the template selection. Check your Supabase connection.');
+  }
+}
 async function resetPKTemplate(artistId){const pk=getPressKit(artistId);if(!pk)return;if(!confirm('Change template? Your EPK content, section order and colours will be preserved.'))return;try{const r=await db('press_kits','PATCH',{template:null,status:'not_started'},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),template:null,status:'not_started'}:p);}catch(e){alert('Could not change template.');return;}openPressKitEditor(artistId);}
 async function updatePKStatus(artistId,status){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{status},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),status}:p);}catch(e){console.error(e);}}
 async function updatePKUrl(artistId,url){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{url:url||null},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),url:url||null}:p);}catch(e){console.error(e);}}
-function updatePKColor(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg'?'bg':el.id==='pk-ink'?'ink':'accent',v=el.value,c={...getPKColors(pk.template),[key]:v};savePKColors(pk.template,c);const text=document.getElementById(el.id+'-text');if(text)text.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
-function updatePKColorText(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg-text'?'bg':el.id==='pk-ink-text'?'ink':'accent';let v=el.value.trim();if(!/^#[0-9a-fA-F]{6}$/.test(v))return;const c={...getPKColors(pk.template),[key]:v};savePKColors(pk.template,c);const color=document.getElementById(el.id.replace('-text',''));if(color)color.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
-function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template)return;if(!confirm('Reset this template to its default colours?'))return;localStorage.removeItem(pkColorKey(pk.template));persistPKData(artistId);openPressKitEditor(artistId);}
-function savePKNow(artistId){const c=getPKContent(artistId);savePKContentLocal(artistId,c);persistPKData(artistId);setPKSaveState('Saved ✓');}
+function updatePKColor(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg'?'bg':el.id==='pk-ink'?'ink':'accent',v=el.value,c={...getPKColors(artistId),[key]:v};savePKColors(artistId,c);const text=document.getElementById(el.id+'-text');if(text)text.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
+function updatePKColorText(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg-text'?'bg':el.id==='pk-ink-text'?'ink':'accent';let v=el.value.trim();if(!/^#[0-9a-fA-F]{6}$/.test(v))return;const c={...getPKColors(artistId),[key]:v};savePKColors(artistId,c);const color=document.getElementById(el.id.replace('-text',''));if(color)color.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
+function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template)return;if(!confirm('Reset this template to its default colours?'))return;localStorage.removeItem(pkColorKey(artistId));persistPKData(artistId);openPressKitEditor(artistId);}
+async function savePKNow(artistId){const c=getPKContent(artistId);savePKContentLocal(artistId,c);await persistPKData(artistId);setPKSaveState('Saved ✓');}
 function pkLink(label,url){if(!url)return'';const href=/^https?:\/\//i.test(url)?url:'https://'+url.replace(/^@/,'');return`<a class="pk-live-link" href="${escPK(href)}" target="_blank" rel="noopener">${escPK(label)} ↗</a>`;}
 function pkSectionHtml(key,c,artistId){if(key==='short_bio'&&c.short_bio)return`<section class="pk-live-section"><div class="pk-live-short">${nlPK(c.short_bio)}</div></section>`;if(key==='bio'&&c.bio)return`<section class="pk-live-section"><div class="pk-live-label">Biography</div><div class="pk-live-bio">${nlPK(c.bio)}</div></section>`;if(key==='quote'&&c.quote)return`<section class="pk-live-section"><div class="pk-live-quote">${nlPK(c.quote)}</div></section>`;if(key==='links'){const links=[pkLink('Website',c.website),pkLink('Email',c.email),pkLink('Instagram',c.instagram),pkLink('Spotify',c.spotify),pkLink('Apple Music',c.apple_music),pkLink('SoundCloud',c.soundcloud),pkLink('YouTube',c.youtube),pkLink('TikTok',c.tiktok)].join('');return links?`<section class="pk-live-section"><div class="pk-live-label">Listen / connect</div><div class="pk-live-grid">${links}</div></section>`:'';}if(key==='releases'){const rels=(c.releases||pkReleasesText(artistId)).split('\n').filter(Boolean);return rels.length?`<section class="pk-live-section"><div class="pk-live-label">Selected releases</div>${rels.map(r=>`<div class="pk-live-release">${nlPK(r)}</div>`).join('')}</section>`:'';}if(key==='achievements'&&c.achievements)return`<section class="pk-live-section"><div class="pk-live-label">Highlights</div><div class="pk-live-highlights">${nlPK(c.achievements)}</div></section>`;return'';}
 function buildPKPreview(artistId){const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return'<div class="pk-empty-preview">Choose a template to preview this EPK.</div>';const c=getArtistPKSeed(a),col=getPKColors(pk.template),image=c.image_url?`<img class="pk-live-image" src="${escPK(c.image_url)}" alt="${escPK(c.headline)}">`:'';const sections=getPKOrder(artistId).map(k=>pkSectionHtml(k,c,artistId)).join('');return`<div class="pk-layout-${escPK(pk.template)}"><div class="pk-live-card" style="background:${escPK(col.bg)};color:${escPK(col.ink)}"><div class="pk-live-hero" style="border-bottom:4px solid ${escPK(col.accent)}"><div class="pk-live-kicker" style="color:${escPK(col.accent)}">${escPK(c.eyebrow||'PRESS KIT')}</div><div class="pk-live-name">${escPK(c.headline||a.name)}</div><div class="pk-live-meta">${escPK([c.location,c.genre].filter(Boolean).join(' · '))}</div></div>${image}<div class="pk-live-body">${sections}</div><div class="pk-live-footer" style="border-top:1px solid currentColor">Ardito · Press Kit${c.press_contact||c.press_email?' · '+escPK(c.press_contact||c.press_email):''}</div></div></div>`;}
@@ -851,8 +877,10 @@ async function saveOnboardValue(taskId,val){
 async function db(t,m='GET',b=null,id=null,ex=''){
   const u=`${SB}/rest/v1/${t}${id?`?id=eq.${id}`:''}${ex}`;
   const r=await fetch(u,{method:m,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':m==='POST'?'return=representation':m==='PATCH'?'return=representation':''},body:b?JSON.stringify(b):undefined});
+  const tx=await r.text();
+  if(!r.ok)throw new Error(`Supabase ${r.status}: ${tx||r.statusText}`);
   if(m==='DELETE')return true;
-  const tx=await r.text();return tx?JSON.parse(tx):[];
+  return tx?JSON.parse(tx):[];
 }
 
 function login(){
