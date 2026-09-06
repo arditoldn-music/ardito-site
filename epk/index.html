@@ -22,7 +22,7 @@ const EPK_TEMPLATE_SOURCES={"ardito-signature": "<!DOCTYPE html>\n<html lang=\"e
 const DEFAULTS={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:[]};
 function safeUrl(v){const x=String(v||'').trim();return /^(https?:|mailto:|data:image\/)/i.test(x)?x:'';}
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function pkSlug(){const p=new URLSearchParams(location.search);return (p.get('artist')||'').trim().toLowerCase();}
+function pkSlug(){const p=new URLSearchParams(location.search);let s=(p.get('artist')||'').trim();if(!s){const base='/epk/';const path=location.pathname; if(path.startsWith(base)){s=path.slice(base.length).split('/').filter(Boolean)[0]||'';}}s=s.toLowerCase();if(s&&location.search){history.replaceState(null,'', '/epk/'+encodeURIComponent(s)+'/');}return s;}
 async function api(path){const r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});const t=await r.text();if(!r.ok)throw new Error(t||r.statusText);return t?JSON.parse(t):[];}
 function build(pk,a){
   let html=EPK_TEMPLATE_SOURCES[pk.template]||''; if(!html) return '';
