@@ -689,10 +689,10 @@ const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
 const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'2026',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements']};
 const PK_DEFAULT_COLORS={
-  'ardito-signature':{bg:'#F4F0E8',ink:'#171713',accent:'#4A7C4A'},'quiet-editorial':{bg:'#F7F5F0',ink:'#20201D',accent:'#8A8174'},'night-bloom':{bg:'#111116',ink:'#F1EBDD',accent:'#A66CFF'},'sunbleached':{bg:'#E9D8BA',ink:'#3D3227',accent:'#B76E3B'},'warm-paper':{bg:'#E9E0CF',ink:'#29251F',accent:'#9A6845'},'spec-sheet':{bg:'#E7ECE9',ink:'#15201C',accent:'#3C6E63'},'zine-collage':{bg:'#EFE8DD',ink:'#1D1713',accent:'#D04B32'},'now-playing':{bg:'#151515',ink:'#F5F2E9',accent:'#D9B65D'},'radial-vinyl':{bg:'#17191B',ink:'#EAE6DC',accent:'#8AB0A3'},'letterhead-memo':{bg:'#F2EFE7',ink:'#25231E',accent:'#7C6B55'},'index-dossier':{bg:'#E3E0D6',ink:'#1C1D1B',accent:'#596B5A'},'ledger-sheet':{bg:'#E8E2D4',ink:'#2A2A24',accent:'#68704B'},'press-one-sheet':{bg:'#F6F3EC',ink:'#24211C',accent:'#9B5D3B'},'staggered-sheet':{bg:'#EDE9E0',ink:'#201F1B',accent:'#756D61'}
+  'ardito-signature':{bg:'#0d0d0d',ink:'#e8e0d0',accent:'#2d4a2d'},'quiet-editorial':{bg:'#f2f0ea',ink:'#171717',accent:'#7a2f2f'},'night-bloom':{bg:'#241b2e',ink:'#f2ead9',accent:'#b8873b'},'sunbleached':{bg:'#2b3a4a',ink:'#f1ece0',accent:'#c99a3c'},'warm-paper':{bg:'#ece7dd',ink:'#1c2430',accent:'#a8503f'},'spec-sheet':{bg:'#e8e8f0',ink:'#141420',accent:'#3d2bff'},'zine-collage':{bg:'#fff6ea',ink:'#212121',accent:'#ff4d6d'},'now-playing':{bg:'#1b2a4a',ink:'#fff3d0',accent:'#e4572e'},'radial-vinyl':{bg:'#d3a24c',ink:'#101010',accent:'#c85a3d'},'letterhead-memo':{bg:'#e9e7e4',ink:'#26241f',accent:'#6f7263'},'index-dossier':{bg:'#eceeec',ink:'#23262b',accent:'#5c6470'},'ledger-sheet':{bg:'#e6e2dc',ink:'#1c1b19',accent:'#8a7b6c'},'press-one-sheet':{bg:'#f2ede1',ink:'#111111',accent:'#e8352b'},'staggered-sheet':{bg:'#0a0a0f',ink:'#f5f3ee',accent:'#00e5ff'}
 };
 function pkStorageKey(id){return 'ardito_epk_content_'+id;}
-function pkColorKey(artistId){return 'ardito_epk_colors_'+artistId;}
+function pkColorKey(artistId,templateKey){return 'ardito_epk_colors_'+artistId+'_'+(templateKey||'default');}
 function getPKRemoteContent(id){const pk=getPressKit(id);return pk&&pk.content&&typeof pk.content==='object'?pk.content:{};}
 function getPKContent(id){
   try{return {...PK_DEFAULT_CONTENT,...getPKRemoteContent(id),...JSON.parse(localStorage.getItem(pkStorageKey(id))||'{}')};}
@@ -703,10 +703,14 @@ function getPKColors(artistId){
   const pk=getPressKit(artistId),key=pk?.template||'ardito-signature';
   const d=PK_DEFAULT_COLORS[key]||PK_DEFAULT_COLORS['ardito-signature'];
   const remote=pk&&pk.theme&&typeof pk.theme==='object'?pk.theme:{};
-  try{return {...d,...remote,...JSON.parse(localStorage.getItem(pkColorKey(artistId))||'{}')};}
-  catch(e){return {...d,...remote};}
+  // IMPORTANT: colours are template-specific. Never let an old/global theme
+  // object override the real template defaults (this was causing Night Bloom
+  // and Ardito Signature to inherit pale backgrounds).
+  const remoteColors=remote[key]&&typeof remote[key]==='object'?remote[key]:{};
+  try{return {...d,...remoteColors,...JSON.parse(localStorage.getItem(pkColorKey(artistId,key))||'{}')};}
+  catch(e){return {...d,...remoteColors};}
 }
-function savePKColors(artistId,data){localStorage.setItem(pkColorKey(artistId),JSON.stringify(data));}
+function savePKColors(artistId,data){const pk=getPressKit(artistId),key=pk?.template||'ardito-signature';localStorage.setItem(pkColorKey(artistId,key),JSON.stringify(data));}
 function escPK(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function nlPK(v){return escPK(v).replace(/\n/g,'<br>');}
 function getArtistPKSeed(a){const c=getPKContent(a.id);return {...c,headline:c.headline||a.name||'Artist Name',location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''};}
@@ -714,7 +718,11 @@ function pkReleasesText(artistId){return aRel.filter(r=>r.artist_id===artistId).
 let pkPersistTimer=null;
 async function persistPKData(artistId){
   const pk=getPressKit(artistId);if(!pk)return;
-  const content=getPKContent(artistId),theme=getPKColors(artistId);
+  const content=getPKContent(artistId),key=pk.template||'ardito-signature',colors=getPKColors(artistId),existingTheme=pk.theme&&typeof pk.theme==='object'?pk.theme:{};
+  // Keep only keyed template colours. This prevents legacy unkeyed colours
+  // from leaking into whichever template the artist selects next.
+  const theme={...existingTheme,[key]:colors};
+  delete theme.bg; delete theme.ink; delete theme.accent;
   try{
     const r=await db('press_kits','PATCH',{content,theme},pk.id);
     if(r&&r[0])aPressKits=aPressKits.map(x=>x.id===pk.id?{...x,...r[0]}:x);
@@ -816,7 +824,7 @@ async function updatePKStatus(artistId,status){const pk=getPressKit(artistId);if
 async function updatePKUrl(artistId,url){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{url:url||null},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),url:url||null}:p);}catch(e){console.error(e);}}
 function updatePKColor(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg'?'bg':el.id==='pk-ink'?'ink':'accent',v=el.value,c={...getPKColors(artistId),[key]:v};savePKColors(artistId,c);const text=document.getElementById(el.id+'-text');if(text)text.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
 function updatePKColorText(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg-text'?'bg':el.id==='pk-ink-text'?'ink':'accent';let v=el.value.trim();if(!/^#[0-9a-fA-F]{6}$/.test(v))return;const c={...getPKColors(artistId),[key]:v};savePKColors(artistId,c);const color=document.getElementById(el.id.replace('-text',''));if(color)color.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
-function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template)return;if(!confirm('Reset this template to its default colours?'))return;localStorage.removeItem(pkColorKey(artistId));persistPKData(artistId);openPressKitEditor(artistId);}
+function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template)return;if(!confirm('Reset this template to its default colours?'))return;localStorage.removeItem(pkColorKey(artistId,pk.template));persistPKData(artistId);openPressKitEditor(artistId);}
 async function savePKNow(artistId){const c=getPKContent(artistId);savePKContentLocal(artistId,c);await persistPKData(artistId);setPKSaveState('Saved ✓');}
 function pkLink(label,url){if(!url)return'';const href=/^https?:\/\//i.test(url)?url:'https://'+url.replace(/^@/,'');return`<a class="pk-live-link" href="${escPK(href)}" target="_blank" rel="noopener">${escPK(label)} ↗</a>`;}
 function pkSectionHtml(key,c,artistId){if(key==='short_bio'&&c.short_bio)return`<section class="pk-live-section"><div class="pk-live-short">${nlPK(c.short_bio)}</div></section>`;if(key==='bio'&&c.bio)return`<section class="pk-live-section"><div class="pk-live-label">Biography</div><div class="pk-live-bio">${nlPK(c.bio)}</div></section>`;if(key==='quote'&&c.quote)return`<section class="pk-live-section"><div class="pk-live-quote">${nlPK(c.quote)}</div></section>`;if(key==='links'){const links=[pkLink('Website',c.website),pkLink('Email',c.email),pkLink('Instagram',c.instagram),pkLink('Spotify',c.spotify),pkLink('Apple Music',c.apple_music),pkLink('SoundCloud',c.soundcloud),pkLink('YouTube',c.youtube),pkLink('TikTok',c.tiktok)].join('');return links?`<section class="pk-live-section"><div class="pk-live-label">Listen / connect</div><div class="pk-live-grid">${links}</div></section>`:'';}if(key==='releases'){const rels=(c.releases||pkReleasesText(artistId)).split('\n').filter(Boolean);return rels.length?`<section class="pk-live-section"><div class="pk-live-label">Selected releases</div>${rels.map(r=>`<div class="pk-live-release">${nlPK(r)}</div>`).join('')}</section>`:'';}if(key==='achievements'&&c.achievements)return`<section class="pk-live-section"><div class="pk-live-label">Highlights</div><div class="pk-live-highlights">${nlPK(c.achievements)}</div></section>`;return'';}
