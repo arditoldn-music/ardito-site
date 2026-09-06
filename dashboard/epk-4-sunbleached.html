@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Name — Ardito EPK</title>
+
+<!-- VIBE: Sunbleached. Photo-left hero with condensed poster type, more energy.
+     Working on real brand colours with this artist? Replace the hex values below.
+     Delete any streaming links or sections that don't apply to this artist. -->
+
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Karla:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #2b3a4a;
+    --text: #f1ece0;
+    --text-dim: #b7c4cf;
+    --accent: #c99a3c;
+    --accent-light: #e0b658;
+    --font-display: 'Big Shoulders Display', sans-serif;
+    --font-body: 'Karla', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-weight: 300; font-size: 15px; line-height: 1.7; }
+  .page { max-width: 880px; margin: 0 auto; padding: 70px 40px 100px; }
+  a { color: var(--text); text-decoration: underline; }
+  a:hover { color: var(--accent-light); }
+  section { margin-bottom: 72px; }
+  section:last-of-type { margin-bottom: 0; }
+  .hero { display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: end; border-bottom: 1px solid var(--accent); padding-bottom: 40px; }
+  .hero img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
+  .hero h1 { font-family: var(--font-display); font-weight: 800; font-size: 64px; line-height: 0.95; letter-spacing: 0.01em; margin-bottom: 12px; }
+  .hero .hook { font-size: 16px; color: var(--text-dim); }
+  .block-title { font-family: var(--font-display); font-weight: 600; font-size: 26px; margin-bottom: 20px; }
+  .bio p { font-size: 15px; color: var(--text-dim); max-width: 68ch; margin-bottom: 16px; }
+  .bio p:last-child { margin-bottom: 0; }
+  .embed-wrap { margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); }
+  .embed-wrap iframe { display: block; width: 100%; }
+  .track-list { list-style: none; }
+  .track-list li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 14px; color: var(--text-dim); }
+  .track-list li:last-child { border-bottom: none; }
+  .track-list .track-name { color: var(--text); }
+  .links-row { font-size: 14px; color: var(--text-dim); }
+  .press-quote { border-left: 3px solid var(--accent); padding: 4px 0 4px 20px; margin-bottom: 24px; }
+  .press-quote:last-child { margin-bottom: 0; }
+  .press-quote p { font-size: 16px; font-style: italic; margin-bottom: 6px; }
+  .press-quote .source { font-size: 12px; color: var(--text-dim); }
+  .stats-line { font-size: 14px; color: var(--text-dim); }
+  .stats-line strong { color: var(--text); font-weight: 500; }
+  .contact p { font-size: 14px; color: var(--text-dim); }
+  .contact .assets-note { font-size: 13px; margin-top: 10px; }
+  .footer { margin-top: 80px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: var(--text-dim); letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <img src="[PRESS PHOTO URL]" alt="Artist Name">
+    <div>
+      <h1>Artist Name</h1>
+      <p class="hook">Your one-line hook lives here — sum up the sound in a single breath.</p>
+    </div>
+  </section>
+  <section class="bio">
+    <div class="block-title">Bio</div>
+    <p>This is where your bio will live. Two or three sentences, third person, telling the story so far.</p>
+  </section>
+  <section class="sound">
+    <div class="block-title">Sound</div>
+    <div class="embed-wrap"><iframe src="[SPOTIFY EMBED URL]" height="152" frameborder="0" allow="encrypted-media"></iframe></div>
+    <ul class="track-list"><li><span class="track-name">Track Title</span><span>2026</span></li></ul>
+  </section>
+  <section class="elsewhere">
+    <div class="block-title">Listen &amp; follow</div>
+    <p class="links-row">
+      <a href="[SPOTIFY URL]">Spotify</a> &nbsp;·&nbsp;
+      <a href="[APPLE MUSIC URL]">Apple Music</a> &nbsp;·&nbsp;
+      <a href="[DISTROKID / HYPERFOLLOW URL]">DistroKid</a> &nbsp;·&nbsp;
+      <a href="[SOUNDCLOUD URL]">SoundCloud</a>
+    </p>
+    <!-- delete whichever platforms don't apply to this artist -->
+  </section>
+  <section class="press">
+    <div class="block-title">Press</div>
+    <div class="press-quote"><p>"A great quote about the song from press goes here."</p><div class="source">Publication Name</div></div>
+  </section>
+  <section class="stats">
+    <p class="stats-line"><strong>A key stat</strong> &nbsp;·&nbsp; a placement or credit &nbsp;·&nbsp; anything else worth flagging</p>
+  </section>
+  <section class="contact">
+    <div class="block-title">Contact</div>
+    <p>Management: Laura, Ardito<br><a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a></p>
+    <p class="assets-note"><a href="[PRESS KIT PDF URL]">Download press kit (PDF)</a><br>High-res photos and audio files available on request.</p>
+  </section>
+  <div class="footer">Ardito — ardito.co.uk</div>
+</div>
+</body>
+</html>
