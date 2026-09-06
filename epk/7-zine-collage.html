@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Name — Ardito EPK</title>
+
+<!-- VIBE: Zine Collage. Bright, playful, torn-tape collage feel.
+     Working on real brand colours with this artist? Replace the hex values below.
+     Delete any streaming links that don't apply to this artist. Note: this one's
+     built from specifically placed, rotated pieces, adding new sections needs a
+     bit of bespoke placement to keep the collage feel, it's not a plain stack. -->
+
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #fff6ea;
+    --text: #212121;
+    --text-dim: #6b6b6b;
+    --accent: #ff4d6d;
+    --accent-secondary: #ffd23f;
+    --font-display: 'League Spartan', sans-serif;
+    --font-body: 'Hanken Grotesk', sans-serif;
+    --font-mono: 'Courier Prime', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 56px);
+    background-image: radial-gradient(circle, color-mix(in srgb, var(--text) 9%, transparent) 1px, transparent 1px);
+    background-size: 9px 9px;
+  }
+  a { color: var(--accent); }
+  a:hover { color: color-mix(in srgb, var(--accent) 70%, black); }
+  .wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: clamp(28px, 4vw, 48px); }
+
+  .header { position: relative; }
+  .tag {
+    position: absolute; top: -14px; left: -10px; background: var(--accent-secondary);
+    padding: 6px 16px; font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; transform: rotate(-3deg); border: 2px solid var(--text);
+  }
+  .header h1 {
+    padding-top: 36px; font-family: var(--font-display); font-size: clamp(52px, 10vw, 120px);
+    line-height: 0.9; font-weight: 900; letter-spacing: -0.02em;
+  }
+  .header .hook { margin-top: 10px; font-size: clamp(20px, 2.6vw, 32px); font-weight: 700; color: var(--accent); max-width: 600px; }
+
+  .body-row { display: flex; gap: clamp(20px, 3vw, 36px); flex-wrap: wrap; align-items: flex-start; }
+
+  .photo-block { flex: 1 1 280px; min-width: 240px; max-width: 380px; position: relative; transform: rotate(-2deg); }
+  .photo-frame { border: 6px solid var(--text); padding: 10px 10px 34px; background: #fff; }
+  .photo-frame img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; }
+  .photo-caption { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.05em; text-align: center; margin-top: 8px; color: var(--text-dim); }
+  .tape { position: absolute; top: -12px; right: 24px; width: 70px; height: 26px; background: color-mix(in srgb, var(--accent-secondary) 85%, transparent); border: 1px solid rgba(0,0,0,0.2); transform: rotate(4deg); }
+
+  .content-block { flex: 1 1 320px; min-width: 260px; display: flex; flex-direction: column; gap: 24px; }
+  .bio-card { background: var(--text); color: var(--bg); padding: 22px 24px; border-radius: 2px; transform: rotate(1deg); }
+  .bio-card .label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-secondary); margin-bottom: 10px; }
+  .bio-card p { font-size: 18px; line-height: 1.5; font-weight: 500; }
+
+  .track-card { background: #fff; border: 3px solid var(--text); padding: 18px 20px; border-radius: 2px; }
+  .track-row { display: flex; align-items: center; gap: 14px; }
+  .track-info { flex: 1; min-width: 0; }
+  .track-info .top { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; margin-bottom: 6px; }
+  .track-info .top .name { font-weight: 700; }
+  .track-info .top .time { color: var(--text-dim); }
+
+  .links-card { background: #fff; border: 3px solid var(--text); padding: 16px 20px; border-radius: 2px; transform: rotate(-1deg); font-family: var(--font-mono); font-size: 13px; }
+  .links-card .label { text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 8px; font-size: 11px; }
+
+  .press-block { position: relative; padding: 6px 0; }
+  .press-rule { background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); height: 3px; width: 100%; }
+  .press-quote { margin-top: 20px; font-size: clamp(22px, 3vw, 34px); font-weight: 800; font-style: italic; max-width: 820px; line-height: 1.25; }
+  .press-source { margin-top: 8px; font-family: var(--font-mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); }
+
+  .footer-row {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+    border-top: 2px dashed var(--text); padding-top: 20px; font-family: var(--font-mono); font-size: 14px;
+  }
+  .footer-row .assets-note { width: 100%; color: var(--text-dim); font-size: 12px; }
+.spotify-cta-track{font-weight:600;margin-bottom:6px}
+  .spotify-cta-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+  .spotify-cta-link:hover{opacity:.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="tag">Ardito EPK</div>
+    <h1>Artist Name</h1>
+    <p class="hook">Your one-line hook lives here.</p>
+  </div>
+
+  <div class="body-row">
+    <div class="photo-block">
+      <div class="photo-frame">
+        <img src="[PRESS PHOTO URL]" alt="Artist Name">
+        <div class="photo-caption">ARTIST NAME, 2026</div>
+      </div>
+      <div class="tape"></div>
+    </div>
+
+    <div class="content-block">
+      <div class="bio-card">
+        <div class="label">Bio</div>
+        <p>This is where your bio will live. Two or three sentences, third person, telling the story so far.</p>
+      </div>
+
+      <div class="track-card">
+        <div class="track-row">
+          <div class="track-info">
+            <div class="top spotify-cta-track"><span class="name">Track Title</span></div>
+            <a class="spotify-cta-link" href="[SPOTIFY URL]" target="_blank" rel="noopener noreferrer">Listen on Spotify ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="links-card">
+        <div class="label">Listen &amp; follow</div>
+        <a href="[SPOTIFY URL]">Spotify</a> ·
+        <a href="[APPLE MUSIC URL]">Apple Music</a> ·
+        <a href="[DISTROKID / HYPERFOLLOW URL]">DistroKid</a> ·
+        <a href="[SOUNDCLOUD URL]">SoundCloud</a>
+        <!-- delete whichever platforms don't apply to this artist -->
+      </div>
+    </div>
+  </div>
+
+  <div class="press-block">
+    <div class="press-rule"></div>
+    <p class="press-quote">"A great quote about the song from press goes here."</p>
+    <p class="press-source">— Publication Name</p>
+  </div>
+
+  <div class="footer-row">
+    <span>Booking &amp; press: <a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a></span>
+    <span>@yourhandle</span>
+    <span class="assets-note"><a href="[PRESS KIT PDF URL]">Download press kit (PDF)</a> — high-res photos and audio files available on request.</span>
+  </div>
+
+</div>
+
+</body>
+</html>

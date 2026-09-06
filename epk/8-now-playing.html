@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Name — Ardito EPK</title>
+
+<!-- VIBE: Now Playing. Stacked card layout, most extendable of the set,
+     add a discography or second press card by copying the .card block.
+     Working on real brand colours with this artist? Replace the hex values below.
+     Delete any streaming links that don't apply to this artist. -->
+
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Fragment+Mono&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #1b2a4a;
+    --card-bg: #22335a;
+    --text: #fff3d0;
+    --text-dim: color-mix(in srgb, #fff3d0 55%, transparent);
+    --accent: #e4572e;
+    --font-display: 'Familjen Grotesk', sans-serif;
+    --font-mono: 'Fragment Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-display);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 48px);
+    display: flex;
+    justify-content: center;
+  }
+  a { color: var(--text); }
+  a:hover { color: var(--accent); }
+  .wrap { max-width: 460px; width: 100%; display: flex; flex-direction: column; gap: 18px; }
+
+  .eyebrow {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-dim);
+  }
+
+  .card { background: var(--card-bg); border-radius: 20px; padding: 20px 22px; }
+  .card .label {
+    font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 8px;
+  }
+
+  .hero-card { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .hero-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; border-radius: 14px; }
+  .hero-card .name { font-weight: 700; font-size: clamp(30px, 6vw, 42px); line-height: 1.05; }
+  .hero-card .hook { margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--accent); }
+
+  .track-row { display: flex; align-items: center; gap: 14px; }
+  .track-info { flex: 1; min-width: 0; }
+  .track-info .top { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; margin-bottom: 6px; }
+  .track-info .top .time { color: var(--text-dim); }
+
+  .card p { font-size: 15px; line-height: 1.6; }
+  .card .quote { font-style: italic; }
+  .card .source { margin-top: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+  .card .links-line a { margin-right: 4px; }
+
+  .footer-row {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    font-family: var(--font-mono); font-size: 12px; padding: 6px 4px;
+  }
+  .assets-note { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); padding: 0 4px; }
+.spotify-cta-track{font-weight:600;margin-bottom:6px}
+  .spotify-cta-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+  .spotify-cta-link:hover{opacity:.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">
+    <span>Ardito · Now Playing</span>
+    <span>EPK</span>
+  </div>
+
+  <div class="card hero-card">
+    <img src="[PRESS PHOTO URL]" alt="Artist Name">
+    <div>
+      <div class="name">Artist Name</div>
+      <div class="hook">Your one-line hook lives here.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="track-row">
+      <div class="track-info">
+        <div class="top spotify-cta-track"><span>Track Title</span></div>
+        <a class="spotify-cta-link" href="[SPOTIFY URL]" target="_blank" rel="noopener noreferrer">Listen on Spotify ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">About</div>
+    <p>This is where your bio will live. Two or three sentences, third person, telling the story so far.</p>
+  </div>
+
+  <div class="card">
+    <div class="label">Listen &amp; follow</div>
+    <p class="links-line">
+      <a href="[SPOTIFY URL]">Spotify</a>
+      <a href="[APPLE MUSIC URL]">Apple Music</a>
+      <a href="[DISTROKID / HYPERFOLLOW URL]">DistroKid</a>
+      <a href="[SOUNDCLOUD URL]">SoundCloud</a>
+    </p>
+    <!-- delete whichever platforms don't apply to this artist -->
+  </div>
+
+  <div class="card">
+    <div class="label">Featured in</div>
+    <p class="quote">"A great quote about the song from press goes here."</p>
+    <p class="source">— Publication Name</p>
+  </div>
+
+  <!-- to add more, copy a <div class="card">...</div> block above, e.g. for
+       a discography list or a second press quote, same shape as the ones here -->
+
+  <div class="footer-row">
+    <a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a>
+    <span>@yourhandle</span>
+  </div>
+  <div class="assets-note"><a href="[PRESS KIT PDF URL]">Download press kit (PDF)</a> — high-res photos and audio files available on request.</div>
+
+</div>
+
+</body>
+</html>

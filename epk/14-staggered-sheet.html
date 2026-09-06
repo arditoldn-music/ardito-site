@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artist Name — Ardito EPK</title>
+
+<!-- VIBE: Staggered Sheet. Riso rave flyer, black background, spinning conic
+     sunburst (pure CSS, no state needed), chromatic-aberration headline,
+     magenta/cyan glitch palette, a clean Spotify link. Photo is optional,
+     sits in a small card of its own, delete it if there isn't one yet.
+     Working on real brand colours with this artist? Replace the hex values below.
+     Delete any streaming links that don't apply to this artist. -->
+
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card-bg: #151520;
+    --text: #f5f3ee;
+    --accent: #00e5ff;
+    --accent-secondary: #ff2fb0;
+    --font-display: 'Bungee', sans-serif;
+    --font-body: 'Space Mono', monospace;
+  }
+  @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(20px, 4vw, 48px);
+    box-sizing: border-box;
+  }
+  a { color: var(--accent); }
+  a:hover { color: var(--accent-secondary); }
+
+  .sunburst {
+    position: absolute; top: -20%; left: 50%; width: 900px; height: 900px; margin-left: -450px;
+    background: conic-gradient(from 0deg,
+      color-mix(in srgb, var(--accent) 18%, transparent) 0 20deg, transparent 20deg 40deg,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent) 40deg 60deg, transparent 60deg 80deg,
+      color-mix(in srgb, var(--accent) 18%, transparent) 80deg 100deg, transparent 100deg 120deg,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent) 120deg 140deg, transparent 140deg 160deg,
+      color-mix(in srgb, var(--accent) 18%, transparent) 160deg 180deg, transparent 180deg 200deg,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent) 200deg 220deg, transparent 220deg 240deg,
+      color-mix(in srgb, var(--accent) 18%, transparent) 240deg 260deg, transparent 260deg 280deg,
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent) 280deg 300deg, transparent 300deg 320deg,
+      color-mix(in srgb, var(--accent) 18%, transparent) 320deg 340deg, transparent 340deg 360deg);
+    border-radius: 50%; animation: spin360 40s linear infinite; z-index: 0;
+  }
+
+  .content { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 26px; }
+
+  .eyebrow { display: flex; justify-content: space-between; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: color-mix(in srgb, var(--text) 55%, transparent); }
+  .eyebrow .year { color: var(--accent-secondary); }
+
+  .headline-block { position: relative; }
+  .headline-block h1 {
+    font-family: var(--font-display); font-size: clamp(42px, 10vw, 92px); line-height: 1; color: var(--text);
+    text-shadow: 3px 0 0 var(--accent), -3px 0 0 var(--accent-secondary); transform: rotate(-2deg); letter-spacing: 0.01em;
+  }
+  .hook-tag { display: inline-block; margin-top: 16px; background: var(--accent-secondary); transform: rotate(-3deg); padding: 8px 18px; }
+  .hook-tag span { font-weight: 700; font-size: 15px; text-transform: uppercase; color: var(--bg); letter-spacing: 0.05em; }
+
+  .photo-card { display: inline-block; }
+  .photo-card img { width: 140px; height: 140px; object-fit: cover; border: 3px solid var(--accent); border-radius: 50%; }
+
+  .bio-card { background: var(--text); color: var(--bg); padding: clamp(20px, 3vw, 28px); border: 3px solid var(--accent); }
+  .bio-card .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-secondary); margin-bottom: 10px; }
+  .bio-card p { font-size: 15px; line-height: 1.7; }
+
+  .track-card { background: var(--card-bg); border: 2px solid var(--accent); padding: 20px 22px; display: flex; align-items: center; gap: 14px; }
+  .track-info { flex: 1; min-width: 0; }
+  .track-info .top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+  .track-info .top .name { font-weight: 700; }
+  .track-info .top .time { color: color-mix(in srgb, var(--text) 55%, transparent); }
+
+  .quote-card { background: var(--accent-secondary); padding: clamp(24px, 4vw, 36px); transform: rotate(1deg); }
+  .quote-card p { font-family: var(--font-display); font-size: clamp(22px, 3.6vw, 34px); line-height: 1.25; color: var(--bg); }
+  .quote-card .source { margin-top: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--card-bg); }
+
+  .links-line { font-size: 13px; }
+  .links-line a { margin-right: 12px; }
+
+  .footer-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13px; }
+  .footer-row .handle { color: var(--accent); }
+  .assets-note { font-size: 12px; color: color-mix(in srgb, var(--text) 55%, transparent); }
+.spotify-cta-track{font-weight:600;margin-bottom:6px}
+  .spotify-cta-link{display:inline-flex;align-items:center;gap:6px;font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
+  .spotify-cta-link:hover{opacity:.7}
+</style>
+</head>
+<body>
+
+  <div class="sunburst"></div>
+
+  <div class="content">
+
+    <div class="eyebrow">
+      <span>Ardito · EPK</span>
+      <span class="year">Press Kit 2026</span>
+    </div>
+
+    <div class="headline-block">
+      <h1>ARTIST NAME</h1>
+      <div class="hook-tag"><span>Your one-line hook lives here.</span></div>
+    </div>
+
+    <div class="photo-card">
+      <img src="[PRESS PHOTO OR SINGLE ARTWORK URL]" alt="Artist Name">
+      <!-- delete this whole .photo-card block if there isn't one yet -->
+    </div>
+
+    <div class="bio-card">
+      <div class="label">Bio</div>
+      <p>This is where your bio will live. Two or three sentences, third person, telling the story so far.</p>
+    </div>
+
+    <div class="track-card">
+      <div class="track-info">
+        <div class="top spotify-cta-track"><span class="name">Track Title</span></div>
+        <a class="spotify-cta-link" href="[SPOTIFY URL]" target="_blank" rel="noopener noreferrer">Listen on Spotify ↗</a>
+      </div>
+    </div>
+
+    <div class="quote-card">
+      <p>"A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE."</p>
+      <p class="source">— Publication Name</p>
+    </div>
+
+    <div class="links-line">
+      <a href="[SPOTIFY URL]">Spotify</a>
+      <a href="[APPLE MUSIC URL]">Apple Music</a>
+      <a href="[DISTROKID / HYPERFOLLOW URL]">DistroKid</a>
+      <a href="[SOUNDCLOUD URL]">SoundCloud</a>
+      <!-- delete whichever platforms don't apply to this artist -->
+    </div>
+
+    <div class="footer-row">
+      <a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a>
+      <span class="handle">@yourhandle</span>
+    </div>
+    <p class="assets-note"><a href="[PRESS KIT PDF URL]">Download press kit (PDF)</a> — high-res photos and audio files available on request.</p>
+
+  </div>
+
+</body>
+</html>
