@@ -264,8 +264,18 @@ textarea{resize:vertical;min-height:80px}
 .pk-color-field{display:flex;align-items:center;gap:8px}
 .pk-color-field input[type=color]{width:38px;height:34px;padding:2px;border-radius:5px;cursor:pointer;flex:0 0 auto}
 .pk-color-field input[type=text]{min-width:0}
-.pk-preview-shell{padding:1.25rem;background:#eee;min-height:720px;overflow:auto}
-.pk-preview-device{max-width:900px;margin:0 auto}.pk-template-frame{display:block;width:100%;min-height:900px;height:1000px;border:0;background:#fff}.pk-template-src{display:none}
+.pk-image-editor{margin-top:10px;padding:10px;border:1px solid var(--b2);border-radius:8px;background:var(--s2)}
+.pk-image-editor-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.pk-image-editor-head .pk-note{margin:0}
+.pk-image-stage{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;border:1px solid var(--b1);border-radius:6px;background:#111;touch-action:none;cursor:grab;user-select:none}
+.pk-image-stage.dragging{cursor:grabbing}
+.pk-image-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;pointer-events:none;user-select:none;display:block}
+.pk-image-stage.empty{display:grid;place-items:center;color:#888;font-size:11px;text-align:center;padding:20px}
+.pk-image-stage .pk-image-stage-hint{position:absolute;left:8px;bottom:8px;right:8px;padding:5px 7px;background:rgba(0,0,0,.65);color:#fff;border-radius:4px;font-size:9px;letter-spacing:.03em;text-align:center;pointer-events:none}
+.pk-image-position-readout{display:flex;gap:12px;align-items:center;margin-top:7px;font-size:10px;color:var(--cdim)}
+.pk-image-position-readout strong{color:var(--cream)}
+.pk-image-controls{display:none}
+.pk-preview-device{max-width:900px;margin:0 auto}.pk-template-frame{display:block;width:100%;min-height:900px;height:1000px;border:0;background:transparent}.pk-template-src{display:none}
 .pk-live-card{max-width:780px;margin:0 auto;min-height:700px;box-shadow:0 16px 50px rgba(0,0,0,.18);overflow:hidden}
 .pk-live-hero{padding:52px 46px 34px}
 .pk-live-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.72}
@@ -687,6 +697,7 @@ function epkLabel(key){const t=epkTemplate(key);return t?t.label:key;}
 function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)||null;}
 const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
+const EPK_PUBLIC_BASE='https://ardito.co.uk/epk/';
 const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'2026',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements']};
 const PK_DEFAULT_COLORS={
   'ardito-signature':{bg:'#0d0d0d',ink:'#e8e0d0',accent:'#2d4a2d'},'quiet-editorial':{bg:'#f2f0ea',ink:'#171717',accent:'#7a2f2f'},'night-bloom':{bg:'#241b2e',ink:'#f2ead9',accent:'#b8873b'},'sunbleached':{bg:'#2b3a4a',ink:'#f1ece0',accent:'#c99a3c'},'warm-paper':{bg:'#ece7dd',ink:'#1c2430',accent:'#a8503f'},'spec-sheet':{bg:'#e8e8f0',ink:'#141420',accent:'#3d2bff'},'zine-collage':{bg:'#fff6ea',ink:'#212121',accent:'#ff4d6d'},'now-playing':{bg:'#1b2a4a',ink:'#fff3d0',accent:'#e4572e'},'radial-vinyl':{bg:'#d3a24c',ink:'#101010',accent:'#c85a3d'},'letterhead-memo':{bg:'#e9e7e4',ink:'#26241f',accent:'#6f7263'},'index-dossier':{bg:'#eceeec',ink:'#23262b',accent:'#5c6470'},'ledger-sheet':{bg:'#e6e2dc',ink:'#1c1b19',accent:'#8a7b6c'},'press-one-sheet':{bg:'#f2ede1',ink:'#111111',accent:'#e8352b'},'staggered-sheet':{bg:'#0a0a0f',ink:'#f5f3ee',accent:'#00e5ff'}
@@ -735,10 +746,10 @@ function renderPressKits(){
   const g=document.getElementById('pkgrid');
   document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-workspace').classList.remove('open');
   if(!aArt.length){g.innerHTML='<div class="empty"><div class="ei">🗂️</div><div>Add an artist first, then build their press kit</div></div>';return;}
-  g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{const pk=getPressKit(a.id),status=pk?.status||'not_started';return`<div class="li" style="cursor:pointer" onclick="openPressKitEditor('${a.id}')"><div style="flex:1;min-width:0"><div class="an">${escPK(a.name)}</div><div class="al">${pk?.template?epkLabel(pk.template):'No template chosen yet'}${pk?.url?' · Live URL set':''}</div></div><span class="tag ${PK_STATUS_TAG[status]||'td'}">${PK_STATUS_LABEL[status]||status}</span>${pk?.url?`<a href="${escPK(pk.url)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a>`:''}<button class="btn bg bsm" onclick="event.stopPropagation();openPressKitEditor('${a.id}')">${pk?.template?'Edit':'Build'}</button></div>`;}).join('');
+  g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{const pk=getPressKit(a.id),status=pk?.status||'not_started';return`<div class="li" style="cursor:pointer" onclick="openPressKitEditor('${a.id}')"><div style="flex:1;min-width:0"><div class="an">${escPK(a.name)}</div><div class="al">${pk?.template?epkLabel(pk.template):'No template chosen yet'}${pk?.public_slug?' · Published URL set':''}</div></div><span class="tag ${PK_STATUS_TAG[status]||'td'}">${PK_STATUS_LABEL[status]||status}</span>${epkPublicUrl(a.id)?`<a href="${escPK(epkPublicUrl(a.id))}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a>`:''}<button class="btn bg bsm" onclick="event.stopPropagation();openPressKitEditor('${a.id}')">${pk?.template?'Edit':'Build'}</button></div>`;}).join('');
 }
 function closePressKitEditor(){document.getElementById('pk-workspace').classList.remove('open');document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-editor-root').innerHTML='';renderPressKits();}
-function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKPreview(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
+function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKImageStage(artistId);updatePKPreview(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
 function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);return`<div class="pk-section"><div class="pk-section-title">1 · Choose your design</div><div class="pk-template-grid">${EPK_TEMPLATES.map(t=>{const c=(pk?.template===t.key)?getPKColors(artistId):(PK_DEFAULT_COLORS[t.key]||PK_DEFAULT_COLORS['ardito-signature']);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate('${artistId}','${t.key}')"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></div>`;}
 function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="fg"><label class="fl">${escPK(label)}</label>${type==='textarea'?`<textarea id="${id}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">${escPK(value)}</textarea>`:`<input id="${id}" type="text" value="${escPK(value)}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">`}</div>`;}
 function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
@@ -758,12 +769,40 @@ async function uploadPKImage(artistId,input){
     const publicUrl=`${SB}/storage/v1/object/public/${bucket}/${path}`;
     const c=getPKContent(artistId);savePKContentLocal(artistId,{...c,image_url:publicUrl});
     const inputEl=document.getElementById('pk-image');if(inputEl)inputEl.value=publicUrl;
-    updatePKPreview(artistId);await persistPKData(artistId);setPKSaveState('Photo uploaded · saved ✓');
+    updatePKImageStage(artistId);updatePKPreview(artistId);await persistPKData(artistId);setPKSaveState('Photo uploaded · saved ✓');
   }catch(e){console.error('EPK photo upload failed:',e);setPKSaveState('Upload failed');alert('Photo upload failed. The Supabase Storage bucket "epk-assets" may need to be created and given upload/public policies. Your existing EPK data has not been changed.');}
   finally{input.value='';}
 }
+let pkImageDragState=null;
+function updatePKImageStage(artistId){
+  const c=getPKContent(artistId),stage=document.getElementById('pk-image-stage-'+artistId);if(!stage)return;
+  const x=Math.max(0,Math.min(100,Number(c.image_position_x??50)||50)),y=Math.max(0,Math.min(100,Number(c.image_position_y??50)||50));
+  stage.classList.toggle('empty',!c.image_url);
+  stage.innerHTML=c.image_url?'<img src="'+escPK(c.image_url)+'" alt="Press photo preview" style="object-position:'+x+'% '+y+'%;object-fit:'+escPK(c.image_fit||'cover')+';"><div class="pk-image-stage-hint">Drag the image to move the crop</div>':'<span>Add a press photo above to see it here.</span>';
+  const xe=document.getElementById('pk-image-stage-x-'+artistId),ye=document.getElementById('pk-image-stage-y-'+artistId);
+  if(xe)xe.textContent=x+'%';if(ye)ye.textContent=y+'%';
+}
+function startPKImageDrag(event){
+  const stage=event.currentTarget,artistId=stage?.dataset?.artistId;if(!stage||!artistId||!getPKContent(artistId).image_url)return;
+  const c=getPKContent(artistId);pkImageDragState={artistId,startX:event.clientX,startY:event.clientY,startPX:Number(c.image_position_x??50)||50,startPY:Number(c.image_position_y??50)||50,width:stage.clientWidth,height:stage.clientHeight};stage.classList.add('dragging');stage.setPointerCapture?.(event.pointerId);event.preventDefault();
+}
+function movePKImageDrag(event){
+  if(!pkImageDragState)return;const st=pkImageDragState,dx=event.clientX-st.startX,dy=event.clientY-st.startY;
+  const x=Math.max(0,Math.min(100,st.startPX-(dx/st.width)*100)),y=Math.max(0,Math.min(100,st.startPY-(dy/st.height)*100));
+  const c=getPKContent(st.artistId);savePKContentLocal(st.artistId,{...c,image_position_x:String(Math.round(x)),image_position_y:String(Math.round(y))});updatePKImageStage(st.artistId);updatePKPreview(st.artistId);
+}
+function endPKImageDrag(){if(!pkImageDragState)return;const artistId=pkImageDragState.artistId;document.getElementById('pk-image-stage-'+artistId)?.classList.remove('dragging');pkImageDragState=null;queuePKPersist(artistId);}
+function updatePKImageControl(kind,el){
+  const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
+  const c=getPKContent(artistId),patch={};
+  if(kind==='fit')patch.image_fit=el.value||'cover';
+  if(kind==='x')patch.image_position_x=String(el.value||50);
+  if(kind==='y')patch.image_position_y=String(el.value||50);
+  savePKContentLocal(artistId,{...c,...patch});updatePKImageStage(artistId);updatePKPreview(artistId);queuePKPersist(artistId);
+}
 function buildPKEditor(artistId){
   const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId),c=getArtistPKSeed(a);
+  c.image_fit=c.image_fit||'cover'; c.image_position_x=c.image_position_x||50; c.image_position_y=c.image_position_y||50;
   const status=pk?.status||'not_started',tpl=pk?.template||'',colors=tpl?getPKColors(artistId):PK_DEFAULT_COLORS['ardito-signature'];
   let head='<div class="ph" style="margin-bottom:1rem"><div><div class="pt">'+escPK(a.name)+' · EPK Studio</div><div class="ps">Edit once, switch designs freely, preview the real template live and publish when ready.</div></div><div class="pk-actions"><span class="tag '+(PK_STATUS_TAG[status]||'td')+'">'+escPK(PK_STATUS_LABEL[status]||status)+'</span>';
   if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button>';
@@ -778,9 +817,9 @@ function buildPKEditor(artistId){
   identity+=pkField('pk-quote','Press / artist quote',c.quote,'A quote worth putting in front of a journalist','updatePKField','textarea');
   identity+=pkField('pk-quote-source','Quote source',c.quote_source,'Publication / journalist','updatePKField')+'</div>';
   let visual='<div class="pk-section"><div class="pk-section-title">3 · Visual identity</div>';
-  visual+='<div class="fg"><label class="fl">Hero / press photo</label><input id="pk-image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadPKImage(\''+artistId+'\',this)"><div class="pk-note" style="margin-top:6px">Upload a photo directly, or use the URL field below if the image is already hosted.</div></div>';
+  visual+='<div class="fg"><label class="fl">Hero / press photo</label><input id="pk-image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadPKImage(\''+artistId+'\',this)"><div class="pk-note" style="margin-top:6px">Upload the photo, then drag it in the preview below to position the crop exactly where you want it.</div></div>';
   visual+=pkField('pk-image','Hero / press photo URL',c.image_url,'https://…','updatePKField');
-  visual+='</div>';
+  visual+='<div class="pk-image-editor"><div class="pk-image-editor-head"><div class="pk-note">Image position</div><div class="pk-note">Drag directly on the photo</div></div><div id="pk-image-stage-'+artistId+'" class="pk-image-stage '+(c.image_url?'':'empty')+'" data-artist-id="'+artistId+'" onpointerdown="startPKImageDrag(event)" onpointermove="movePKImageDrag(event)" onpointerup="endPKImageDrag(event)" onpointercancel="endPKImageDrag(event)">'+(c.image_url?'<img src="'+escPK(c.image_url)+'" alt="Press photo preview" style="object-position:'+escPK(c.image_position_x)+'% '+escPK(c.image_position_y)+'%;object-fit:'+escPK(c.image_fit||'cover')+';"><div class="pk-image-stage-hint">Drag the image to move the crop</div>':'<span>Add a press photo above to see it here.</span>')+'</div><div class="pk-image-position-readout"><span>Horizontal <strong id="pk-image-stage-x-'+artistId+'">'+escPK(c.image_position_x)+'%</strong></span><span>Vertical <strong id="pk-image-stage-y-'+artistId+'">'+escPK(c.image_position_y)+'%</strong></span></div></div></div>';
   let links='<div class="pk-section"><div class="pk-section-title">4 · Links & contact</div>';
   links+=pkField('pk-website','Website',c.website,'https://…','updatePKField');
   links+='<div class="fr">'+pkField('pk-email','Artist email',c.email,'artist@example.com','updatePKField')+pkField('pk-press-contact','Press contact',c.press_contact,'Name / company','updatePKField')+'</div>';
@@ -796,8 +835,9 @@ function buildPKEditor(artistId){
   story+=pkField('pk-achievements','Highlights / achievements',c.achievements,'Festival support, radio, press, awards…','updatePKField','textarea');
   story+=pkField('pk-notes','Internal notes',c.notes,'Not shown in preview','updatePKField','textarea')+'</div>';
   let statusHtml='<div class="pk-section"><div class="pk-section-title">7 · Status & publishing</div><div class="fg"><label class="fl">Status</label><select id="pk-status" onchange="updatePKStatus(\''+artistId+'\',this.value)"><option value="not_started" '+(status==='not_started'?'selected':'')+'>Not started</option><option value="in_progress" '+(status==='in_progress'?'selected':'')+'>In progress</option><option value="ready" '+(status==='ready'?'selected':'')+'>Ready to publish</option><option value="published" '+(status==='published'?'selected':'')+'>Published</option></select></div>';
-  statusHtml+='<div class="fg"><label class="fl">Live URL</label><input id="pk-url" type="text" value="'+escPK(pk?.url||'')+'" placeholder="https://…" onblur="updatePKUrl(\''+artistId+'\',this.value)"></div>';
-  statusHtml+='<div class="pk-actions"><button class="btn bp" onclick="savePKNow(\''+artistId+'\')">Save EPK</button><button class="btn bg" onclick="previewPK(\''+artistId+'\')">Open preview ↗</button></div><div class="pk-export-note">“Export HTML” exports the exact selected template with the artist data injected.</div></div>';
+  statusHtml+='<div class="fg"><label class="fl">Public EPK URL</label><input id="pk-url" type="text" value="'+escPK(epkPublicUrl(artistId))+'" placeholder="Publish to generate URL" readonly></div>';
+  const publishLabel=status==='published'?'Republish EPK':'Publish EPK';
+  statusHtml+='<div class="pk-actions"><button class="btn bp" onclick="savePKNow(\''+artistId+'\')">Save EPK</button><button class="btn bg" onclick="previewPK(\''+artistId+'\')">Open preview ↗</button><button class="btn bg" onclick="publishPK(\''+artistId+'\')">'+publishLabel+'</button></div><div class="pk-export-note">Publish makes the EPK public at ardito.co.uk/epk/?artist=artist-slug. The one-time public viewer must be deployed at /epk/. Unpublish removes it from the public page.</div></div>';
   const colours='<div class="pk-section"><div class="pk-section-title">8 · Template colours</div><div class="pk-color-row">'+pkColorField('pk-bg','Background',colors.bg)+pkColorField('pk-ink','Text',colors.ink)+pkColorField('pk-accent','Accent',colors.accent)+'</div><div class="pk-actions" style="margin-top:10px"><button class="btn bg bsm" onclick="resetPKColors(\''+artistId+'\')">Reset template colours</button></div><div class="pk-section-help">HEX values are editable. They are injected into the selected template CSS variables.</div></div>';
   return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
 }
@@ -807,7 +847,7 @@ function updatePKField(el){
   const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-notes'];
   const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','hyperfollow','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','notes'];
   const map={};ids.forEach((id,i)=>{const x=document.getElementById(id);if(x)map[keys[i]]=x.value;});
-  savePKContentLocal(artistId,{...getPKContent(artistId),...map});updatePKPreview(artistId);queuePKPersist(artistId);
+  savePKContentLocal(artistId,{...getPKContent(artistId),...map});if(map.image_url!==undefined)updatePKImageStage(artistId);updatePKPreview(artistId);queuePKPersist(artistId);
 }
 
 function getPKOrder(artistId){const c=getPKContent(artistId);return Array.isArray(c.section_order)&&c.section_order.length?c.section_order:[...PK_DEFAULT_CONTENT.section_order];}
@@ -842,6 +882,21 @@ async function choosePKTemplate(artistId,templateKey){
 async function resetPKTemplate(artistId){const pk=getPressKit(artistId);if(!pk)return;if(!confirm('Change template? Your EPK content, section order and colours will be preserved.'))return;try{const r=await db('press_kits','PATCH',{template:null,status:'not_started'},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),template:null,status:'not_started'}:p);}catch(e){alert('Could not change template.');return;}openPressKitEditor(artistId);}
 async function updatePKStatus(artistId,status){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{status},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),status}:p);}catch(e){console.error(e);}}
 async function updatePKUrl(artistId,url){const pk=getPressKit(artistId);if(!pk)return;try{const r=await db('press_kits','PATCH',{url:url||null},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),url:url||null}:p);}catch(e){console.error(e);}}
+async function publishPK(artistId){
+  const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return alert('Choose an EPK template first.');
+  const c=getPKContent(artistId);
+  if(!c.headline && !a.name)return alert('Add an artist name before publishing.');
+  const slug=pk.public_slug||epkSlugify(a.name);
+  const publicUrl=EPK_PUBLIC_BASE+'?artist='+encodeURIComponent(slug);
+  if(!confirm('Publish this EPK publicly?\n\n'+publicUrl))return;
+  try{const r=await db('press_kits','PATCH',{public_slug:slug,status:'published',url:publicUrl},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),public_slug:slug,status:'published',url:publicUrl}:p);
+    setPKSaveState('Published ✓');openPressKitEditor(artistId);alert('EPK published.\n\n'+publicUrl);
+  }catch(e){console.error(e);alert('Could not publish the EPK. Run the publish migration in Supabase first.');}
+}
+async function unpublishPK(artistId){
+  const pk=getPressKit(artistId);if(!pk)return;if(!confirm('Unpublish this EPK?'))return;
+  try{const r=await db('press_kits','PATCH',{status:'ready',url:null},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),status:'ready',url:null}:p);openPressKitEditor(artistId);}catch(e){alert('Could not unpublish the EPK.');}
+}
 function updatePKColor(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg'?'bg':el.id==='pk-ink'?'ink':'accent',v=el.value,c={...getPKColors(artistId),[key]:v};savePKColors(artistId,c);const text=document.getElementById(el.id+'-text');if(text)text.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
 function updatePKColorText(el){const artistId=window.currentPKArtistId;if(!artistId)return;const pk=getPressKit(artistId);if(!pk?.template)return;const key=el.id==='pk-bg-text'?'bg':el.id==='pk-ink-text'?'ink':'accent';let v=el.value.trim();if(!/^#[0-9a-fA-F]{6}$/.test(v))return;const c={...getPKColors(artistId),[key]:v};savePKColors(artistId,c);const color=document.getElementById(el.id.replace('-text',''));if(color)color.value=v;updatePKPreview(artistId);queuePKPersist(artistId);}
 function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template)return;if(!confirm('Reset this template to its default colours?'))return;localStorage.removeItem(pkColorKey(artistId,pk.template));persistPKData(artistId);openPressKitEditor(artistId);}
@@ -849,23 +904,26 @@ async function savePKNow(artistId){const c=getPKContent(artistId);savePKContentL
 function pkLink(label,url){if(!url)return'';const href=/^https?:\/\//i.test(url)?url:'https://'+url.replace(/^@/,'');return`<a class="pk-live-link" href="${escPK(href)}" target="_blank" rel="noopener">${escPK(label)} ↗</a>`;}
 function pkSectionHtml(key,c,artistId){if(key==='short_bio'&&c.short_bio)return`<section class="pk-live-section"><div class="pk-live-short">${nlPK(c.short_bio)}</div></section>`;if(key==='bio'&&c.bio)return`<section class="pk-live-section"><div class="pk-live-label">Biography</div><div class="pk-live-bio">${nlPK(c.bio)}</div></section>`;if(key==='quote'&&c.quote)return`<section class="pk-live-section"><div class="pk-live-quote">${nlPK(c.quote)}</div></section>`;if(key==='links'){const links=[pkLink('Website',c.website),pkLink('Email',c.email),pkLink('Instagram',c.instagram),pkLink('Spotify',c.spotify),pkLink('Apple Music',c.apple_music),pkLink('SoundCloud',c.soundcloud),pkLink('YouTube',c.youtube),pkLink('TikTok',c.tiktok)].join('');return links?`<section class="pk-live-section"><div class="pk-live-label">Listen / connect</div><div class="pk-live-grid">${links}</div></section>`:'';}if(key==='releases'){const rels=(c.releases||pkReleasesText(artistId)).split('\n').filter(Boolean);return rels.length?`<section class="pk-live-section"><div class="pk-live-label">Selected releases</div>${rels.map(r=>`<div class="pk-live-release">${nlPK(r)}</div>`).join('')}</section>`:'';}if(key==='achievements'&&c.achievements)return`<section class="pk-live-section"><div class="pk-live-label">Highlights</div><div class="pk-live-highlights">${nlPK(c.achievements)}</div></section>`;return'';}
 function pkSafeUrl(v){const x=String(v||'').trim();if(!x)return'';return /^(https?:|mailto:|data:image\/)/i.test(x)?x:'';}
+function epkSlugify(name){return String(name||'artist').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'artist';}
+function epkPublicUrl(artistId){const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.public_slug)return'';return EPK_PUBLIC_BASE+'?artist='+encodeURIComponent(pk.public_slug); }
 function pkFirstReleaseTrack(c){if(c.track_title)return c.track_title;const first=String(c.releases||'').split('\n').find(Boolean)||'';return first.split(' · ')[0].trim()||'Track Title';}
 function pkTemplateSource(artistId){const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return'';return EPK_TEMPLATE_SOURCES[pk.template]||'';}
 function buildPKTemplateDocument(artistId){
   const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return'';
   let html=pkTemplateSource(artistId);if(!html)return'';
-  const c=getArtistPKSeed(a),col=getPKColors(artistId),track=pkFirstReleaseTrack(c),year=c.track_year||new Date().getFullYear(),quoteSource=c.quote_source||c.press_contact||'Press';
+  const c=getArtistPKSeed(a),col=getPKColors(artistId),track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
   const image=pkSafeUrl(c.image_url), spotify=pkSafeUrl(c.spotify), apple=pkSafeUrl(c.apple_music), soundcloud=pkSafeUrl(c.soundcloud), website=pkSafeUrl(c.website), youtube=pkSafeUrl(c.youtube), tiktok=pkSafeUrl(c.tiktok);
+  const imageFit=(c.image_fit==='contain'?'contain':'cover'),imageX=Math.max(0,Math.min(100,Number(c.image_position_x??50)||50)),imageY=Math.max(0,Math.min(100,Number(c.image_position_y??50)||50));
   const spotifyEmbed=spotify?spotify.replace('open.spotify.com/','open.spotify.com/embed/').replace(/\/embed\/embed\//g,'/embed/') : '';
   const hyperfollow=pkSafeUrl(c.hyperfollow||c.distrokid||'');
   const textMap={
     'Artist Name':c.headline||a.name||'Artist Name','ARTIST NAME':String(c.headline||a.name||'Artist Name').toUpperCase(),
-    'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'Your one-line hook lives here.',
-    'Your one-line hook lives here.':c.short_bio||c.genre||'Your one-line hook lives here.',
+    'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'',
+    'Your one-line hook lives here.':c.short_bio||c.genre||'',
     'This is where your bio will live. Two or three sentences, third person, telling the story so far.':c.bio||c.short_bio||'',
     'Track Title':track,'2026':String(year),'Publication Name':quoteSource,'A great quote about the song from press goes here.':c.quote||'',
     '"A great quote about the song from press goes here."':c.quote?'"'+c.quote.replace(/^"|"$/g,'')+'"':'',
-    '@yourhandle':c.instagram||'','ardito.ldn@gmail.com':c.email||c.press_email||'ardito.ldn@gmail.com'
+    '@yourhandle':c.instagram||''
   };
   html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,escPK(c.headline||a.name||'Artist Name'));
   Object.entries(textMap).forEach(([from,to])=>{if(from.includes('['))return;html=html.split(from).join(escPK(to));});
@@ -874,6 +932,31 @@ function buildPKTemplateDocument(artistId){
     '[DISTROKID / HYPERFOLLOW URL]':hyperfollow,'[PRESS KIT PDF URL]':pkSafeUrl(c.press_kit_pdf_url)
   };
   Object.entries(repl).forEach(([from,to])=>{html=html.split(from).join(escPK(to));});
+  // Never let an absent PDF URL resolve to the current/internal dashboard. Remove the download link entirely when no PDF is supplied.
+  if(!c.press_kit_pdf_url){html=html.replace(/<a[^>]+href=""[^>]*>\s*Download press kit \(PDF\)\s*<\/a>/gi,'');}
+  html=html.replace(/href="(?:\/|\.\/|\.\.\/)[^"]*"/gi,'href=""');
+  // Remove any empty links left by optional URL fields. This prevents blank/internal navigation targets.
+  html=html.replace(/<a[^>]*href=\"\"[^>]*>[\s\S]*?<\/a>/gi,'');
+  // Hide optional content blocks when no corresponding artist data exists.
+  if(!c.short_bio && !c.genre){
+    html=html.replace(/<p[^>]*class=\"[^\"]*hook[^\"]*\"[^>]*>[\s\S]*?<\/p>/gi,'');
+    html=html.replace(/<div[^>]*class=\"[^\"]*hook[^\"]*\"[^>]*>[\s\S]*?<\/div>/gi,'');
+  }
+  if(!c.bio && !c.short_bio){
+    html=html.replace(/<(section|div)[^>]*class=\"[^\"]*(?:bio|bio-card|bio-block)[^\"]*\"[^>]*>[\s\S]*?<\/\1>/gi,'');
+  }
+  if(!c.quote){
+    html=html.replace(/<(section|div)[^>]*class=\"[^\"]*(?:press-quote|quote-card|quote|press)[^\"]*\"[^>]*>[\s\S]*?<\/\1>/gi,'');
+  }
+  if(!track){
+    html=html.replace(/<(section|div)[^>]*class=\"[^\"]*(?:track-card|track-list|featured-track|track-block|sound)[^\"]*\"[^>]*>[\s\S]*?<\/\1>/gi,'');
+  }
+  const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||c.website);
+  if(!hasStreaming){
+    html=html.replace(/<(section|div)[^>]*class=\"[^\"]*(?:elsewhere|links|listen|social|platforms|connect)[^\"]*\"[^>]*>[\s\S]*?<\/\1>/gi,'');
+  }
+  // Remove any now-empty anchor containers/asset notes left by absent optional fields.
+  html=html.replace(/<p[^>]*class=\"[^\"]*assets-note[^\"]*\"[^>]*>\s*(?:—|\·)?\s*(?:high-res photos and audio files available on request\.)?\s*<\/p>/gi,'');
   // Remove photo blocks cleanly when no photo is supplied, since several supplied designs mark photography as optional.
   if(!image){
     html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');
@@ -885,14 +968,28 @@ function buildPKTemplateDocument(artistId){
     html=html.replace(/<a[^>]+href=""[^>]*>\s*DistroKid\s*<\/a>/gi,'');
   }
   // Replace template-owner contact/branding placeholders with the artist's contact details where supplied.
-  const contactEmail=pkSafeUrl(c.press_email||c.email||'');
+  const contactEmail=String(c.press_email||c.email||'').trim();
   const artistWebsite=website||'';
-  html=html.split('mailto:ardito.ldn@gmail.com').join(contactEmail?('mailto:'+contactEmail.replace(/^mailto:/i,'')):'mailto:');
-  html=html.split('ardito.ldn@gmail.com').join(c.press_email||c.email||'');
+  // Never expose Ardito's internal email in an artist-facing EPK. Only inject an artist/press email when one is actually provided.
+  if(contactEmail){
+    const mailHref=contactEmail.replace(/^mailto:/i,'');
+    html=html.split('mailto:ardito.ldn@gmail.com').join('mailto:'+escPK(mailHref));
+    html=html.split('ardito.ldn@gmail.com').join(escPK(mailHref));
+  } else {
+    html=html.replace(/<(p|span|div)[^>]*>[^<]*(?:Management:\s*Laura,\s*Ardito|Laura,\s*Ardito|Booking &amp; press:|For booking and press:)[\s\S]*?ardito\.ldn@gmail\.com[\s\S]*?<\/\1>/gi,'');
+    html=html.replace(/<a[^>]*href=\"mailto:ardito\.ldn@gmail\.com\"[^>]*>ardito\.ldn@gmail\.com<\/a>/gi,'');
+    html=html.replace(/<a[^>]*>ardito\.ldn@gmail\.com<\/a>/gi,'');
+  }
   html=html.split('Ardito — ardito.co.uk').join(artistWebsite||'Press Kit');
   html=html.split('ardito.co.uk').join(artistWebsite||'');
+  html=html.replace(/>Ardito Agency — Artist Manifest</g,'>'+escPK((c.headline||a.name||'Artist')+' — Press Kit'));
+  html=html.replace(/>Ardito Agency<\/span>/g,'>Press Kit<\/span>');
+  html=html.replace(/>Ardito EPK<\/div>/g,'>Press Kit<\/div>');
+  html=html.replace(/>Ardito · Now Playing<\/span>/g,'>Press Kit · Now Playing<\/span>');
+  html=html.replace(/>Ardito · Press Kit<\/div>/g,'>Press Kit<\/div>');
+  html=html.replace(/>Ardito · EPK<\/span>/g,'>Press Kit<\/span>');
   // Apply the editor's three HEX controls to the real template CSS variables. Secondary colours, where a template has them, remain part of its original design.
-  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}</style>';
+  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}body img{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}</style>';
   html=html.replace('</head>',override+'</head>');
   // Ensure every supplied template behaves as a self-contained preview/export document.
   return html;
