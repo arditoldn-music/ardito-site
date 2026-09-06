@@ -269,6 +269,11 @@ textarea{resize:vertical;min-height:80px}
       <div class="ni" onclick="nav('templates')" id="nav-templates"><span class="ni-icon">✉️</span>Outreach Templates</div>
     </div>
     <div class="sb-ft"><button class="lo" onclick="logout()">Log out</button></div>
+    <div class="ns"><div class="nl">Releases</div>
+  <div class="ni" onclick="nav('releases')" id="nav-releases"><span class="ni-icon">🚀</span>Release Tracker</div>
+  <div class="ni" onclick="nav('roster')" id="nav-roster"><span class="ni-icon">🎤</span>Artist Roster</div>
+  <div class="ni" onclick="nav('presskits')" id="nav-presskits"><span class="ni-icon">🗂️</span>Press Kits</div>
+</div>
   </nav>
 
   <main class="main">
@@ -474,7 +479,7 @@ textarea{resize:vertical;min-height:80px}
 const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN',PW='ArditoIsTheBest';
 let cM=new Date().getMonth(),cY=new Date().getFullYear(),cvMode='cal';
 let eLib=null,eArt=null,eRel=null,eIdea=null;
-let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[],aOnboard=[];
+let aLib=[],aArt=[],aRel=[],aIdeas=[],aPays=[],aLog=[],aRelTasks=[],aOnboard=[],aPressKits=[];
 let ePay=null;
 
 const RW=[
@@ -561,6 +566,113 @@ async function seedOnboardingTasks(artistId){
 
 const ONBOARD_CAT_COLOR={artist:'#c9a227',invite:'#6b7a3a',ardito:'#b5651d'};
 
+const EPK_TEMPLATES=[
+  {key:'ardito-signature',label:'Ardito Signature'},
+  {key:'quiet-editorial',label:'Quiet Editorial'},
+  {key:'night-bloom',label:'Night Bloom'},
+  {key:'sunbleached',label:'Sunbleached'},
+  {key:'warm-paper',label:'Warm Paper'},
+  {key:'spec-sheet',label:'Spec Sheet'},
+  {key:'zine-collage',label:'Zine Collage'},
+  {key:'now-playing',label:'Now Playing'},
+  {key:'radial-vinyl',label:'Radial Vinyl'},
+  {key:'letterhead-memo',label:'Letterhead Memo'},
+  {key:'index-dossier',label:'Index Dossier'},
+  {key:'ledger-sheet',label:'Ledger Sheet'},
+  {key:'press-one-sheet',label:'Press One-Sheet'},
+  {key:'staggered-sheet',label:'Staggered Sheet'}
+];
+function epkLabel(key){const t=EPK_TEMPLATES.find(x=>x.key===key);return t?t.label:key;}
+function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)||null;}
+
+const PK_STATUS_TAG={not_started:'td',in_progress:'ta',published:'tg'};
+const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',published:'Published'};
+
+function renderPressKits(){
+  const g=document.getElementById('pkgrid');
+  if(!aArt.length){g.innerHTML='<div class="empty"><div class="ei">🗂️</div><div>Add an artist first, then build their press kit</div></div>';return;}
+  g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{
+    const pk=getPressKit(a.id);
+    const status=pk?.status||'not_started';
+    return`<div class="li" style="cursor:pointer" onclick="nav('roster');showAD('${a.id}')">
+      <div style="flex:1">
+        <div class="an">${a.name}</div>
+        <div class="al">${pk&&pk.template?epkLabel(pk.template):'No template chosen yet'}</div>
+      </div>
+      <span class="tag ${PK_STATUS_TAG[status]}">${PK_STATUS_LABEL[status]}</span>
+      ${pk?.url?`<a href="${pk.url}" target="_blank" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a>`:''}
+    </div>`;
+  }).join('');
+}
+
+function togPK(id){
+  const h=document.querySelector(`#pk-card-${id} .rch`);
+  const b=document.querySelector(`#pk-card-${id} .rc-body`);
+  h.classList.toggle('open');
+  b.classList.toggle('open');
+}
+
+function buildPressKitSection(artistId){
+  const pk=getPressKit(artistId);
+  if(!pk||!pk.template){
+    return`<div style="padding:1rem 0">
+      <div style="font-size:12px;color:var(--cdim);margin-bottom:12px">Pick a template to start this artist's press kit.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+        ${EPK_TEMPLATES.map(t=>`<div class="ci" onclick="choosePKTemplate('${artistId}','${t.key}')" style="justify-content:center;text-align:center">${t.label}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+  return`<div style="padding:1rem 0">
+    <div class="dr2"><span class="dk">Template</span><span class="dv">${epkLabel(pk.template)} · <a href="javascript:void(0)" onclick="resetPKTemplate('${artistId}')">change</a></span></div>
+    <div class="fg" style="margin-top:12px"><label class="fl">Status</label>
+      <select onchange="updatePKStatus('${artistId}',this.value)">
+        <option value="not_started" ${pk.status==='not_started'?'selected':''}>Not started</option>
+        <option value="in_progress" ${pk.status==='in_progress'?'selected':''}>In progress</option>
+        <option value="published" ${pk.status==='published'?'selected':''}>Published</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Live URL</label>
+      <input type="text" value="${pk.url||''}" placeholder="https://ardito.co.uk/press/artistname.html" onblur="updatePKUrl('${artistId}',this.value)">
+    </div>
+  </div>`;
+}
+
+async function choosePKTemplate(artistId,templateKey){
+  const existing=getPressKit(artistId);
+  if(existing){
+    await db('press_kits','PATCH',{template:templateKey,status:'in_progress'},existing.id);
+    aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,template:templateKey,status:'in_progress'}:p);
+  }else{
+    const r=await db('press_kits','POST',{artist_id:artistId,template:templateKey,status:'in_progress'});
+    if(r&&r[0])aPressKits.push(r[0]);
+  }
+  document.getElementById(`pkcont-${artistId}`).innerHTML=buildPressKitSection(artistId);
+  document.getElementById(`pkstat-${artistId}`).textContent=PK_STATUS_LABEL['in_progress'];
+}
+
+async function resetPKTemplate(artistId){
+  const pk=getPressKit(artistId);
+  if(!pk)return;
+  if(!confirm('Change template? This clears the current template choice.'))return;
+  await db('press_kits','PATCH',{template:null,status:'not_started'},pk.id);
+  aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,template:null,status:'not_started'}:p);
+  document.getElementById(`pkcont-${artistId}`).innerHTML=buildPressKitSection(artistId);
+  document.getElementById(`pkstat-${artistId}`).textContent=PK_STATUS_LABEL['not_started'];
+}
+
+async function updatePKStatus(artistId,status){
+  const pk=getPressKit(artistId);if(!pk)return;
+  await db('press_kits','PATCH',{status},pk.id);
+  aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,status}:p);
+  document.getElementById(`pkstat-${artistId}`).textContent=PK_STATUS_LABEL[status];
+}
+
+async function updatePKUrl(artistId,url){
+  const pk=getPressKit(artistId);if(!pk)return;
+  await db('press_kits','PATCH',{url:url||null},pk.id);
+  aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,url:url||null}:p);
+}
+  
 function buildOnboardSection(artistId){
   const tasks=aOnboard.filter(t=>t.artist_id===artistId).sort((a,b)=>a.sort_order-b.sort_order);
   if(!tasks.length)return '<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No onboarding checklist found for this artist, it\'s generated automatically the moment a new artist is added.</div>';
@@ -633,11 +745,11 @@ function login(){
 function logout(){sessionStorage.removeItem('aa');location.reload();}
 
 async function init(){
-  aLib=[];aArt=[];aRel=[];aIdeas=[];aRelTasks=[];aOnboard=[];
+  aLib=[];aArt=[];aRel=[];aIdeas=[];aRelTasks=[];aOnboard=[];aPressKits=[];
   setG();
   try{
-    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc'),db('release_tasks','GET',null,null,'?order=sort_order.asc'),db('artist_onboarding_tasks','GET',null,null,'?order=sort_order.asc')]);
-    [aLib,aArt,aRel,aIdeas,aRelTasks,aOnboard]=results.map(r=>Array.isArray(r)?r:[]);
+    const results=await Promise.all([db('content_library','GET',null,null,'?order=post_date.asc'),db('artists','GET',null,null,'?order=name.asc'),db('releases','GET',null,null,'?order=release_date.desc'),db('post_ideas','GET',null,null,'?order=created_at.desc'),db('release_tasks','GET',null,null,'?order=sort_order.asc'),db('artist_onboarding_tasks','GET',null,null,'?order=sort_order.asc'),db('press_kits','GET',null,null,'?order=updated_at.desc')]);
+[aLib,aArt,aRel,aIdeas,aRelTasks,aOnboard,aPressKits]=results.map(r=>Array.isArray(r)?r:[]);
     const bad=results.find(r=>!Array.isArray(r));
     if(bad)console.error('Ardito dashboard: unexpected response from Supabase',bad);
   }catch(e){
@@ -675,6 +787,7 @@ function nav(p){
   if(p==='income'){loadPays();renderIncome();}
   if(p==='templates')renderTemplates();
   if(p==='brain')runBrain();
+  if(p==='presskits')renderPressKits();
 }
 
 function wk(d){
@@ -813,6 +926,7 @@ function renderListV(){
 }
 
 // ROSTER
+  
 function showRL(){document.getElementById('rlv').style.display='block';document.getElementById('adv').style.display='none';}
 const STAGE_ORDER={Active:0,'In Conversation':1,Watching:2,Paused:3,Alumni:4,'Fell Through':5};
 const STAGE_TAG={Watching:'ta','In Conversation':'tc',Active:'tg',Paused:'tr',Alumni:'td','Fell Through':'tx'};
@@ -876,6 +990,27 @@ function showAD(id){
         <span id="opn-${id}" style="font-size:12px;color:var(--cdim)">${(()=>{const h=buildOnboardHeader(id);return h.total?`${h.done}/${h.total} · ${h.pct}%`:'Not started';})()}</span>
       </div>
       <div class="rc-body" id="obcont-${id}">${buildOnboardSection(id)}</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
+    <div id="logcont-${id}" style="margin-bottom:2rem"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Releases</h3><button class="btn bp bsm" onclick="openRMFA('${id}')">+ New release</button></div>
+       <div class="rc" id="ob-card-${id}" style="margin-bottom:2rem">
+      <div class="rch" onclick="togOnboard('${id}')">
+        <div class="rn">Onboarding<span class="rc-toggle">▾</span></div>
+        <span id="opn-${id}" style="font-size:12px;color:var(--cdim)">${(()=>{const h=buildOnboardHeader(id);return h.total?`${h.done}/${h.total} · ${h.pct}%`:'Not started';})()}</span>
+      </div>
+      <div class="rc-body" id="obcont-${id}">${buildOnboardSection(id)}</div>
+    </div>
+    <div class="rc" id="pk-card-${id}" style="margin-bottom:2rem">
+      <div class="rch" onclick="togPK('${id}')">
+        <div class="rn">Press Kit<span class="rc-toggle">▾</span></div>
+        <span id="pkstat-${id}" style="font-size:12px;color:var(--cdim)">${(()=>{const pk=getPressKit(id);return pk&&pk.status?PK_STATUS_LABEL[pk.status]:'Not started';})()}</span>
+      </div>
+      <div class="page" id="page-presskits">
+  <div class="ph"><div><div class="pt">Press Kits</div><div class="ps">Status per artist — click through to build or edit one</div></div></div>
+  <div class="rlist" id="pkgrid"></div>
+</div>
+      <div class="rc-body" id="pkcont-${id}">${buildPressKitSection(id)}</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
     <div id="logcont-${id}" style="margin-bottom:2rem"></div>
