@@ -255,13 +255,15 @@ textarea{resize:vertical;min-height:80px}
     <div class="ns"><div class="nl">Releases</div>
       <div class="ni" onclick="nav('releases')" id="nav-releases"><span class="ni-icon">🚀</span>Release Tracker</div>
       <div class="ni" onclick="nav('roster')" id="nav-roster"><span class="ni-icon">🎤</span>Artist Roster</div>
+      <div class="ni" onclick="nav('presskits')" id="nav-presskits"><span class="ni-icon">🗂️</span>Press Kits</div>
     </div>
     <div class="ns"><div class="nl">Content</div>
       <div class="ni" onclick="nav('calendar')" id="nav-calendar"><span class="ni-icon">📅</span>Calendar</div>
       <div class="ni" onclick="nav('library')" id="nav-library"><span class="ni-icon">📚</span>Content Library</div>
       <div class="ni" onclick="nav('ideas')" id="nav-ideas"><span class="ni-icon">💡</span>Post Ideas</div>
     </div>
-    <div class="ns"><div class="nl">Intel</div><div class="ni" onclick="nav('news')" id="nav-news"><span class="ni-icon">📰</span>News Feed</div>
+    <div class="ns"><div class="nl">Intel</div>
+      <div class="ni" onclick="nav('news')" id="nav-news"><span class="ni-icon">📰</span>News Feed</div>
       <div class="ni" onclick="nav('brain')" id="nav-brain"><span class="ni-icon">🧠</span>Ardita</div>
     </div>
     <div class="ns"><div class="nl">Business</div>
@@ -269,11 +271,6 @@ textarea{resize:vertical;min-height:80px}
       <div class="ni" onclick="nav('templates')" id="nav-templates"><span class="ni-icon">✉️</span>Outreach Templates</div>
     </div>
     <div class="sb-ft"><button class="lo" onclick="logout()">Log out</button></div>
-    <div class="ns"><div class="nl">Releases</div>
-  <div class="ni" onclick="nav('releases')" id="nav-releases"><span class="ni-icon">🚀</span>Release Tracker</div>
-  <div class="ni" onclick="nav('roster')" id="nav-roster"><span class="ni-icon">🎤</span>Artist Roster</div>
-  <div class="ni" onclick="nav('presskits')" id="nav-presskits"><span class="ni-icon">🗂️</span>Press Kits</div>
-</div>
   </nav>
 
   <main class="main">
@@ -330,6 +327,12 @@ textarea{resize:vertical;min-height:80px}
     <div class="page" id="page-releases">
       <div class="ph"><div><div class="pt">Release Tracker</div><div class="ps">Campaign timelines per release</div></div><button class="btn bp" onclick="openRM()">+ New release</button></div>
       <div id="rcont"></div>
+    </div>
+
+    <!-- PRESS KITS -->
+    <div class="page" id="page-presskits">
+      <div class="ph"><div><div class="pt">Press Kits</div><div class="ps">Status per artist — click through to build or edit one</div></div></div>
+      <div class="rlist" id="pkgrid"></div>
     </div>
 
     <!-- LIBRARY -->
@@ -773,8 +776,11 @@ function toggleMobileMenu(){
 function nav(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  document.getElementById('nav-'+p).classList.add('active');
+  const page=document.getElementById('page-'+p);
+  const navItem=document.getElementById('nav-'+p);
+  if(!page||!navItem){console.error('Ardito: missing navigation target',p);return;}
+  page.classList.add('active');
+  navItem.classList.add('active');
   sessionStorage.setItem('ap',p);
   document.getElementById('main-sb').classList.remove('mobile-open');
   if(p==='home')renderHome();
@@ -991,25 +997,11 @@ function showAD(id){
       </div>
       <div class="rc-body" id="obcont-${id}">${buildOnboardSection(id)}</div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
-    <div id="logcont-${id}" style="margin-bottom:2rem"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Releases</h3><button class="btn bp bsm" onclick="openRMFA('${id}')">+ New release</button></div>
-       <div class="rc" id="ob-card-${id}" style="margin-bottom:2rem">
-      <div class="rch" onclick="togOnboard('${id}')">
-        <div class="rn">Onboarding<span class="rc-toggle">▾</span></div>
-        <span id="opn-${id}" style="font-size:12px;color:var(--cdim)">${(()=>{const h=buildOnboardHeader(id);return h.total?`${h.done}/${h.total} · ${h.pct}%`:'Not started';})()}</span>
-      </div>
-      <div class="rc-body" id="obcont-${id}">${buildOnboardSection(id)}</div>
-    </div>
     <div class="rc" id="pk-card-${id}" style="margin-bottom:2rem">
       <div class="rch" onclick="togPK('${id}')">
         <div class="rn">Press Kit<span class="rc-toggle">▾</span></div>
         <span id="pkstat-${id}" style="font-size:12px;color:var(--cdim)">${(()=>{const pk=getPressKit(id);return pk&&pk.status?PK_STATUS_LABEL[pk.status]:'Not started';})()}</span>
       </div>
-      <div class="page" id="page-presskits">
-  <div class="ph"><div><div class="pt">Press Kits</div><div class="ps">Status per artist — click through to build or edit one</div></div></div>
-  <div class="rlist" id="pkgrid"></div>
-</div>
       <div class="rc-body" id="pkcont-${id}">${buildPressKitSection(id)}</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM('${id}')">+ Add note</button></div>
