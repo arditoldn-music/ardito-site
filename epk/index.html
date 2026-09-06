@@ -73,17 +73,17 @@ function build(pk,a){
   const slug=pkSlug();
   if(!slug){root.innerHTML='<div class="state"><h1>Press kit not found</h1><p>No artist was specified.</p></div>';return;}
   try{
-    const pks=await api('press_kits?select=*&status=eq.published&public_slug=eq.'+encodeURIComponent(slug)+'&limit=1');
-    if(!pks.length)throw new Error('not found');
-    const pk=pks[0];
-    const artists=await api('artists?select=*&id=eq.'+encodeURIComponent(pk.artist_id)+'&limit=1');
-    if(!artists.length)throw new Error('artist not found');
-    const doc=build(pk,artists[0]);
+    const rows=await api('published_epk_public?select=*&public_slug=eq.'+encodeURIComponent(slug)+'&limit=1');
+    if(!rows.length)throw new Error('not found');
+    const row=rows[0];
+    const pk={template:row.template,theme:row.theme,content:row.content};
+    const artist={name:row.artist_name||'Artist'};
+    const doc=build(pk,artist);
     if(!doc)throw new Error('template not found');
     const blob=new Blob([doc],{type:'text/html'}),url=URL.createObjectURL(blob);
-    root.innerHTML='<iframe class="frame" title="'+esc(artists[0].name||'Artist')+' press kit"></iframe>';
+    root.innerHTML='<iframe class="frame" title="'+esc(artist.name)+' press kit"></iframe>';
     const iframe=root.querySelector('iframe');iframe.src=url;
-    document.title=(artists[0].name||'Artist')+' · Press Kit';
+    document.title=artist.name+' · Press Kit';
   }catch(e){console.error(e);root.innerHTML='<div class="state"><h1>Press kit unavailable</h1><p>This press kit may not be published yet.</p></div>';}
 })();
 </script>
