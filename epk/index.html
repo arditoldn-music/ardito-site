@@ -95,6 +95,8 @@ function epkApplySectionOrder(doc,c){
   if(movable.length<2)return;
   const content=body.querySelector('.page,.wrap,.content,.column,.main')||body;
   const anchor=content.querySelector('.contact,[class*="contact" i],.footer,[class*="footer" i],.sign-off')||null;
+  const hierarchyConflict=el=>el===content||el.contains(content)||(anchor&&(anchor===el||el.contains(anchor)));
+  if(movable.some(hierarchyConflict))return;
   movable.forEach(el=>content.insertBefore(el,anchor));
 }
 function build(pk,a){let html=EPK_TEMPLATE_SOURCES[pk.template]||'';if(!html)return'';const c={...DEFAULTS,...(pk.content||{})};const headline=c.headline||a.name||'Artist Name';const image=safeUrl(c.image_url),spotify=safeUrl(c.spotify),apple=safeUrl(c.apple_music),soundcloud=safeUrl(c.soundcloud),website=safeUrl(c.website),youtube=safeUrl(c.youtube),tiktok=safeUrl(c.tiktok),hyperfollow=safeUrl(c.hyperfollow||c.distrokid),pdf=safeUrl(c.press_kit_pdf_url);const track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
