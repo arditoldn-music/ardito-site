@@ -980,6 +980,34 @@ function buildPKTemplateDocument(artistId){
   html=html.replace(/>Ardito · Now Playing<\/span>/g,'>Press Kit · Now Playing<\/span>');
   html=html.replace(/>Ardito · Press Kit<\/div>/g,'>Press Kit<\/div>');
   html=html.replace(/>Ardito · EPK<\/span>/g,'>Press Kit<\/span>');
+  // Highlights are optional. Replace the supplied placeholder when present, otherwise omit the entire placeholder block.
+  const achievements=String(c.achievements||'').trim();
+  const achievementsPlaceholder='A key stat · a placement or credit · anything else worth flagging';
+  if(achievements){
+    html=html.split(achievementsPlaceholder).join(escPK(achievements));
+  }else{
+    html=html.replace(/<section[^>]*class="[^"]*(?:stats|highlights|achievements)[^"]*"[^>]*>[\s\S]*?A key stat\s*&nbsp;·&nbsp;\s*a placement or credit\s*&nbsp;·&nbsp;\s*anything else worth flagging[\s\S]*?<\/section>/gi,'');
+    html=html.replace(/<p[^>]*>\s*<strong>A key stat<\/strong>\s*&nbsp;·&nbsp;\s*a placement or credit\s*&nbsp;·&nbsp;\s*anything else worth flagging\s*<\/p>/gi,'');
+  }
+  // Final guard: template copy and internal notes must never leak into public/preview output.
+  html=html.split(achievementsPlaceholder).join('');
+  html=html.replace(/<[^>]*>[^<]*Internal notes[^<]*<\/[^>]+>/gi,'');
+  html=html.replace(/>[^<]*(?:Not shown in preview)[^<]*</gi,'><');
+
+  // The supplied templates do not all expose the same public fields. Preserve their design,
+  // but add one neutral runtime block for populated fields that have no stable placeholder.
+  const runtimeLinks=[];
+  const publicHref=(label,url)=>{const raw=String(url||'').trim();if(label==='Instagram'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return 'https://instagram.com/'+raw.replace(/^@/,'');if(label==='TikTok'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return 'https://tiktok.com/@'+raw.replace(/^@/,'');return pkSafeUrl(raw);};
+  const addRuntimeLink=(label,url)=>{const href=publicHref(label,url);if(href)runtimeLinks.push('<a href="'+escPK(href)+'" target="_blank" rel="noopener">'+escPK(label)+'</a>');};
+  addRuntimeLink('Website',website);addRuntimeLink('Instagram',c.instagram);addRuntimeLink('Spotify',spotify);addRuntimeLink('Apple Music',apple);addRuntimeLink('SoundCloud',soundcloud);addRuntimeLink('YouTube',youtube);addRuntimeLink('TikTok',c.tiktok);addRuntimeLink('Hyperfollow',hyperfollow);
+  const runtimeMeta=[];
+  if(c.location)runtimeMeta.push('<span>'+escPK(c.location)+'</span>');
+  if(c.genre)runtimeMeta.push('<span>'+escPK(c.genre)+'</span>');
+  if(c.press_contact)runtimeMeta.push('<span>'+escPK(c.press_contact)+'</span>');
+  const runtimeContact=contactEmail?'<a href="mailto:'+escPK(contactEmail.replace(/^mailto:/i,''))+'">'+escPK(contactEmail.replace(/^mailto:/i,''))+'</a>':'';
+  const runtimeSections=(runtimeLinks.length||runtimeMeta.length||runtimeContact||achievements)?'<section id="epk-runtime-public-fields" style="margin:32px auto;max-width:880px;padding:0 24px;font:14px/1.6 system-ui,sans-serif">'+(runtimeMeta.length?'<div>'+runtimeMeta.join(' · ')+'</div>':'')+(runtimeLinks.length?'<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px">'+runtimeLinks.join('')+'</div>':'')+(runtimeContact?'<div style="margin-top:8px">'+runtimeContact+'</div>':'')+(achievements&&!html.includes(escPK(achievements))?'<div style="margin-top:16px"><strong>Highlights</strong><br>'+escPK(achievements).replace(/\n/g,'<br>')+'</div>':'')+'</section>':'';
+  if(runtimeSections)html=html.replace('</body>',runtimeSections+'</body>');
+
   // Apply the editor's three HEX controls to the real template CSS variables. Secondary colours, where a template has them, remain part of its original design.
   const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}body img{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}</style>';
   html=html.replace('</head>',override+'</head>');
