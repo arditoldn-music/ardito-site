@@ -56,48 +56,288 @@ const email=String(c.press_email||c.email||'').trim().replace(/^mailto:/i,'').to
 body.querySelectorAll('[data-epk-internal-notes],.internal-notes').forEach(el=>el.remove());body.querySelectorAll('*').forEach(el=>{if(/internal notes/i.test(normalize(el.textContent))&&normalize(el.textContent).length<300)el.remove();});epkApplySectionOrder(doc,c);const style=doc.createElement('style');style.textContent='.epk-social-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.75rem}.epk-social-link{display:inline-flex!important;align-items:center;gap:.45rem;padding:.48rem .68rem;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:999px;text-decoration:none!important;color:inherit!important;font:inherit;font-size:.82em;line-height:1;transition:transform .15s ease,background .15s ease}.epk-social-link:hover{transform:translateY(-1px);background:color-mix(in srgb,currentColor 9%,transparent)}.epk-social-link svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}';doc.head.appendChild(style);return'<!doctype html>\n'+doc.documentElement.outerHTML;}
 function epkApplySectionOrder(doc,c){
   const body=doc.body;
-  const order=Array.isArray(c.section_order)?c.section_order.filter(Boolean):[];
-  if(!order.length)return;
-  const hasLinks=!!epkSocialHtml(c);
+  const order=[...new Set(Array.isArray(c.section_order)?c.section_order.filter(Boolean):[])];
+  if(order.length<2)return;
+
   const hasAchievements=!!String(c.achievements||'').trim();
+  const direct=el=>el?[...el.children]:[];
   const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
-  const pick=(selectors,matcher)=>{
-    const all=[...body.querySelectorAll(selectors)];
-    return all.filter(el=>!el.closest('.epk-runtime-section')&&(!matcher||matcher(el))).sort((a,b)=>a.textContent.length-b.textContent.length)[0]||null;
+  const classes=el=>el&&el.classList?el.classList:null;
+  const has= (el,name)=>!!(classes(el)&&classes(el).contains(name));
+  const textOfDirectLabel=el=>{
+    const label=direct(el).find(ch=>has(ch,'label')||has(ch,'block-title'));
+    return norm(label&&label.textContent||'');
   };
-  const blocks={
-    short_bio:pick('.hook,.hook-ribbon,.hook-tag',el=>!!norm(c.short_bio||c.genre)&&norm(el.textContent).includes(norm(c.short_bio||c.genre).slice(0,40))),
-    bio:pick('.bio,.bio-card,.bio-block,.bio-row',el=>!!String(c.bio||c.short_bio||'').trim()),
-    quote:pick('.press-quote,.quote-card,.quote-block,.press-card,.press-block,.press',el=>!!String(c.quote||'').trim()),
-    releases:pick('[data-epk-track],.track-card,.track-block,.sound,.sound-card,.enclosure,.label-line',el=>!!String(c.releases||c.track_title||'').trim()),
-    links:body.querySelector('.epk-runtime-social'),
-    achievements:pick('.stats,[class*="highlight" i],[class*="achievement" i],[data-epk-achievements]',el=>hasAchievements)
+  const rowLabel=el=>{
+    const n=direct(el).find(ch=>has(ch,'row-num'));
+    return norm(n&&n.textContent||'');
   };
-  if(hasAchievements&&!blocks.achievements){
-    const sec=doc.createElement('section');sec.className='epk-runtime-section epk-runtime-achievements';sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
-    const localParent=(blocks.links||blocks.quote||blocks.bio)?.parentElement||null;const anchor=localParent&&[...localParent.children].find(el=>/contact|footer|sign-off/i.test(String(el.className||'')))||body.querySelector('.contact,[class*="contact" i],.footer,[class*="footer" i],.sign-off')||null;(localParent||body).insertBefore(sec,anchor&&anchor.parentElement===(localParent||body)?anchor:null);blocks.achievements=sec;
+
+  /*
+   * Section ordering is deliberately conservative:
+   * only direct children of an authored section host are eligible to move.
+   * Nested cards, headings, images, paragraphs, etc. are never selected.
+   */
+  const isPotentialUnit=el=>{
+    if(!el)return false;
+    if(el.hasAttribute('data-epk-track'))return true;
+    if(has(el,'hero')||has(el,'hero-row')||has(el,'hero-card')||has(el,'headline-block')||
+       has(el,'name-row')||has(el,'name-block')||has(el,'header')||has(el,'bio')||
+       has(el,'bio-card')||has(el,'bio-block')||has(el,'bio-row')||has(el,'sound')||
+       has(el,'track-card')||has(el,'track-block')||has(el,'elsewhere')||has(el,'links-card')||
+       has(el,'links-line')||has(el,'press')||has(el,'press-card')||has(el,'press-block')||
+       has(el,'press-quote')||has(el,'quote-block')||has(el,'quote-card')||has(el,'stats')||
+       has(el,'row'))return true;
+    if(has(el,'card'))return true;
+    if(has(el,'dark-card'))return true;
+    return false;
+  };
+
+  let host=null;
+  let pairUnits=null;
+
+  /*
+   * index-dossier is a two-column grid made from alternating rail-label /
+   * content-cell siblings. Its section wrapper is the pair, not either
+   * individual cell.
+   */
+  const bodyKids=direct(body);
+  if(bodyKids.length>=2){
+    const pairs=[];
+    for(let i=0;i<bodyKids.length-1;i++){
+      const a=bodyKids[i],b=bodyKids[i+1];
+      if(has(a,'rail-label')&&has(b,'content-cell')){
+        const label=norm(a.textContent);
+        let key=null;
+        if(label==='artist')key='short_bio';
+        else if(label==='bio')key='bio';
+        else if(label==='track')key='releases';
+        else if(label==='press')key='quote';
+        else if(label==='elsewhere')key='links';
+        else if(/highlight|achievement/.test(label))key='achievements';
+        pairs.push({key,nodes:[a,b],parent:body});
+        i++;
+      }
+    }
+    if(pairs.length>=2)pairUnits=pairs;
   }
-  if(!hasAchievements&&blocks.achievements){blocks.achievements.remove();blocks.achievements=null;}
-  if(!hasLinks&&blocks.links){blocks.links.remove();blocks.links=null;}
-  const wanted=order.map(k=>[k,blocks[k]]).filter(([,el])=>el&&el.isConnected);
-  wanted.forEach(([k,el])=>el.setAttribute('data-epk-section',k));
-  if(wanted.length<2)return;
-  const parents=wanted.map(([,el])=>el.parentElement).filter(Boolean);
-  const parent=parents.find(p=>parents.filter(x=>x===p).length===parents.length)||null;
-  if(parent){
-    const first=wanted.map(([,el])=>el).sort((a,b)=>{const pos=a.compareDocumentPosition(b);return pos&Node.DOCUMENT_POSITION_FOLLOWING?-1:1;})[0];
-    const marker=doc.createComment('epk-section-order');parent.insertBefore(marker,first);
-    wanted.forEach(([,el])=>parent.insertBefore(el,marker));
+
+  if(!pairUnits){
+    const top=bodyKids;
+    const directByClass=(parent,name)=>direct(parent).find(el=>has(el,name));
+    const usable=parent=>direct(parent).filter(isPotentialUnit).length>=2;
+
+    const content=directByClass(body,'content');
+    if(content&&usable(content)){
+      host=content;
+    }else{
+      const page=directByClass(body,'page');
+      if(page){
+        const inner=directByClass(page,'inner');
+        if(inner&&usable(inner))host=inner;
+        else if(usable(page))host=page;
+      }
+      if(!host){
+        const layout=directByClass(body,'layout');
+        const main=layout&&directByClass(layout,'main');
+        if(main&&usable(main))host=main;
+      }
+      if(!host){
+        const column=directByClass(body,'column');
+        if(column&&usable(column))host=column;
+      }
+      if(!host){
+        const wrap=directByClass(body,'wrap');
+        if(wrap&&usable(wrap))host=wrap;
+      }
+    }
+  }
+
+  const labelMatches=(el,key)=>{
+    const rl=rowLabel(el);
+    if(key==='short_bio')return rl==='01 artist'||/^01\s+artist\b/.test(rl);
+    if(key==='bio')return rl==='02 bio'||/^02\s+bio\b/.test(rl);
+    if(key==='releases')return rl==='03 track'||/^03\s+track\b/.test(rl);
+    if(key==='quote')return /^04\s+press\b/.test(rl);
+    if(key==='links')return /^08\s+elsewhere\b/.test(rl)||/\belsewhere\b/.test(rl);
+    return false;
+  };
+
+  const matchesKey=(el,key)=>{
+    if(!el)return false;
+    if(key==='short_bio'){
+      return has(el,'hero')||has(el,'hero-row')||has(el,'hero-card')||has(el,'headline-block')||
+        has(el,'name-row')||has(el,'name-block')||
+        (has(el,'header')&&!!el.querySelector('.hook'))||
+        (has(el,'row')&&(labelMatches(el,key)||!!el.querySelector('.artist-name')));
+    }
+    if(key==='bio'){
+      return has(el,'bio')||has(el,'bio-card')||has(el,'bio-block')||has(el,'bio-row')||
+        (has(el,'card')&&textOfDirectLabel(el)==='about')||
+        (has(el,'row')&&(labelMatches(el,key)||!!el.querySelector('.bio-row')));
+    }
+    if(key==='releases'){
+      return el.hasAttribute('data-epk-track')||has(el,'track-card')||has(el,'track-block')||has(el,'sound')||
+        (has(el,'row')&&labelMatches(el,key));
+    }
+    if(key==='links'){
+      return has(el,'epk-runtime-social')||has(el,'elsewhere')||has(el,'links-card')||has(el,'links-line')||
+        (has(el,'card')&&/listen\s*(?:&|and)\s*follow/i.test(textOfDirectLabel(el)))||
+        (has(el,'dark-card')&&/listen\s*(?:&|and)\s*follow/i.test(textOfDirectLabel(el)))||
+        (has(el,'row')&&labelMatches(el,key));
+    }
+    if(key==='quote'){
+      return has(el,'press')||has(el,'press-card')||has(el,'press-block')||has(el,'press-quote')||
+        has(el,'quote-block')||has(el,'quote-card')||
+        (has(el,'card')&&!!el.querySelector('.quote'))||
+        (has(el,'row')&&(labelMatches(el,key)||!!el.querySelector('.press-quote')||!!el.querySelector('.press-multi')));
+    }
+    if(key==='achievements'){
+      return has(el,'stats')||el.hasAttribute('data-epk-achievements')||
+        (/highlight|achievement/i.test(String(el.className||'')));
+    }
+    return false;
+  };
+
+  const score=(el,key)=>{
+    let s=0;
+    if(key==='short_bio'){
+      if(has(el,'hero')||has(el,'hero-row')||has(el,'hero-card')||has(el,'headline-block')||has(el,'name-row')||has(el,'name-block'))s+=120;
+      if(has(el,'header'))s+=110;
+      if(has(el,'row')&&labelMatches(el,key))s+=140;
+    }else if(key==='bio'){
+      if(has(el,'bio')||has(el,'bio-card')||has(el,'bio-block')||has(el,'bio-row'))s+=120;
+      if(has(el,'row')&&labelMatches(el,key))s+=140;
+      if(has(el,'card')&&textOfDirectLabel(el)==='about')s+=110;
+    }else if(key==='releases'){
+      if(el.hasAttribute('data-epk-track'))s+=150;
+      if(has(el,'track-card')||has(el,'track-block')||has(el,'sound'))s+=120;
+      if(has(el,'row')&&labelMatches(el,key))s+=140;
+    }else if(key==='links'){
+      if(has(el,'epk-runtime-social'))s+=160;
+      if(has(el,'row')&&/^08\s+elsewhere\b/.test(rowLabel(el)))s+=150;
+      if(has(el,'elsewhere')||has(el,'links-card')||has(el,'links-line'))s+=120;
+      if((has(el,'card')||has(el,'dark-card'))&&/listen\s*(?:&|and)\s*follow/i.test(textOfDirectLabel(el)))s+=110;
+    }else if(key==='quote'){
+      if(has(el,'press')||has(el,'press-card')||has(el,'press-block')||has(el,'press-quote')||has(el,'quote-block')||has(el,'quote-card'))s+=120;
+      if(has(el,'row')&&labelMatches(el,key))s+=140;
+      if(has(el,'card')&&!!el.querySelector('.quote'))s+=110;
+    }else if(key==='achievements'){
+      if(el.hasAttribute('data-epk-achievements'))s+=150;
+      if(has(el,'stats'))s+=140;
+      if(/highlight|achievement/i.test(String(el.className||'')))s+=120;
+    }
+    return s;
+  };
+
+  if(pairUnits){
+    if(hasAchievements&&!pairUnits.some(u=>u.key==='achievements')){
+      const label=doc.createElement('div');
+      label.className='rail-label';
+      label.textContent='Highlights';
+      const cell=doc.createElement('div');
+      cell.className='content-cell epk-runtime-section epk-runtime-achievements';
+      cell.innerHTML=String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
+      const runtime={key:'achievements',nodes:[label,cell],parent:body,runtime:true};
+      const contactIndex=pairUnits.findIndex(u=>u.nodes[0]&&/contact/i.test(norm(u.nodes[0].textContent)));
+      if(contactIndex>=0){
+        const before=pairUnits[contactIndex].nodes[0];
+        body.insertBefore(label,before);
+        body.insertBefore(cell,before);
+      }else{
+        body.appendChild(label);
+        body.appendChild(cell);
+      }
+      pairUnits.push(runtime);
+    }
+    if(!hasAchievements){
+      const native=pairUnits.find(u=>u.key==='achievements');
+      if(native){native.nodes.forEach(n=>n.remove());pairUnits=pairUnits.filter(u=>u!==native);}
+    }
+  }else{
+    if(!host)return;
+
+    let units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
+    if(hasAchievements&&!units.some(u=>matchesKey(u.node,'achievements'))){
+      const sec=doc.createElement('section');
+      sec.className='epk-runtime-section epk-runtime-achievements';
+      sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+
+        String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
+      const anchor=direct(host).find(el=>has(el,'contact')||has(el,'footer')||has(el,'footer-row')||has(el,'sign-off')||has(el,'assets-note'))||null;
+      host.insertBefore(sec,anchor||null);
+      units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
+    }
+    if(!hasAchievements){
+      const native=direct(host).find(el=>matchesKey(el,'achievements'));
+      if(native)native.remove();
+      units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
+    }
+
+    const selected=[];
+    const used=new Set();
+    order.forEach(key=>{
+      let best=null,bestScore=-1;
+      units.forEach(unit=>{
+        if(used.has(unit.node))return;
+        if(!matchesKey(unit.node,key))return;
+        const s=score(unit.node,key);
+        if(s>bestScore){best=unit;bestScore=s;}
+      });
+      if(best){
+        best.key=key;
+        used.add(best.node);
+        selected.push(best);
+      }
+    });
+
+    if(selected.length<2)return;
+    const allSameParent=selected.every(u=>u.parent===host);
+    if(!allSameParent)return;
+
+    selected.forEach(u=>u.nodes.forEach(n=>n.setAttribute('data-epk-section',u.key)));
+
+    const marker=doc.createComment('epk-section-order');
+    const first=selected.reduce((earliest,u)=>{
+      const n=u.nodes[0];
+      if(!earliest)return n;
+      const pos=earliest.compareDocumentPosition(n);
+      return pos&Node.DOCUMENT_POSITION_FOLLOWING?earliest:n;
+    },null);
+    if(!first||first.parentElement!==host)return;
+    host.insertBefore(marker,first);
+    selected.forEach(u=>u.nodes.forEach(n=>host.insertBefore(n,marker)));
     marker.remove();
     return;
   }
-  const movable=wanted.filter(([k])=>k==='links'||k==='achievements').map(([,el])=>el);
-  if(movable.length<2)return;
-  const content=body.querySelector('.page,.wrap,.content,.column,.main')||body;
-  const anchor=content.querySelector('.contact,[class*="contact" i],.footer,[class*="footer" i],.sign-off')||null;
-  const hierarchyConflict=el=>el===content||el.contains(content)||(anchor&&(anchor===el||el.contains(anchor)));
-  if(movable.some(hierarchyConflict))return;
-  movable.forEach(el=>content.insertBefore(el,anchor));
+
+  const selected=[];
+  const used=new Set();
+  order.forEach(key=>{
+    let best=null,bestScore=-1;
+    pairUnits.forEach(unit=>{
+      if(used.has(unit))return;
+      if(unit.key!==key)return;
+      if(unit.nodes.some(n=>!n.isConnected||n.parentElement!==body))return;
+      const s=unit.runtime?150:100;
+      if(s>bestScore){best=unit;bestScore=s;}
+    });
+    if(best){used.add(best);selected.push(best);}
+  });
+
+  if(selected.length<2)return;
+  selected.forEach(u=>u.nodes.forEach(n=>n.setAttribute('data-epk-section',u.key)));
+
+  const marker=doc.createComment('epk-section-order');
+  const first=selected.reduce((earliest,u)=>{
+    const n=u.nodes[0];
+    if(!earliest)return n;
+    const pos=earliest.compareDocumentPosition(n);
+    return pos&Node.DOCUMENT_POSITION_FOLLOWING?earliest:n;
+  },null);
+  if(!first||first.parentElement!==body)return;
+  body.insertBefore(marker,first);
+  selected.forEach(u=>u.nodes.forEach(n=>body.insertBefore(n,marker)));
+  marker.remove();
 }
 function build(pk,a){let html=EPK_TEMPLATE_SOURCES[pk.template]||'';if(!html)return'';const c={...DEFAULTS,...(pk.content||{})};const headline=c.headline||a.name||'Artist Name';const image=safeUrl(c.image_url),spotify=safeUrl(c.spotify),apple=safeUrl(c.apple_music),soundcloud=safeUrl(c.soundcloud),website=safeUrl(c.website),youtube=safeUrl(c.youtube),tiktok=safeUrl(c.tiktok),hyperfollow=safeUrl(c.hyperfollow||c.distrokid),pdf=safeUrl(c.press_kit_pdf_url);const track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
 const textMap={'Artist Name':headline,'ARTIST NAME':String(headline).toUpperCase(),'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'','Your one-line hook lives here.':c.short_bio||c.genre||'','This is where your bio will live. Two or three sentences, third person, telling the story so far.':c.bio||c.short_bio||'','Track Title':track,'2026':year,'Publication Name':quoteSource,'A great quote about the song from press goes here.':c.quote||'','A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE.':c.quote||'','"A great quote about the song from press goes here."':c.quote?'"'+String(c.quote).replace(/^"|"$/g,'')+'"':'','@yourhandle':c.instagram||''};
