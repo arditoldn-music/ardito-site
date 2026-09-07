@@ -1,92 +1,22 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ardito · Press Kit</title>
-<meta name="robots" content="index,follow">
-<style>
-  html,body{margin:0;padding:0;min-height:100%;background:#111;color:#eee}
-  #app{min-height:100vh}
-  .state{font:14px/1.6 system-ui,sans-serif;max-width:760px;margin:0 auto;padding:80px 24px}
-  .state h1{font-size:24px;margin:0 0 12px}
-  .state p{opacity:.75}
-  .frame{width:100%;min-height:100vh;border:0;display:block}
-</style>
-<script src="/epk/epk-shared.js"></script>
-</head>
-<body>
-<div id="app"><div class="state"><h1>Loading press kit…</h1><p>Please wait.</p></div></div>
-<script>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ardito · Press Kit</title><meta name="robots" content="index,follow"><style>html,body{margin:0;padding:0;min-height:100%;background:#111;color:#eee}#app{min-height:100vh}.state{font:14px/1.6 system-ui,sans-serif;max-width:760px;margin:0 auto;padding:80px 24px}.state h1{font-size:24px;margin:0 0 12px}.state p{opacity:.75}.frame{width:100%;min-height:100vh;border:0;display:block}</style><script src="/epk/epk-shared.js"></script></head><body><div id="app"><div class="state"><h1>Loading press kit…</h1><p>Please wait.</p></div></div><script>
 const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN';
-
 const DEFAULTS={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:[]};
-function safeUrl(v){const x=String(v||'').trim();return /^(https?:|mailto:|data:image\/)/i.test(x)?x:'';}
-function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function pkSlug(){const p=new URLSearchParams(location.search);let s=(p.get('artist')||'').trim();if(!s){const base='/epk/';const path=location.pathname; if(path.startsWith(base)){s=path.slice(base.length).split('/').filter(Boolean)[0]||'';}}s=s.toLowerCase();if(s&&location.search){history.replaceState(null,'', '/epk/'+encodeURIComponent(s)+'/');}return s;}
+function safeUrl(v){const x=String(v||'').trim();return /^(https?:|mailto:|data:image\/)/i.test(x)?x:'';}function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function publicHref(label,v){const raw=String(v||'').trim();if(label==='Instagram'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://instagram.com/'+raw.replace(/^@/,'');if(label==='TikTok'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://tiktok.com/@'+raw.replace(/^@/,'');return safeUrl(raw);}
+function pkSlug(){const p=new URLSearchParams(location.search);let s=(p.get('artist')||'').trim();if(!s){const base='/epk/';const path=location.pathname;if(path.startsWith(base))s=path.slice(base.length).split('/').filter(Boolean)[0]||'';}s=s.toLowerCase();if(s&&location.search)history.replaceState(null,'','/epk/'+encodeURIComponent(s)+'/');return s;}
 async function api(path){const r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});const t=await r.text();if(!r.ok)throw new Error(t||r.statusText);return t?JSON.parse(t):[];}
-function build(pk,a){
-  let html=EPK_TEMPLATE_SOURCES[pk.template]||''; if(!html) return '';
-  const c={...DEFAULTS,...(pk.content||{})};
-  const headline=c.headline||a.name||'Artist Name';
-  const image=safeUrl(c.image_url), spotify=safeUrl(c.spotify), apple=safeUrl(c.apple_music), soundcloud=safeUrl(c.soundcloud), website=safeUrl(c.website), youtube=safeUrl(c.youtube), tiktok=safeUrl(c.tiktok), hyperfollow=safeUrl(c.hyperfollow||c.distrokid), pdf=safeUrl(c.press_kit_pdf_url);
-  const track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'';
-  const year=c.track_year||'';
-  const quoteSource=c.quote_source||c.press_contact||'';
-  const textMap={
-    'Artist Name':headline,'ARTIST NAME':String(headline).toUpperCase(),
-    'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'',
-    'Your one-line hook lives here.':c.short_bio||c.genre||'',
-    'This is where your bio will live. Two or three sentences, third person, telling the story so far.':c.bio||c.short_bio||'',
-    'Track Title':track,'2026':year,'Publication Name':quoteSource,
-    'A great quote about the song from press goes here.':c.quote||'',
-    '"A great quote about the song from press goes here."':c.quote?'"'+String(c.quote).replace(/^"|"$/g,'')+'"':'',
-    '@yourhandle':c.instagram||''
-  };
-  html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,esc(headline));
-  Object.entries(textMap).forEach(([from,to])=>html=html.split(from).join(esc(to)));
-  const repl={'[PRESS PHOTO URL]':image,'[PRESS PHOTO OR SINGLE ARTWORK URL]':image,'[SPOTIFY URL]':spotify,'[APPLE MUSIC URL]':apple,'[SOUNDCLOUD URL]':soundcloud,'[YOUTUBE URL]':youtube,'[TIKTOK URL]':tiktok,'[DISTROKID / HYPERFOLLOW URL]':hyperfollow,'[PRESS KIT PDF URL]':pdf};
-  Object.entries(repl).forEach(([from,to])=>html=html.split(from).join(esc(to)));
-  if(!pdf) html=html.replace(/<a[^>]+href=""[^>]*>\s*Download press kit \(PDF\)\s*<\/a>/gi,'');
-  html=html.replace(/href="(?:\/|\.\/|\.\.\/)[^"]*"/gi,'href=""');
-  html=html.replace(/<a[^>]*href=""[^>]*>[\s\S]*?<\/a>/gi,'');
-  if(!c.short_bio&&!c.genre) html=html.replace(/<p[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/p>/gi,'').replace(/<div[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/div>/gi,'');
-  if(!c.bio&&!c.short_bio) html=html.replace(/<(section|div)[^>]*class="[^"]*(?:bio|bio-card|bio-block)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
-  if(!c.quote) html=html.replace(/<(section|div)[^>]*class="[^"]*(?:press-quote|quote-card|quote|press)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
-  if(!track) html=html.replace(/<([a-zA-Z0-9]+)([^>]*)class="([^"]*\bspotify-cta-track\b[^"]*)"([^>]*)>[\s\S]*?<\/\1>/g,'');
-  if(!track&&!spotify) html=html.replace(/<(section|div)[^>]*class="[^"]*(?:track-card|sound|track-block|enclosure)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
-  const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||website);
-  if(!hasStreaming) html=html.replace(/<(section|div)[^>]*class="[^"]*(?:elsewhere|links|listen|social|platforms|connect)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
-  if(!image){html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');html=html.replace(/<img[^>]+src=""[^>]*>\s*/gi,'');}
-  if(!hyperfollow) html=html.replace(/<a[^>]+href=""[^>]*>\s*DistroKid\s*<\/a>/gi,'');
-  const contact=String(c.press_email||c.email||'').trim();
-  if(contact){const mh=contact.replace(/^mailto:/i,'');html=html.split('mailto:ardito.ldn@gmail.com').join('mailto:'+esc(mh)).split('ardito.ldn@gmail.com').join(esc(mh));}
-  else {html=html.replace(/<(p|span|div)[^>]*>[^<]*(?:Management:\s*Laura,\s*Ardito|Laura,\s*Ardito|Booking &amp; press:|For booking and press:)[\s\S]*?ardito\.ldn@gmail\.com[\s\S]*?<\/\1>/gi,'');html=html.replace(/<a[^>]*href="mailto:ardito\.ldn@gmail\.com"[^>]*>ardito\.ldn@gmail\.com<\/a>/gi,'');html=html.replace(/<a[^>]*>ardito\.ldn@gmail\.com<\/a>/gi,'');}
-  html=html.split('Ardito — ardito.co.uk').join(website||'Press Kit');html=html.split('ardito.co.uk').join(website||'');
-  html=html.replace(/>Ardito Agency — Artist Manifest</g,'>'+esc(headline+' — Press Kit')).replace(/>Ardito Agency<\/span>/g,'>Press Kit</span>').replace(/>Ardito EPK<\/div>/g,'>Press Kit</div>').replace(/>Ardito · Now Playing<\/span>/g,'>Press Kit · Now Playing</span>').replace(/>Ardito · Press Kit<\/div>/g,'>Press Kit</div>').replace(/>Ardito · EPK<\/span>/g,'>Press Kit</span>');
-  const colors=(pk.theme&&pk.theme[pk.template])||{};
-  html=html.replace('</head>','<style id="ardito-epk-runtime">:root{--bg:'+esc(colors.bg||'')+';--text:'+esc(colors.ink||'')+';--ink:'+esc(colors.ink||'')+';--accent:'+esc(colors.accent||'')+';}body{}</style></head>');
-  html=html.replace(/<meta[^>]+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index,follow">');
-  return html;
-}
-(async function(){
-  const root=document.getElementById('app');
-  const slug=pkSlug();
-  if(!slug){root.innerHTML='<div class="state"><h1>Press kit not found</h1><p>No artist was specified.</p></div>';return;}
-  try{
-    const rows=await api('published_epk_public?select=*&public_slug=eq.'+encodeURIComponent(slug)+'&limit=1');
-    if(!rows.length)throw new Error('not found');
-    const row=rows[0];
-    const pk={template:row.template,theme:row.theme,content:row.content};
-    const artist={name:row.artist_name||'Artist'};
-    const doc=build(pk,artist);
-    if(!doc)throw new Error('template not found');
-    const blob=new Blob([doc],{type:'text/html'}),url=URL.createObjectURL(blob);
-    root.innerHTML='<iframe class="frame" title="'+esc(artist.name)+' press kit"></iframe>';
-    const iframe=root.querySelector('iframe');iframe.src=url;
-    document.title=artist.name+' · Press Kit';
-  }catch(e){console.error(e);root.innerHTML='<div class="state"><h1>Press kit unavailable</h1><p>This press kit may not be published yet.</p></div>';}
-})();
-</script>
-</body>
-</html>
+function build(pk,a){let html=EPK_TEMPLATE_SOURCES[pk.template]||'';if(!html)return'';const c={...DEFAULTS,...(pk.content||{})};const headline=c.headline||a.name||'Artist Name';const image=safeUrl(c.image_url),spotify=safeUrl(c.spotify),apple=safeUrl(c.apple_music),soundcloud=safeUrl(c.soundcloud),website=safeUrl(c.website),youtube=safeUrl(c.youtube),tiktok=safeUrl(c.tiktok),hyperfollow=safeUrl(c.hyperfollow||c.distrokid),pdf=safeUrl(c.press_kit_pdf_url);const track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
+const textMap={'Artist Name':headline,'ARTIST NAME':String(headline).toUpperCase(),'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'','Your one-line hook lives here.':c.short_bio||c.genre||'','This is where your bio will live. Two or three sentences, third person, telling the story so far.':c.bio||c.short_bio||'','Track Title':track,'2026':year,'Publication Name':quoteSource,'A great quote about the song from press goes here.':c.quote||'','A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE.':c.quote||'','"A great quote about the song from press goes here."':c.quote?'"'+String(c.quote).replace(/^"|"$/g,'')+'"':'','@yourhandle':c.instagram||''};
+html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,esc(headline));Object.entries(textMap).forEach(([from,to])=>html=html.split(from).join(esc(to)));const repl={'[PRESS PHOTO URL]':image,'[PRESS PHOTO OR SINGLE ARTWORK URL]':image,'[SPOTIFY URL]':spotify,'[APPLE MUSIC URL]':apple,'[SOUNDCLOUD URL]':soundcloud,'[YOUTUBE URL]':youtube,'[TIKTOK URL]':tiktok,'[DISTROKID / HYPERFOLLOW URL]':hyperfollow,'[PRESS KIT PDF URL]':pdf};Object.entries(repl).forEach(([from,to])=>html=html.split(from).join(esc(to)));
+if(!pdf)html=html.replace(/<a[^>]+href=""[^>]*>\s*(?:Download press kit \(PDF\)|↓ Download full press kit \(PDF\))\s*<\/a>/gi,'');html=html.replace(/href="(?:\/|\.\/|\.\.\/)[^"]*"/gi,'href=""');html=html.replace(/<a[^>]*href=""[^>]*>[\s\S]*?<\/a>/gi,'');
+if(!c.short_bio&&!c.genre)html=html.replace(/<p[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/p>/gi,'').replace(/<div[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/div>/gi,'');if(!c.bio&&!c.short_bio)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:bio|bio-card|bio-block)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!c.quote)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:press-quote|quote-card|quote|press)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
+if(!track&&!spotify)html=html.replace(/<!-- EPK_TRACK_START -->[\s\S]*?<!-- EPK_TRACK_END -->/gi,'');else if(!track){html=html.replace(/<[^>]*data-epk-track-title[^>]*>[\s\S]*?<\/[^>]+>/gi,'').replace(/<[^>]*data-epk-track-meta[^>]*>[\s\S]*?<\/[^>]+>/gi,'');}
+const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||website);if(!hasStreaming)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:elsewhere|links|listen|social|platforms|connect)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!image){html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');html=html.replace(/<img[^>]+src=""[^>]*>\s*/gi,'');}
+const achievements=String(c.achievements||'').trim(),placeholder='A key stat · a placement or credit · anything else worth flagging';if(achievements)html=html.split(placeholder).join(esc(achievements));else{html=html.replace(/<section[^>]*class="[^"]*(?:stats|highlights|achievements)[^"]*"[^>]*>[\s\S]*?A key stat\s*&nbsp;·&nbsp;\s*a placement or credit\s*&nbsp;·&nbsp;\s*anything else worth flagging[\s\S]*?<\/section>/gi,'');html=html.replace(/<p[^>]*>\s*<strong>A key stat<\/strong>\s*&nbsp;·&nbsp;\s*a placement or credit\s*&nbsp;·&nbsp;\s*anything else worth flagging\s*<\/p>/gi,'');}html=html.split(placeholder).join('');
+if(!hyperfollow)html=html.replace(/<a[^>]+href=""[^>]*>\s*DistroKid\s*<\/a>/gi,'');const contact=String(c.press_email||c.email||'').trim();if(contact){const mh=contact.replace(/^mailto:/i,'');html=html.split('mailto:ardito.ldn@gmail.com').join('mailto:'+esc(mh)).split('ardito.ldn@gmail.com').join(esc(mh));}else{html=html.replace(/<(p|span|div)[^>]*>[^<]*(?:Management:\s*Laura,\s*Ardito|Laura,\s*Ardito|Booking &amp; press:|For booking and press:)[\s\S]*?ardito\.ldn@gmail\.com[\s\S]*?<\/\1>/gi,'');html=html.replace(/<a[^>]*href="mailto:ardito\.ldn@gmail\.com"[^>]*>ardito\.ldn@gmail\.com<\/a>/gi,'');}
+html=html.split('Ardito — ardito.co.uk').join(website||'Press Kit').split('ardito.co.uk').join(website||'');html=html.replace(/>Ardito Agency — Artist Manifest</g,'>'+esc(headline+' — Press Kit')).replace(/>Ardito Agency<\/span>/g,'>Press Kit</span>').replace(/>Ardito EPK<\/div>/g,'>Press Kit</div>').replace(/>Ardito · Now Playing<\/span>/g,'>Press Kit · Now Playing</span>').replace(/>Ardito · Press Kit<\/div>/g,'>Press Kit</div>').replace(/>Ardito · EPK<\/span>/g,'>Press Kit</span>');
+const links=[];const add=(label,v)=>{const href=publicHref(label,v);if(href)links.push('<a href="'+esc(href)+'" target="_blank" rel="noopener">'+esc(label)+'</a>');};add('Website',website);add('Instagram',c.instagram);add('Spotify',spotify);add('Apple Music',apple);add('SoundCloud',soundcloud);add('YouTube',youtube);add('TikTok',c.tiktok);add('Hyperfollow',hyperfollow);const meta=[c.location,c.genre,c.press_contact].filter(Boolean).map(esc);const contactHtml=contact?'<a href="mailto:'+esc(contact.replace(/^mailto:/i,''))+'">'+esc(contact.replace(/^mailto:/i,''))+'</a>':'';const runtime=(links.length||meta.length||contactHtml||achievements)?'<section id="epk-runtime-public-fields" style="margin:32px auto;max-width:880px;padding:0 24px;font:14px/1.6 system-ui,sans-serif">'+(meta.length?'<div>'+meta.join(' · ')+'</div>':'')+(links.length?'<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px">'+links.join('')+'</div>':'')+(contactHtml?'<div style="margin-top:8px">'+contactHtml+'</div>':'')+(achievements&&!html.includes(esc(achievements))?'<div style="margin-top:16px"><strong>Highlights</strong><br>'+esc(achievements).replace(/\n/g,'<br>')+'</div>':'')+'</section>':'';if(runtime)html=html.replace('</body>',runtime+'</body>');
+html=html.replace(/<[^>]*>[^<]*Internal notes[^<]*<\/[^>]+>/gi,'').replace(/>[^<]*Not shown in preview[^<]*</gi,'><');const colors=(pk.theme&&pk.theme[pk.template])||{};html=html.replace('</head>','<style id="ardito-epk-runtime">:root{--bg:'+esc(colors.bg||'')+';--text:'+esc(colors.ink||'')+';--ink:'+esc(colors.ink||'')+';--accent:'+esc(colors.accent||'')+';}body{}</style></head>');html=html.replace(/<meta[^>]+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index,follow">');return html;}
+(async function(){const root=document.getElementById('app'),slug=pkSlug();if(!slug){root.innerHTML='<div class="state"><h1>Press kit not found</h1><p>No artist was specified.</p></div>';return;}try{const rows=await api('published_epk_public?select=*&public_slug=eq.'+encodeURIComponent(slug)+'&limit=1');if(!rows.length)throw new Error('not found');const row=rows[0],pk={template:row.template,theme:row.theme,content:row.content},artist={name:row.artist_name||'Artist'},doc=build(pk,artist);if(!doc)throw new Error('template not found');const blob=new Blob([doc],{type:'text/html'}),url=URL.createObjectURL(blob);root.innerHTML='<iframe class="frame" title="'+esc(artist.name)+' press kit"></iframe>';root.querySelector('iframe').src=url;document.title=artist.name+' · Press Kit';}catch(e){console.error(e);root.innerHTML='<div class="state"><h1>Press kit unavailable</h1><p>This press kit may not be published yet.</p></div>';}})();
+</script></body></html>
