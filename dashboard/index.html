@@ -951,7 +951,7 @@ async function publishPK(artistId){
   if(!confirm('Publish this EPK publicly?\n\n'+publicUrl))return;
   try{await persistPKData(artistId);const r=await db('press_kits','PATCH',{public_slug:slug,status:'published',url:publicUrl},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),public_slug:slug,status:'published',url:publicUrl}:p);
     setPKSaveState('Published ✓');openPressKitEditor(artistId);alert('EPK published.\n\n'+publicUrl);
-  }catch(e){console.error(e);alert('Could not publish the EPK. Run the publish migration in Supabase first.');}
+  }catch(e){ console.error('EPK publish failed:', e); alert('Could not publish the EPK.\n\n'+(e?.message||String(e))); }
 }
 async function unpublishPK(artistId){
   const pk=getPressKit(artistId);if(!pk)return;if(!confirm('Unpublish this EPK?'))return;
