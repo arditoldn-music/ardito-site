@@ -357,7 +357,7 @@ textarea{resize:vertical;min-height:80px}
     <div class="ns"><div class="nl">Releases</div>
       <div class="ni" onclick="nav('releases')" id="nav-releases"><span class="ni-icon">🚀</span>Release Tracker</div>
       <div class="ni" onclick="nav('roster')" id="nav-roster"><span class="ni-icon">🎤</span>Artist Roster</div>
-      <div class="ni" onclick="nav('presskits')" id="nav-presskits"><span class="ni-icon">🗂️</span>Press Kits</div>
+      <div class="ni" onclick="nav('presskits')" id="nav-presskits"><span class="ni-icon">🗂️</span>EPK Studio</div>
     </div>
     <div class="ns"><div class="nl">Content</div>
       <div class="ni" onclick="nav('calendar')" id="nav-calendar"><span class="ni-icon">📅</span>Calendar</div>
@@ -434,7 +434,7 @@ textarea{resize:vertical;min-height:80px}
     <!-- PRESS KITS -->
     <div class="page" id="page-presskits">
       <div id="pk-list-view">
-        <div class="ph"><div><div class="pt">Press Kits</div><div class="ps">Choose an artist to build, edit, preview and publish their EPK.</div></div></div>
+        <div class="ph"><div><div class="pt">EPK Studio</div><div class="ps">Choose an artist to build, edit, preview and publish their EPK.</div></div></div>
         <div class="rlist" id="pkgrid"></div>
       </div>
       <div id="pk-workspace" class="pk-workspace">
@@ -847,8 +847,12 @@ async function choosePKTemplate(artistId,templateKey){
   const existing=getPressKit(artistId);
   try{
     if(existing){
-      const r=await db('press_kits','PATCH',{template:templateKey,status:'in_progress'},existing.id);
-      aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,...(r&&r[0]?r[0]:{}),template:templateKey,status:'in_progress'}:p);
+      const patch={template:templateKey};
+      // Selecting/editing a template must not unpublish an already-published EPK.
+      // Only an explicit Publish/Republish action changes a published record's status.
+      if(existing.status!=='published')patch.status='in_progress';
+      const r=await db('press_kits','PATCH',patch,existing.id);
+      aPressKits=aPressKits.map(p=>p.id===existing.id?{...p,...(r&&r[0]?r[0]:{}),template:templateKey,status:existing.status==='published'?'published':'in_progress'}:p);
     }else{
       const r=await db('press_kits','POST',{artist_id:artistId,template:templateKey,status:'in_progress'});
       if(r&&r[0])aPressKits.push(r[0]);
@@ -1342,7 +1346,7 @@ function showAD(id){
     </div>
     <div class="rc" id="pk-card-${htmlId(id)}" style="margin-bottom:2rem">
       <div class="rch" onclick="togPK(${jsqAttr(id)})">
-        <div class="rn">Press Kit<span class="rc-toggle">▾</span></div>
+        <div class="rn">EPK Studio<span class="rc-toggle">▾</span></div>
         <span id="pkstat-${htmlId(id)}" style="font-size:12px;color:var(--cdim)">${(()=>{const pk=getPressKit(id);return pk&&pk.status?PK_STATUS_LABEL[pk.status]:'Not started';})()}</span>
       </div>
       <div class="rc-body" id="pkcont-${htmlId(id)}">${buildPressKitSection(id)}</div>
