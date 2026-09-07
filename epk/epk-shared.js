@@ -22,3 +22,53 @@ function epkLabel(key){const t=epkTemplate(key);return t?t.label:key;}
 const PK_DEFAULT_COLORS={
   'ardito-signature':{bg:'#0d0d0d',ink:'#e8e0d0',accent:'#2d4a2d'},'quiet-editorial':{bg:'#f2f0ea',ink:'#171717',accent:'#7a2f2f'},'night-bloom':{bg:'#241b2e',ink:'#f2ead9',accent:'#b8873b'},'sunbleached':{bg:'#2b3a4a',ink:'#f1ece0',accent:'#c99a3c'},'warm-paper':{bg:'#ece7dd',ink:'#1c2430',accent:'#a8503f'},'spec-sheet':{bg:'#e8e8f0',ink:'#141420',accent:'#3d2bff'},'zine-collage':{bg:'#fff6ea',ink:'#212121',accent:'#ff4d6d'},'now-playing':{bg:'#1b2a4a',ink:'#fff3d0',accent:'#e4572e'},'radial-vinyl':{bg:'#d3a24c',ink:'#101010',accent:'#c85a3d'},'letterhead-memo':{bg:'#e9e7e4',ink:'#26241f',accent:'#6f7263'},'index-dossier':{bg:'#eceeec',ink:'#23262b',accent:'#5c6470'},'ledger-sheet':{bg:'#e6e2dc',ink:'#1c1b19',accent:'#8a7b6c'},'press-one-sheet':{bg:'#f2ede1',ink:'#111111',accent:'#e8352b'},'staggered-sheet':{bg:'#0a0a0f',ink:'#f5f3ee',accent:'#00e5ff'}
 };
+
+/* Section spacing (per-template hooks).
+   Each of the 14 templates already governs vertical rhythm through a different
+   mechanism (bare <section> margins, flex "gap", row padding, empty spacer divs,
+   etc). This map targets the exact selector/property each template already
+   uses for that rhythm, instead of a single generic rule applied to all of them.
+   Returning '' (from epkSpacingCss) means "don't touch anything" -- used whenever
+   section_spacing is missing/null/'default', so the template's authored spacing
+   is left completely untouched. */
+const EPK_SPACING_HOOKS={
+  'ardito-signature':v=>'section{margin-bottom:'+v+'px}section:last-of-type{margin-bottom:0}',
+  'quiet-editorial':v=>'section{margin-bottom:'+v+'px}section:last-of-type{margin-bottom:0}',
+  'night-bloom':v=>'section{margin-bottom:'+v+'px}section:last-of-type{margin-bottom:0}.hero{margin-bottom:'+v+'px}',
+  'sunbleached':v=>'section{margin-bottom:'+v+'px}section:last-of-type{margin-bottom:0}',
+  'warm-paper':v=>'.main section{margin-bottom:'+v+'px}.main section:last-child{margin-bottom:0}',
+  'spec-sheet':v=>'.row{padding-top:'+v+'px;padding-bottom:'+v+'px}',
+  'zine-collage':v=>'.wrap{gap:'+v+'px}',
+  'now-playing':v=>'.wrap{gap:'+v+'px}',
+  'radial-vinyl':v=>'.wrap{gap:'+v+'px}',
+  'letterhead-memo':v=>'.name-row,.bio,.quote-block,.enclosure,.sign-off{margin-top:'+v+'px}',
+  'index-dossier':v=>'.rail-label,.content-cell{padding-top:'+v+'px;padding-bottom:'+v+'px}',
+  'ledger-sheet':v=>{
+    /* Ledger Sheet's entire background is a fixed 36px ruled grid, and every
+       text line's height is locked to that same 36px module. Applying an
+       arbitrary pixel value to the spacer breaks that alignment (text drifts
+       off the ruled lines for the rest of the page). Snapping to the nearest
+       whole ruled line keeps the grid intentional at every setting, even
+       though it means values within about one ruled line of each other can
+       resolve to the same visible result on this template specifically. */
+    const snapped=Math.max(0,Math.round(v/36))*36;
+    return '.spacer{height:'+snapped+'px}';
+  },
+  'press-one-sheet':v=>'.content{gap:'+v+'px}',
+  'staggered-sheet':v=>'.content{gap:'+v+'px}'
+};
+function epkResolveSpacingPx(v){
+  if(v===null||v===undefined||v===''||v==='default')return null;
+  if(v==='small')return 16;
+  if(v==='medium')return 32;
+  if(v==='large')return 48;
+  const n=Number(v);
+  if(Number.isFinite(n))return Math.max(0,Math.min(240,Math.round(n)));
+  return null;
+}
+function epkSpacingCss(templateKey,rawValue){
+  const px=epkResolveSpacingPx(rawValue);
+  if(px===null)return'';
+  const fn=EPK_SPACING_HOOKS[templateKey];
+  return fn?fn(px):'';
+}
