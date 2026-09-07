@@ -938,11 +938,16 @@ function epkApplySectionOrder(doc,c){
   wanted.forEach(([k,el])=>el.setAttribute('data-epk-section',k));
   if(wanted.length<2)return;
   const parents=wanted.map(([,el])=>el.parentElement).filter(Boolean);
-  const parent=parents.find(p=>parents.filter(x=>x===p).length===parents.length)||null;
+  const parent=parents.length===wanted.length&&parents.every(p=>p===parents[0])?parents[0]:null;
   if(parent){
-    const first=wanted.map(([,el])=>el).sort((a,b)=>{const pos=a.compareDocumentPosition(b);return pos&Node.DOCUMENT_POSITION_FOLLOWING?-1:1;})[0];
-    const marker=doc.createComment('epk-section-order');parent.insertBefore(marker,first);
-    wanted.forEach(([,el])=>parent.insertBefore(el,marker));
+    const elements=wanted.map(([,el])=>el);
+    if(elements.some(el=>el===parent||elements.some(other=>other!==el&&(el.contains(other)||other.contains(el)))))return;
+    if(!elements.every(el=>el.parentElement===parent))return;
+    const first=elements.slice().sort((a,b)=>{const pos=a.compareDocumentPosition(b);return pos&Node.DOCUMENT_POSITION_FOLLOWING?-1:1;})[0];
+    if(!first||first.parentElement!==parent)return;
+    const marker=doc.createComment('epk-section-order');
+    parent.insertBefore(marker,first);
+    elements.forEach(el=>{if(el.parentElement===parent)parent.insertBefore(el,marker);});
     marker.remove();
     return;
   }
