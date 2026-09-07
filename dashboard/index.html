@@ -1336,11 +1336,28 @@ function buildPKTemplateDocument(artistId){
       return '<img'+attrs+'>';
     });
   }
+  const spotifyEmbed=epkSpotifyEmbedSrc(spotify);
+  if(spotifyEmbed){
+    // Ledger Sheet's whole layout is locked to a 36px ruled-line grid (same constraint
+    // already handled for section spacing and headshot size). The standard 152px embed
+    // height isn't a multiple of 36 and would push every ruled line below it out of
+    // alignment, so it gets snapped to the nearest ruled-line height here only.
+    const embedHeight=(pk.template==='ledger-sheet')?144:152;
+    html=html.split('<a href="[SPOTIFY URL]">Listen on Spotify ↗</a>').join(
+      '<iframe class="ardito-spotify-embed" src="'+escPK(spotifyEmbed)+'" width="100%" height="'+embedHeight+'" style="border-radius:12px;border:0;display:block;" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>'
+    );
+  }
   const repl={
     '[PRESS PHOTO URL]':image,'[PRESS PHOTO OR SINGLE ARTWORK URL]':image,'[SPOTIFY URL]':spotify,'[APPLE MUSIC URL]':apple,'[SOUNDCLOUD URL]':soundcloud,'[YOUTUBE URL]':youtube,'[TIKTOK URL]':tiktok,
     '[DISTROKID / HYPERFOLLOW URL]':hyperfollow,'[PRESS KIT PDF URL]':pkSafeUrl(c.press_kit_pdf_url)
   };
   Object.entries(repl).forEach(([from,to])=>{html=html.split(from).join(escPK(to));});
+  // Radial Vinyl's spinning disc is now a real Spotify link (id="vinyl-disc"). With no Spotify URL,
+  // unwrap it back to a plain div first, so the artist photo inside survives the generic empty-href
+  // cleanup below instead of being deleted along with a dead link.
+  if(!spotify){
+    html=html.replace(/<a id="vinyl-disc" class="vinyl vinyl-link" href="" aria-label="Listen on Spotify ↗">([\s\S]*?)<\/a>/,'<div id="vinyl-disc" class="vinyl">$1</div>');
+  }
   // Never let an absent PDF URL resolve to the current/internal dashboard. Remove the download link entirely when no PDF is supplied.
   if(!c.press_kit_pdf_url){html=html.replace(/<a[^>]+href=""[^>]*>\s*Download press kit \(PDF\)\s*<\/a>/gi,'');}
   html=html.replace(/href="(?:\/|\.\/|\.\.\/)[^"]*"/gi,'href=""');
