@@ -684,7 +684,7 @@ function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)
 const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
 const EPK_PUBLIC_BASE='https://ardito.co.uk/epk/';
-const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'2026',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements']};
+const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'2026',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements'],section_spacing:'default',headshot_size:'default'};
 let pkDrafts={};
 function pkColorKey(artistId,templateKey){return 'ardito_epk_colors_'+artistId+'_'+(templateKey||'default');}
 function getPKRemoteContent(id){const pk=getPressKit(id);return pk&&pk.content&&typeof pk.content==='object'?pk.content:{};}
@@ -739,6 +739,63 @@ function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="
 function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
 const PK_SECTION_LABELS={short_bio:'Short bio',bio:'Biography',quote:'Press quote',links:'Links & contact',releases:'Selected releases',achievements:'Highlights'};
 function buildPKOrderEditor(c){const order=Array.isArray(c.section_order)&&c.section_order.length?c.section_order:PK_DEFAULT_CONTENT.section_order;return`<div class="pk-section"><div class="pk-section-title">6 · Arrange your sections</div><div class="pk-section-sort" id="pk-section-sort">${order.filter(k=>PK_SECTION_LABELS[k]).map(k=>`<div class="pk-sort-item" draggable="true" data-section="${k}" ondragstart="pkDragStart(event)" ondragover="pkDragOver(event)" ondrop="pkDrop(event)" ondragend="pkDragEnd(event)"><span class="pk-sort-grip">☷</span>${PK_SECTION_LABELS[k]}</div>`).join('')}</div><div class="pk-section-help">Drag the sections into the order you want. The preview updates instantly.</div></div>`;}
+function buildPKSpacingEditor(c){
+  const raw=c.section_spacing;
+  const preset=(raw===null||raw===undefined||raw===''||raw==='default')?'default':(['small','medium','large'].includes(raw)?raw:'custom');
+  const customVal=preset==='custom'?raw:'';
+  return '<div class="pk-section"><div class="pk-section-title">9 · Section spacing</div>'+
+    '<div class="fg"><label class="fl">Vertical gap between sections</label>'+
+    '<select id="pk-spacing-preset" onchange="updatePKSpacing(this)">'+
+      '<option value="default"'+(preset==='default'?' selected':'')+'>Default (template original)</option>'+
+      '<option value="small"'+(preset==='small'?' selected':'')+'>Small — 16px</option>'+
+      '<option value="medium"'+(preset==='medium'?' selected':'')+'>Medium — 32px</option>'+
+      '<option value="large"'+(preset==='large'?' selected':'')+'>Large — 48px</option>'+
+      '<option value="custom"'+(preset==='custom'?' selected':'')+'>Custom</option>'+
+    '</select></div>'+
+    '<div class="fg" id="pk-spacing-custom-row" style="'+(preset==='custom'?'':'display:none')+'"><label class="fl">Custom spacing (0–240px)</label><input id="pk-spacing-custom" type="number" min="0" max="240" step="1" value="'+escPK(customVal)+'" oninput="updatePKSpacing(this)"></div>'+
+    '<div class="pk-section-help">Controls the vertical gap between EPK sections only, top and bottom, never side spacing. Default leaves this template\'s own spacing exactly as designed.</div>'+
+  '</div>';
+}
+function updatePKSpacing(el){
+  const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
+  const c=getPKContent(artistId);
+  let value=c.section_spacing;
+  if(el.id==='pk-spacing-preset'){
+    value=el.value;
+    const customRow=document.getElementById('pk-spacing-custom-row');
+    if(customRow)customRow.style.display=(value==='custom')?'':'none';
+    if(value==='custom'){
+      const customInput=document.getElementById('pk-spacing-custom');
+      value=customInput?Math.max(0,Math.min(240,Math.round(Number(customInput.value)||0))):0;
+    }
+  }else if(el.id==='pk-spacing-custom'){
+    value=Math.max(0,Math.min(240,Math.round(Number(el.value)||0)));
+  }
+  savePKContentLocal(artistId,{...c,section_spacing:value});
+  updatePKPreview(artistId);
+  queuePKPersist(artistId);
+}
+function updatePKPhotoSize(el){
+  const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
+  const pk=getPressKit(artistId);if(!pk||!EPK_PHOTO_SIZE_TEMPLATES.includes(pk.template))return;
+  const c=getPKContent(artistId);
+  const limits=EPK_PHOTO_SIZE_LIMITS[pk.template]||[36,288];
+  let value=c.headshot_size;
+  if(el.id==='pk-photo-size-preset'){
+    value=el.value;
+    const customRow=document.getElementById('pk-photo-size-custom-row');
+    if(customRow)customRow.style.display=(value==='custom')?'':'none';
+    if(value==='custom'){
+      const customInput=document.getElementById('pk-photo-size-custom');
+      value=customInput?Math.max(limits[0],Math.min(limits[1],Math.round(Number(customInput.value)||limits[0]))):limits[0];
+    }
+  }else if(el.id==='pk-photo-size-custom'){
+    value=Math.max(limits[0],Math.min(limits[1],Math.round(Number(el.value)||limits[0])));
+  }
+  savePKContentLocal(artistId,{...c,headshot_size:value});
+  updatePKPreview(artistId);
+  queuePKPersist(artistId);
+}
 async function uploadPKImage(artistId,input){
   const file=input&&input.files&&input.files[0];if(!file)return;
   if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){alert('Please choose a JPG, PNG, WebP or GIF image.');input.value='';return;}
@@ -804,6 +861,14 @@ function buildPKEditor(artistId){
   visual+='<div class="fg"><label class="fl">Hero / press photo</label><input id="pk-image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadPKImage(\''+artistId+'\',this)"><div class="pk-note" style="margin-top:6px">Upload the photo, then drag it in the preview below to position the crop exactly where you want it.</div></div>';
   visual+=pkField('pk-image','Hero / press photo URL',c.image_url,'https://…','updatePKField');
   visual+='<div class="pk-image-editor"><div class="pk-image-editor-head"><div class="pk-note">Image position</div><div class="pk-note">Drag directly on the photo</div></div><div id="pk-image-stage-'+artistId+'" class="pk-image-stage '+(c.image_url?'':'empty')+'" data-artist-id="'+artistId+'" onpointerdown="startPKImageDrag(event)" onpointermove="movePKImageDrag(event)" onpointerup="endPKImageDrag(event)" onpointercancel="endPKImageDrag(event)">'+(c.image_url?'<img src="'+escPK(c.image_url)+'" alt="Press photo preview" style="object-position:'+escPK(c.image_position_x)+'% '+escPK(c.image_position_y)+'%;object-fit:'+escPK(c.image_fit||'cover')+';"><div class="pk-image-stage-hint">Drag the image to move the crop</div>':'<span>Add a press photo above to see it here.</span>')+'</div><div class="pk-image-position-readout"><span>Horizontal <strong id="pk-image-stage-x-'+artistId+'">'+escPK(c.image_position_x)+'%</strong></span><span>Vertical <strong id="pk-image-stage-y-'+artistId+'">'+escPK(c.image_position_y)+'%</strong></span></div></div></div>';
+  if(EPK_PHOTO_SIZE_TEMPLATES.includes(tpl)){
+    const rawSize=c.headshot_size;
+    const sizePreset=(rawSize===null||rawSize===undefined||rawSize===''||rawSize==='default')?'default':(rawSize==='large'?'large':'custom');
+    const customSizeVal=sizePreset==='custom'?rawSize:'';
+    visual+='<div class="fg"><label class="fl">Photo size</label><select id="pk-photo-size-preset" onchange="updatePKPhotoSize(this)"><option value="default"'+(sizePreset==='default'?' selected':'')+'>Default (template original)</option><option value="large"'+(sizePreset==='large'?' selected':'')+'>Large</option><option value="custom"'+(sizePreset==='custom'?' selected':'')+'>Custom</option></select></div>';
+    visual+='<div class="fg" id="pk-photo-size-custom-row" style="'+(sizePreset==='custom'?'':'display:none')+'"><label class="fl">Custom size (px)</label><input id="pk-photo-size-custom" type="number" value="'+escPK(customSizeVal)+'" oninput="updatePKPhotoSize(this)"></div>';
+    visual+='<div class="pk-section-help">Controls how large this photo appears on '+escPK(epkLabel(tpl))+' only. Other templates are unaffected.</div>';
+  }
   let links='<div class="pk-section"><div class="pk-section-title">4 · Links & contact</div>';
   links+=pkField('pk-website','Website',c.website,'https://…','updatePKField');
   links+='<div class="fr">'+pkField('pk-email','Artist email',c.email,'artist@example.com','updatePKField')+pkField('pk-press-contact','Press contact',c.press_contact,'Name / company','updatePKField')+'</div>';
@@ -823,7 +888,7 @@ function buildPKEditor(artistId){
   const publishLabel=status==='published'?'Republish EPK':'Publish EPK';
   statusHtml+='<div class="pk-actions"><button class="btn bp" onclick="savePKNow(\''+artistId+'\')">Save EPK</button><button class="btn bg" onclick="previewPK(\''+artistId+'\')">Open preview ↗</button><button class="btn bg" onclick="publishPK(\''+artistId+'\')">'+publishLabel+'</button></div><div class="pk-export-note">Publish makes the EPK public at ardito.co.uk/epk/artist-slug/. The one-time public viewer must be deployed at /epk/. Unpublish removes it from the public page.</div></div>';
   const colours='<div class="pk-section"><div class="pk-section-title">8 · Template colours</div><div class="pk-color-row">'+pkColorField('pk-bg','Background',colors.bg)+pkColorField('pk-ink','Text',colors.ink)+pkColorField('pk-accent','Accent',colors.accent)+'</div><div class="pk-actions" style="margin-top:10px"><button class="btn bg bsm" onclick="resetPKColors(\''+artistId+'\')">Reset template colours</button></div><div class="pk-section-help">HEX values are editable. They are injected into the selected template CSS variables.</div></div>';
-  return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
+  return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+buildPKSpacingEditor(c)+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
 }
 
 function updatePKField(el){
@@ -1340,7 +1405,13 @@ function buildPKTemplateDocument(artistId){
   // Apply the editor's three HEX controls to the real template CSS variables. Secondary colours, where a template has them, remain part of its original design.
   // Image fit/position are scoped to .ardito-epk-photo only (the one tagged element above), never a global "body img" rule.
   const photoRule=hasPhotoSlot?'.ardito-epk-photo{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}':'';
-  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}'+photoRule+'</style>';
+  // Section spacing uses the shared per-template hooks in epk-shared.js (EPK_SPACING_HOOKS),
+  // the same ones the public renderer uses, so both stay in sync automatically.
+  const spacingRule=epkSpacingCss(pk.template,c.section_spacing);
+  // Headshot size only applies where EPK_PHOTO_SIZE_HOOKS supports it (Ledger Sheet, Letterhead Memo).
+  // Every other template ignores this entirely, same shared-hook pattern as spacing.
+  const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);
+  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}'+photoRule+spacingRule+sizeRule+'</style>';
   html=html.replace('</head>',override+'</head>');
   // Ensure every supplied template behaves as a self-contained preview/export document.
   return html;
