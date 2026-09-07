@@ -846,7 +846,7 @@ function buildPKEditor(artistId){
   c.image_fit=c.image_fit||'cover'; c.image_position_x=c.image_position_x||50; c.image_position_y=c.image_position_y||50;
    const status=pk?.status||'not_started',tpl=pk?.template||'',colors=tpl?getPKColors(artistId):PK_DEFAULT_COLORS['ardito-signature'],liveUrl=status==='published'?epkPublicUrl(artistId):'';
    let head='<div class="ph" style="margin-bottom:1rem"><div><div class="pt">'+escPK(a.name)+' · EPK Studio</div><div class="ps">Edit once, switch designs freely, preview the real template live and publish when ready.</div></div><div class="pk-actions"><span class="tag '+(PK_STATUS_TAG[status]||'td')+'">'+escPK(PK_STATUS_LABEL[status]||status)+'</span>'+(liveUrl?'<a class="btn bg" href="'+escPK(liveUrl)+'" target="_blank" rel="noopener">View Live EPK ↗</a>':'');
-  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button>';
+  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this)">Export PDF</button>';
   head+='</div></div>';
   if(!tpl)return head+buildPKTemplatePicker(artistId)+'<div class="bc" style="padding:1.5rem"><div style="font-family:\'Playfair Display\',serif;font-size:1.1rem;margin-bottom:8px">Start with a template</div><div class="pk-note">Pick a design above. The actual supplied HTML template will be used for the live preview and export.</div></div>';
   let identity='<div class="pk-section"><div class="pk-section-title">2 · Identity</div>';
@@ -951,7 +951,7 @@ async function publishPK(artistId){
   if(!confirm('Publish this EPK publicly?\n\n'+publicUrl))return;
   try{await persistPKData(artistId);const r=await db('press_kits','PATCH',{public_slug:slug,status:'published',url:publicUrl},pk.id);aPressKits=aPressKits.map(p=>p.id===pk.id?{...p,...(r&&r[0]?r[0]:{}),public_slug:slug,status:'published',url:publicUrl}:p);
     setPKSaveState('Published ✓');openPressKitEditor(artistId);alert('EPK published.\n\n'+publicUrl);
-  }catch(e){ console.error('EPK publish failed:', e); alert('Could not publish the EPK.\n\n'+(e?.message||String(e))); }
+  }catch(e){console.error(e);alert('Could not publish the EPK. Run the publish migration in Supabase first.');}
 }
 async function unpublishPK(artistId){
   const pk=getPressKit(artistId);if(!pk)return;if(!confirm('Unpublish this EPK?'))return;
@@ -1436,6 +1436,79 @@ function buildPKTemplateDocument(artistId){
 function buildPKPreview(artistId){const src=buildPKTemplateDocument(artistId);if(!src)return'<div class="pk-empty-preview">Choose a template to preview this EPK.</div>';return'<iframe class="pk-template-frame" title="EPK live preview" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe>' + '<textarea class="pk-template-src" hidden>'+escPK(src)+'</textarea>';}
 function updatePKPreview(artistId){window.currentPKArtistId=artistId;const el=document.getElementById('pk-preview-'+artistId);if(!el)return;const src=buildPKTemplateDocument(artistId);el.innerHTML='';if(!src){el.innerHTML='<div class="pk-empty-preview">Choose a template to preview this EPK.</div>';return;}const iframe=document.createElement('iframe');iframe.className='pk-template-frame';iframe.title='EPK live preview';iframe.setAttribute('sandbox','allow-scripts allow-same-origin');el.appendChild(iframe);iframe.srcdoc=src;}
 function previewPK(artistId){const src=buildPKTemplateDocument(artistId);if(!src)return;const win=window.open('','_blank');if(!win){alert('Your browser blocked the preview window. Please allow pop-ups for this page.');return;}win.document.open();win.document.write(src);win.document.close();}
+function exportPKPdf(artistId,button){
+  const src=buildPKTemplateDocument(artistId),a=aArt.find(x=>x.id===artistId),c=a?getArtistPKSeed(a):null;
+  if(!src||!a)return;
+  const originalLabel=button?.textContent||'Export PDF';
+  if(button){button.disabled=true;button.textContent='Preparing PDF…';}
+  const filename=((a.name||'Artist').replace(/[<>:"/\\|?*\u0000-\u001F]/g,'-').replace(/\s+/g,' ').trim().replace(/[. ]+$/,'')||'Artist')+' - EPK';
+  const spotify=pkSafeUrl(c?.spotify||'');
+  let win=null;
+  const restore=()=>{if(button){button.disabled=false;button.textContent=originalLabel;}};
+  try{
+    win=window.open('','_blank');
+    if(!win){restore();alert('Your browser blocked the PDF print window. Please allow pop-ups for this page.');return;}
+    win.document.open();
+    win.document.write(src);
+    win.document.close();
+    win.document.title=filename;
+    const printCss=win.document.createElement('style');
+    printCss.id='ardito-epk-pdf-print';
+    printCss.textContent='@page{size:A4 portrait;margin:0}\n'+
+      '@media print{\n'+
+      'html,body{width:auto!important;height:auto!important;min-height:0!important;overflow:visible!important}\n'+
+      'body{-webkit-print-color-adjust:exact;print-color-adjust:exact}\n'+
+      '*,*::before,*::after{animation:none!important;transition:none!important}\n'+
+      'img{break-inside:avoid;page-break-inside:avoid}\n'+
+      'h1,h2,h3,h4,h5,h6,p,blockquote,li{orphans:3;widows:3}\n'+
+      'section,article,figure,.card,.track-card,.quote-card,.links-card,.footer-card,.row{break-inside:avoid;page-break-inside:avoid}\n'+
+      '.ardito-spotify-embed{display:none!important}\n'+
+      '}';
+    win.document.head.appendChild(printCss);
+    if(spotify){
+      win.document.querySelectorAll('.ardito-spotify-embed').forEach(frame=>{
+        const link=win.document.createElement('a');
+        link.href=spotify;
+        link.textContent='Listen on Spotify ↗';
+        link.setAttribute('rel','noopener');
+        link.className='ardito-spotify-print-link';
+        link.style.cssText='display:inline-block;text-decoration:underline;';
+        frame.replaceWith(link);
+      });
+    }
+    const waitForReady=async()=>{
+      if(win.closed){restore();return;}
+      if(win.document.readyState!=='complete'){
+        await new Promise(resolve=>win.addEventListener('load',resolve,{once:true}));
+      }
+      try{if(win.document.fonts?.ready)await win.document.fonts.ready;}catch(e){}
+      const images=[...win.document.images];
+      await Promise.race([
+        Promise.all(images.map(img=>{
+          if(img.complete)return Promise.resolve();
+          return new Promise(resolve=>{const done=()=>resolve();img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});});
+        })),
+        new Promise(resolve=>setTimeout(resolve,10000))
+      ]);
+      await new Promise(resolve=>win.requestAnimationFrame(()=>win.requestAnimationFrame(resolve)));
+      if(win.closed){restore();return;}
+      win.focus();
+      win.print();
+      restore();
+    };
+    waitForReady().catch(e=>{
+      console.error('EPK PDF export failed:',e);
+      try{win.close();}catch(_e){}
+      restore();
+      alert('Could not prepare the EPK for PDF export. '+(e?.message||'Please try again.'));
+    });
+  }catch(e){
+    console.error('EPK PDF export failed:',e);
+    try{if(win&&!win.closed)win.close();}catch(_e){}
+    restore();
+    alert('Could not prepare the EPK for PDF export. '+(e?.message||'Please try again.'));
+  }
+}
 function exportPKHtml(artistId){const src=buildPKTemplateDocument(artistId),a=aArt.find(x=>x.id===artistId);if(!src||!a)return;const blob=new Blob([src],{type:'text/html'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download=(a.name||'artist').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-epk.html';document.body.appendChild(aEl);aEl.click();aEl.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
 function buildPressKitSection(artistId){const pk=getPressKit(artistId),label=pk?.template?epkLabel(pk.template):'No template chosen';return`<div style="padding:.9rem 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><div style="font-size:12px;color:var(--cream)">${escPK(label)}</div><div style="font-size:11px;color:var(--cdim);margin-top:4px">${pk?.template?'Open EPK Studio to edit the content, layout and colours.':'Choose a template to start building this artist’s EPK.'}</div></div><button class="btn bg bsm" onclick="nav('presskits');setTimeout(()=>openPressKitEditor(${jsqAttr(artistId)}),0)">${pk?.template?'Edit EPK':'Build EPK'} ↗</button></div></div>`;}
