@@ -879,7 +879,7 @@ function buildPKEditor(artistId){
   links+=pkField('pk-hyperfollow','Hyperfollow / DistroKid',c.hyperfollow,'https://…','updatePKField')+'</div>';
   let story='<div class="pk-section"><div class="pk-section-title">5 · Story & catalogue</div>';
   story+=pkField('pk-track-title','Featured track',c.track_title,'Track title','updatePKField');
-  story+='<div class="fr">'+pkField('pk-track-year','Track year',c.track_year||'2026','2026','updatePKField')+pkField('pk-pdf','Press kit PDF URL',c.press_kit_pdf_url,'https://…/press-kit.pdf','updatePKField')+'</div>';
+  story+='<div class="fr">'+pkField('pk-track-year','Track year',c.track_year||'2026','2026','updatePKField')+'<div class="fg"><label class="fl">Press kit PDF URL</label><input id="pk-pdf" type="text" value="'+escPK(c.press_kit_pdf_url)+'" placeholder="https://…/press-kit.pdf" oninput="updatePKField(this)"><div style="margin-top:8px"><input id="pk-pdf-upload-'+artistId+'" type="file" accept=".pdf,application/pdf" onchange="uploadPKPdf(\''+artistId+'\',this)"><div id="pk-pdf-upload-status-'+artistId+'" class="pk-note" style="margin-top:6px">'+(c.press_kit_pdf_url?'Existing PDF URL saved. Upload a new PDF to replace it.':'No press kit PDF uploaded yet.')+'</div></div></div></div>';
   story+=pkField('pk-releases','Selected releases',c.releases||pkReleasesText(artistId),'Release · date · link, one per line','updatePKField','textarea');
   story+=pkField('pk-achievements','Highlights / achievements',c.achievements,'Festival support, radio, press, awards…','updatePKField','textarea');
   story+=pkField('pk-notes','Internal notes',c.notes,'Not shown in preview','updatePKField','textarea')+'</div>';
@@ -889,6 +889,47 @@ function buildPKEditor(artistId){
   statusHtml+='<div class="pk-actions"><button class="btn bp" onclick="savePKNow(\''+artistId+'\')">Save EPK</button><button class="btn bg" onclick="previewPK(\''+artistId+'\')">Open preview ↗</button><button class="btn bg" onclick="publishPK(\''+artistId+'\')">'+publishLabel+'</button></div><div class="pk-export-note">Publish makes the EPK public at ardito.co.uk/epk/artist-slug/. The one-time public viewer must be deployed at /epk/. Unpublish removes it from the public page.</div></div>';
   const colours='<div class="pk-section"><div class="pk-section-title">8 · Template colours</div><div class="pk-color-row">'+pkColorField('pk-bg','Background',colors.bg)+pkColorField('pk-ink','Text',colors.ink)+pkColorField('pk-accent','Accent',colors.accent)+'</div><div class="pk-actions" style="margin-top:10px"><button class="btn bg bsm" onclick="resetPKColors(\''+artistId+'\')">Reset template colours</button></div><div class="pk-section-help">HEX values are editable. They are injected into the selected template CSS variables.</div></div>';
   return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+buildPKSpacingEditor(c)+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
+}
+
+async function uploadPKPdf(artistId,input){
+  const file=input&&input.files&&input.files[0];if(!file)return;
+  const status=document.getElementById('pk-pdf-upload-status-'+artistId);
+  const fail=(message)=>{if(status)status.textContent=message;input.value='';};
+  if(!/\.pdf$/i.test(file.name)){fail('Upload failed · please choose a PDF file.');return;}
+  if(file.size>15*1024*1024){fail('Upload failed · please keep the press kit PDF under 15 MB.');return;}
+  try{
+    const header=await file.slice(0,5).arrayBuffer();
+    const sig=new TextDecoder().decode(header);
+    if(sig!=='%PDF-'){fail('Upload failed · the selected file is not a valid PDF.');return;}
+  }catch(e){fail('Upload failed · the PDF could not be validated.');return;}
+  const safeName=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-');
+  const path=`${artistId}/${Date.now()}-${safeName}`;
+  const bucket='epk-assets';
+  if(status)status.textContent='Uploading PDF… 0%';
+  try{
+    await new Promise((resolve,reject)=>{
+      const xhr=new XMLHttpRequest();
+      xhr.open('POST',`${SB}/storage/v1/object/${bucket}/${path}`,true);
+      xhr.setRequestHeader('apikey',KEY);
+      xhr.setRequestHeader('Authorization',`Bearer ${currentSession?.access_token||''}`);
+      xhr.setRequestHeader('Content-Type','application/pdf');
+      xhr.setRequestHeader('x-upsert','true');
+      xhr.upload.onprogress=(event)=>{if(event.lengthComputable&&status)status.textContent='Uploading PDF… '+Math.round(event.loaded/event.total*100)+'%';};
+      xhr.onload=()=>xhr.status>=200&&xhr.status<300?resolve():reject(new Error(xhr.responseText||xhr.statusText));
+      xhr.onerror=()=>reject(new Error('Network error'));
+      xhr.onabort=()=>reject(new Error('Upload cancelled'));
+      xhr.send(file);
+    });
+    const publicUrl=`${SB}/storage/v1/object/public/${bucket}/${path}`;
+    const c=getPKContent(artistId);savePKContentLocal(artistId,{...c,press_kit_pdf_url:publicUrl});
+    const inputEl=document.getElementById('pk-pdf');if(inputEl)inputEl.value=publicUrl;
+    updatePKPreview(artistId);await persistPKData(artistId);
+    if(status)status.textContent='Uploaded: '+file.name+' · saved ✓';
+  }catch(e){
+    console.error('EPK PDF upload failed:',e);
+    if(status)status.textContent='Upload failed · your existing PDF URL was not changed.';
+    alert('Press kit PDF upload failed. Check that the authenticated admin can upload to the existing Supabase Storage bucket. Your existing EPK data has not been changed.');
+  }finally{input.value='';}
 }
 
 function updatePKField(el){
