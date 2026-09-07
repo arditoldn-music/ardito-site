@@ -999,7 +999,8 @@ function epkPostProcess(html,c,artistId){
   const style=doc.createElement('style');
   style.id='ardito-epk-content-runtime';
   style.textContent=`
-    .epk-content-root{box-sizing:border-box;width:min(100%,1100px);margin:0 auto;padding:clamp(28px,5vw,72px) clamp(20px,5vw,64px);font:inherit;color:inherit;}
+    body{position:relative;overflow:auto !important;}
+    .epk-content-root{box-sizing:border-box;position:fixed;inset:0;max-width:1100px;width:100%;height:100%;margin:0 auto;padding:clamp(28px,5vw,72px) clamp(20px,5vw,64px);font:inherit;color:inherit;z-index:10000;overflow:auto;}
     .epk-content-section{margin:0 0 clamp(28px,4vw,52px);padding:0;}
     .epk-content-section:last-child{margin-bottom:0}
     .epk-content-title{font:inherit;font-size:.72em;line-height:1.2;letter-spacing:.16em;text-transform:uppercase;opacity:.62;margin:0 0 12px;}
