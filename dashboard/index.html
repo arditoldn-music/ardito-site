@@ -927,7 +927,7 @@ function epkApplySectionOrder(doc,c){
     achievements:pick('.stats,[class*="highlight" i],[class*="achievement" i],[data-epk-achievements]',el=>hasAchievements)
   };
   if(hasAchievements&&!blocks.achievements){
-    const sec=doc.createElement('section');sec.className='epk-runtime-section epk-runtime-achievements';sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
+    const sec=doc.createElement('section');sec.className='epk-runtime-section epk-runtime-achievements';sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+escPK(x)+'</p>').join('');
     const localParent=(blocks.links||blocks.quote||blocks.bio)?.parentElement||null;const anchor=localParent&&[...localParent.children].find(el=>/contact|footer|sign-off/i.test(String(el.className||'')))||body.querySelector('.contact,[class*="contact" i],.footer,[class*="footer" i],.sign-off')||null;(localParent||body).insertBefore(sec,anchor&&anchor.parentElement===(localParent||body)?anchor:null);blocks.achievements=sec;
   }
   if(!hasAchievements&&blocks.achievements){blocks.achievements.remove();blocks.achievements=null;}
