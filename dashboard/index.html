@@ -708,7 +708,7 @@ function jsqAttr(v){return escPK(jsq(v));}
 function safeUrl(v){try{const u=new URL(String(v??''),window.location.origin);return /^(https?:)$/i.test(u.protocol)?u.href:'';}catch(e){return'';}}
 function htmlId(v){return escPK(String(v??'').replace(/[^A-Za-z0-9_-]/g,'_'));}
 function nlPK(v){return escPK(v).replace(/\n/g,'<br>');}
-function getArtistPKSeed(a){const c=getPKContent(a.id);return {...c,headline:c.headline||a.name||'Artist Name',location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''};}
+function getArtistPKSeed(a){const c=getPKContent(a.id);return {...c,headline:c.headline||a.name||'Artist Name',location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''};}
 function pkReleasesText(artistId){return aRel.filter(r=>r.artist_id===artistId).map(r=>[r.release_name,r.release_date?new Date(r.release_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'',r.streaming_link||''].filter(Boolean).join(' · ')).join('\n');}
 let pkPersistTimer=null;
 async function persistPKData(artistId){
@@ -965,8 +965,7 @@ async function choosePKTemplate(artistId,templateKey){
     }
     const c=getPKContent(artistId),a=aArt.find(x=>x.id===artistId);
     if(a){
-      savePKContentLocal(artistId,{...c,headline:c.headline||a.name,location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||a.notes||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''});
-    }
+savePKContentLocal(artistId,{...c,headline:c.headline||a.name,location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''});    }
   }catch(e){
     console.error('EPK template selection save failed:',e);
     alert('Could not save the template selection. '+(e?.message||'Please try again.'));
