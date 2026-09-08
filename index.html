@@ -1,467 +1,479 @@
-<!doctype html>
-
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ardito · Press Kit</title><meta name="robots" content="index,follow"><style>html,body{margin:0;padding:0;min-height:100%;background:#111;color:#eee}#app{min-height:100vh}.state{font:14px/1.6 system-ui,sans-serif;max-width:760px;margin:0 auto;padding:80px 24px}.state h1{font-size:24px;margin:0 0 12px}.state p{opacity:.75}.state pre{white-space:pre-wrap;word-break:break-word;margin-top:24px;padding:16px;background:#1b1b1b;border:1px solid #333;border-radius:8px;color:#ccc}.frame{width:100%;min-height:100vh;border:0;display:block}</style><script src="/epk/epk-shared.js"></script></head><body><div id="app"><div class="state"><h1>Loading press kit…</h1><p>Please wait.</p></div></div><script>
-const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN';
-const DEFAULTS={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:[],section_spacing:'default',headshot_size:'default'};
-function safeUrl(v){const x=String(v||'').trim();return /^(https?:|mailto:|data:image\/)/i.test(x)?x:'';}function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function publicHref(label,v){const raw=String(v||'').trim();if(label==='Instagram'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://instagram.com/'+raw.replace(/^@/,'');if(label==='TikTok'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://tiktok.com/@'+raw.replace(/^@/,'');return safeUrl(raw);}
-function pkSlug(){const p=new URLSearchParams(location.search);let s=(p.get('artist')||'').trim();if(!s){const base='/epk/';const path=location.pathname;if(path.startsWith(base))s=path.slice(base.length).split('/').filter(Boolean)[0]||'';}s=s.toLowerCase();if(s&&location.search)history.replaceState(null,'','/epk/'+encodeURIComponent(s)+'/');return s;}
-async function api(path){
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),10000);
-  try{
-    const r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:KEY,Authorization:'Bearer '+KEY},signal:controller.signal});
-    const t=await r.text();
-    if(!r.ok){
-      const err=new Error(t||r.statusText);
-      err.name='SUPABASE_HTTP_ERROR';
-      err.status=r.status;
-      err.responseBody=t;
-      throw err;
-    }
-    try{
-      return t?JSON.parse(t):[];
-    }catch(parseError){
-      const err=new Error(parseError&&parseError.message?parseError.message:'Invalid JSON response from Supabase');
-      err.name='SUPABASE_HTTP_ERROR';
-      err.status=r.status;
-      err.responseBody=t;
-      throw err;
-    }
-  }catch(e){
-    if(e&&e.name==='AbortError'){
-      const err=new Error('Supabase request timed out after 10 seconds.');
-      err.name='SUPABASE_HTTP_ERROR';
-      err.status=0;
-      err.cause=e;
-      throw err;
-    }
-    if(e&&e.name==='SUPABASE_HTTP_ERROR')throw e;
-    const err=new Error(e&&e.message?e.message:String(e));
-    err.name='SUPABASE_HTTP_ERROR';
-    err.status=0;
-    err.cause=e;
-    throw err;
-  }finally{
-    clearTimeout(timeout);
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ardito — Artist Development & Release Management</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="apple-touch-icon" href="favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet"/><style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0d0d0d;
+  --cream:#e8e0d0;
+  --green-dark:#1a2e1a;
+  --green-mid:#2d4a2d;
+  --slate:#1e2a38;
+  --off-white:#f0ece4;
+  --warm-dark:#1c1a14;
 }
-function publicHref(label,v){const raw=String(v||'').trim();if(label==='Instagram'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://instagram.com/'+raw.replace(/^@/,'');if(label==='TikTok'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://tiktok.com/@'+raw.replace(/^@/,'');return safeUrl(raw);}
-const EPK_ACHIEVEMENTS_PLACEHOLDER='A key stat · a placement or credit · anything else worth flagging';
-const EPK_ICONS={Website:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>',Instagram:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>',Spotify:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7 10.2c3.8-1 7.1-.5 10 1M7.7 13c3-.8 5.8-.4 8.2.8M8.5 15.7c2-.5 3.9-.2 5.6.6"/></svg>',"Apple Music":'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4v12.2a3.3 3.3 0 1 1-1.7-2.9V6.2l7-1.6v10.6a3.3 3.3 0 1 1-1.7-2.9V4.6L15 5.4z"/></svg>',SoundCloud:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15.5h1M7 15.5h1M10 15.5h1M13 15.5h1M16 15.5h.5a3.5 3.5 0 1 0-1-6.8 5 5 0 0 0-9.5 2.1A3 3 0 0 0 6 16h12"/></svg>',YouTube:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12s0-4.5-1.1-5.8C18.8 5 12 5 12 5s-6.8 0-7.9 1.2C3 7.5 3 12 3 12s0 4.5 1.1 5.8C5.2 19 12 19 12 19s6.8 0 7.9-1.2C21 16.5 21 12 21 12z"/><path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none"/></svg>',TikTok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v10.2a3.8 3.8 0 1 1-2.5-3.6V7.1c1.2 1.6 2.8 2.6 5 2.8V7.3c-1.2-.2-2.1-1.3-2.5-3.3z"/></svg>',Hyperfollow:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 12.5 12 16l3.5-3.5M12 4v12M5 19h14"/></svg>'};
-function epkSocialHtml(c){const defs=[['Website',c.website],['Instagram',c.instagram],['Spotify',c.spotify],['Apple Music',c.apple_music],['SoundCloud',c.soundcloud],['YouTube',c.youtube],['TikTok',c.tiktok],['Hyperfollow',c.hyperfollow||c.distrokid]];const items=defs.map(([label,value])=>{const href=publicHref(label,value);return href?'<a class="epk-social-link" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer" aria-label="'+esc(label)+'">'+EPK_ICONS[label]+'<span>'+esc(label)+'</span></a>':''}).join('');return items?'<div class="epk-social-links" aria-label="Listen and follow">'+items+'</div>':'';}
-function epkPostProcess(html,c){const doc=new DOMParser().parseFromString(html,'text/html');const body=doc.body;const normalize=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();const ach=String(c.achievements||'').trim();const placeholder=normalize(EPK_ACHIEVEMENTS_PLACEHOLDER);if(!ach){[...body.querySelectorAll('*')].filter(el=>normalize(el.textContent).includes(placeholder)).forEach(el=>{let block=el.closest('section,[class*="stats"],[class*="highlight"],[class*="achievement"]');if(!block){for(let n=el;n&&n!==body;n=n.parentElement){if(n.parentElement===body)break;if(/^(section|article|div)$/i.test(n.tagName)&&normalize(n.textContent).length<500){block=n;break;}}}if(block&&block!==body)block.remove();});[...body.querySelectorAll('section,div,article')].filter(el=>/\b(highlights?|achievements?)\b/i.test(normalize(el.textContent).split(' ').slice(0,8).join(' '))&&!normalize(el.textContent).includes(placeholder)&&!el.querySelector('[data-epk-achievements]')).forEach(()=>{});}else{[...body.querySelectorAll('*')].filter(el=>normalize(el.textContent).includes(placeholder)).forEach(el=>{if(el.children.length===0)el.textContent=ach;else{const walker=doc.createTreeWalker(el,NodeFilter.SHOW_TEXT);const nodes=[];let n;while(n=walker.nextNode())nodes.push(n);const first=nodes.find(t=>normalize(t.nodeValue).includes('a key stat'));if(first){const strong=first.parentElement&&first.parentElement.closest('strong');if(strong){strong.textContent=ach;nodes.filter(t=>t!==first&&t.parentNode).forEach(t=>{if(normalize(t.nodeValue).includes('· a placement or credit · anything else worth flagging'))t.remove();});}}}});}
-const social=epkSocialHtml(c);let target=null;
-if(social){
-  target=body.querySelector(':scope > .page > .elsewhere, :scope > .column > .elsewhere, :scope > .page > .inner > .elsewhere, :scope > .layout > .main > .elsewhere');
-  if(!target){
-    const row=[...body.querySelectorAll(':scope > .wrap > .row')].find(el=>{const n=el.querySelector(':scope > .row-num');return n&&/^08\s*elsewhere$/i.test(normalize(n.textContent));});
-    target=row?.querySelector(':scope > .row-content.elsewhere')||null;
-  }
-  if(!target){
-    target=body.querySelector(':scope > .wrap > .body-row > .content-block > .links-card')||null;
-  }
-  if(!target){
-    const card=[...body.querySelectorAll(':scope > .wrap > .card')].find(el=>{const label=el.querySelector(':scope > .label');return label&&/^listen\s*(?:&|and)\s*follow$/i.test(normalize(label.textContent));});
-    target=card||null;
-  }
-  if(!target){
-    const dark=[...body.querySelectorAll(':scope > .wrap > .dark-card')].find(el=>{const label=el.querySelector(':scope > .label');return label&&/^listen\s*(?:&|and)\s*follow$/i.test(normalize(label.textContent));});
-    target=dark||null;
-  }
-  if(!target){
-    target=body.querySelector(':scope > .wrap > .enclosure > .links-line')||null;
-  }
-  if(!target){
-    const labels=[...body.children];
-    const elsewhereLabel=labels.find(el=>el.matches('.rail-label')&&normalize(el.textContent)==='elsewhere');
-    const next=elsewhereLabel?.nextElementSibling;
-    target=next&&next.matches('.content-cell.links-cell')?next:null;
-  }
-  if(!target){
-    target=body.querySelector(':scope > .wrap > .main > .links-line.streaming')||null;
-  }
-  if(!target){
-    target=body.querySelector(':scope > .content > .links-card')||null;
-  }
-  if(!target){
-    target=body.querySelector(':scope > .content > .links-line')||null;
-  }
-  if(target){target.classList.add('epk-runtime-social');target.innerHTML=social;}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(232,224,208,0.1);padding:0 40px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-logo-svg{width:40px;height:40px}
+.nav-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:18px;color:#e8e0d0;letter-spacing:2px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{color:rgba(232,224,208,0.75);font-size:13px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;font-family:'DM Sans',sans-serif}
+.nav-links a:hover{color:#e8e0d0}
+.nav-cta{background:#2d4a2d;color:#e8e0d0 !important;padding:9px 20px;border-radius:4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:#3a5e3a !important}
+.nav-team{color:rgba(232,224,208,0.35) !important;font-size:11px;letter-spacing:1px;text-decoration:none}
+.nav-team:hover{color:rgba(232,224,208,0.55) !important}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 40px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%, rgba(45,74,45,0.15) 0%, transparent 60%),radial-gradient(ellipse at 70% 20%, rgba(30,42,56,0.1) 0%, transparent 50%)}
+.hero-inner{max-width:900px;width:100%;position:relative;z-index:1}
+.hero-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.55);margin-bottom:24px;font-family:'DM Sans',sans-serif}
+.hero-headline{font-family:'Playfair Display',Georgia,serif;font-size:clamp(48px,7vw,84px);font-weight:700;line-height:1.05;margin-bottom:28px;color:#e8e0d0}
+.hero-headline em{font-style:italic;color:rgba(232,224,208,0.8)}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:rgba(232,224,208,0.8);max-width:560px;line-height:1.75;margin-bottom:48px;font-family:'DM Sans',sans-serif}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-primary{background:var(--cream);color:var(--black);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;font-weight:700;transition:all .2s}
+.btn-primary:hover{background:var(--off-white)}
+.btn-secondary{background:transparent;color:var(--cream);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.25);transition:all .2s}
+.btn-secondary:hover{border-color:rgba(232,224,208,0.5)}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(232,224,208,0.3);font-size:11px;letter-spacing:2px;text-transform:uppercase}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom, rgba(232,224,208,0.3), transparent)}
+
+/* SECTIONS */
+section{padding:100px 40px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.5);margin-bottom:16px;font-family:'DM Sans',sans-serif}
+.section-heading{font-family:'Playfair Display',Georgia,serif;font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.15;margin-bottom:20px;color:#e8e0d0}
+.section-sub{font-size:16px;color:rgba(232,224,208,0.75);max-width:560px;line-height:1.75;margin-bottom:60px;font-family:'DM Sans',sans-serif}
+.divider{width:100%;height:1px;background:rgba(232,224,208,0.06)}
+
+/* WHAT WE DO */
+#services{background:var(--warm-dark)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px}
+.service-card{background:rgba(232,224,208,0.03);border:1px solid rgba(232,224,208,0.06);padding:40px 36px;transition:background .2s}
+.service-card:hover{background:rgba(232,224,208,0.05)}
+.service-num{font-family:'Playfair Display',Georgia,serif;font-size:48px;color:rgba(232,224,208,0.08);font-weight:700;line-height:1;margin-bottom:16px}
+.service-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:12px;color:#e8e0d0}
+.service-desc{font-size:14px;color:rgba(232,224,208,0.75);line-height:1.75;font-family:'DM Sans',sans-serif}
+
+/* TOOLS */
+#tools{background:var(--black)}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.tool-card{background:var(--green-dark);border:1px solid rgba(45,74,45,0.4);border-radius:8px;padding:36px 32px;position:relative;overflow:hidden;transition:border-color .2s}
+.tool-card:hover{border-color:rgba(45,74,45,0.8)}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-mid),transparent)}
+.tool-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:12px}
+.tool-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:10px;color:var(--cream)}
+.tool-desc{font-size:14px;color:rgba(232,224,208,0.6);line-height:1.7;margin-bottom:24px}
+.tool-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:var(--cream);margin-bottom:20px}
+.tool-price span{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;color:rgba(232,224,208,0.4)}
+.tool-features{list-style:none;margin-bottom:28px}
+.tool-features li{font-size:13px;color:rgba(232,224,208,0.6);padding:7px 0;border-bottom:1px solid rgba(232,224,208,0.06);display:flex;gap:10px;align-items:flex-start}
+.tool-features li::before{content:'—';color:var(--green-mid);flex-shrink:0}
+.tool-btn{display:block;background:rgba(232,224,208,0.08);color:var(--cream);text-align:center;padding:12px;border-radius:4px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.12);transition:all .2s}
+.tool-btn:hover{background:rgba(232,224,208,0.12)}
+.tool-card.featured{background:var(--green-mid);border-color:rgba(45,74,45,0.8)}
+.tool-card.featured .tool-btn{background:var(--cream);color:var(--black);border-color:var(--cream)}
+.tool-card.featured .tool-btn:hover{background:var(--off-white)}
+
+/* PRICING */
+#pricing{background:var(--warm-dark)}
+.pricing-table{width:100%;border-collapse:collapse}
+.pricing-table th{text-align:left;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.35);padding:12px 20px;border-bottom:1px solid rgba(232,224,208,0.08)}
+.pricing-table td{padding:20px;border-bottom:1px solid rgba(232,224,208,0.05);font-size:14px;color:rgba(232,224,208,0.7);vertical-align:top}
+.pricing-table tr.clickable{cursor:pointer}
+.pricing-table tr.clickable:hover td{background:rgba(232,224,208,0.04)}
+.tier-name{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);font-weight:700}
+.tier-price{font-family:'Playfair Display',Georgia,serif;font-size:24px;color:var(--cream);font-weight:700}
+.tier-badge{display:inline-block;background:var(--green-mid);color:var(--cream);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-left:8px;vertical-align:middle}
+
+/* ABOUT */
+#about{background:var(--black)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-logo{width:200px;height:200px;border-radius:50%;border:1px solid rgba(232,224,208,0.15);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:32px}
+.about-logo-inner{width:160px;height:160px;border-radius:50%;border:0.5px solid rgba(232,224,208,0.08);display:flex;align-items:center;justify-content:center}
+.about-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:28px;color:var(--cream);letter-spacing:3px}
+.about-text p{font-size:16px;color:rgba(232,224,208,0.65);line-height:1.8;margin-bottom:20px}
+.about-text p strong{color:var(--cream);font-weight:500}
+.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;padding-top:48px;border-top:1px solid rgba(232,224,208,0.08)}
+.stat-num{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;color:var(--cream)}
+.stat-label{font-size:12px;color:rgba(232,224,208,0.4);letter-spacing:0.5px;margin-top:4px}
+@media(max-width:768px){.about-grid{grid-template-columns:1fr}}
+
+/* CONTACT */
+#contact{background:var(--green-dark)}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center}
+.contact-inner .section-heading{font-size:clamp(36px,5vw,60px)}
+.contact-inner .section-sub{margin:0 auto 48px;max-width:480px}
+.contact-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+.contact-card{background:rgba(232,224,208,0.05);border:1px solid rgba(232,224,208,0.1);border-radius:6px;padding:28px 24px;text-align:left}
+.contact-card-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:8px}
+.contact-card-title{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);margin-bottom:8px}
+.contact-card-desc{font-size:13px;color:rgba(232,224,208,0.5);line-height:1.6;margin-bottom:16px}
+.contact-card-link{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream);text-decoration:none;border-bottom:1px solid rgba(232,224,208,0.2);padding-bottom:2px;transition:border-color .2s}
+.contact-card-link:hover{border-color:var(--cream)}
+@media(max-width:600px){.contact-options{grid-template-columns:1fr}}
+
+/* FOOTER */
+footer{background:var(--black);padding:40px;border-top:1px solid rgba(232,224,208,0.06)}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:16px;letter-spacing:1px;color:rgba(232,224,208,0.4)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:rgba(232,224,208,0.3);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:rgba(232,224,208,0.6)}
+.footer-copy{font-size:11px;color:rgba(232,224,208,0.2)}
+
+/* MOBILE NAV */
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{width:22px;height:1.5px;background:var(--cream);transition:all .3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Playfair Display',Georgia,serif;font-size:32px;color:var(--cream);text-decoration:none}
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-links{display:none}
+  section{padding:70px 24px}
+  nav{padding:0 24px}
+  .hero{padding:100px 24px 60px}
+  .pricing-table{display:block;overflow-x:auto}
+  .tools-grid{grid-template-columns:1fr}
+  .about-grid{grid-template-columns:1fr}
+  .about-grid>div:last-child{order:-1}
+  .about-grid img{width:140px;height:140px}
+  .services-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column}
+  .btn-primary,.btn-secondary{text-align:center}
+  .contact-options{grid-template-columns:1fr}
+  .about-stats{grid-template-columns:repeat(3,1fr)}
+  .footer-inner{flex-direction:column;text-align:center}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
 }
-const email=String(c.press_email||c.email||'').trim().replace(/^mailto:/i,'').toLowerCase();if(email){const same=[...body.querySelectorAll('a[href^="mailto:"]')].filter(a=>a.getAttribute('href').replace(/^mailto:/i,'').toLowerCase()===email);if(same.length>1){const keep=same.find(a=>a.closest('.contact,[class*="contact"],[class*="management"],[class*="press"]'))||same[0];same.forEach(a=>{if(a!==keep){const parent=a.parentElement;a.remove();if(parent&&normalize(parent.textContent)==='')parent.remove();}});}}
-body.querySelectorAll('[data-epk-internal-notes],.internal-notes').forEach(el=>el.remove());body.querySelectorAll('*').forEach(el=>{if(/internal notes/i.test(normalize(el.textContent))&&normalize(el.textContent).length<300)el.remove();});epkApplySectionOrder(doc,c);const style=doc.createElement('style');style.textContent='.epk-social-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.75rem}.epk-social-link{display:inline-flex!important;align-items:center;gap:.45rem;padding:.48rem .68rem;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:999px;text-decoration:none!important;color:inherit!important;font:inherit;font-size:.82em;line-height:1;transition:transform .15s ease,background .15s ease}.epk-social-link:hover{transform:translateY(-1px);background:color-mix(in srgb,currentColor 9%,transparent)}.epk-social-link svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}';doc.head.appendChild(style);return'<!doctype html>\n'+doc.documentElement.outerHTML;}
-function epkApplySectionOrder(doc,c){
-  const body=doc.body;
-  const order=[...new Set(Array.isArray(c.section_order)?c.section_order.filter(Boolean):[])];
-  if(order.length<2)return;
+</style>
+</head>
+<body>
 
-  const hasAchievements=!!String(c.achievements||'').trim();
-  const direct=el=>el?[...el.children]:[];
-  const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
-  const classes=el=>el&&el.classList?el.classList:null;
-  const has= (el,name)=>!!(classes(el)&&classes(el).contains(name));
-  const textOfDirectLabel=el=>{
-    const label=direct(el).find(ch=>has(ch,'label')||has(ch,'block-title'));
-    return norm(label&&label.textContent||'');
-  };
-  const rowLabel=el=>{
-    const n=direct(el).find(ch=>has(ch,'row-num'));
-    return norm(n&&n.textContent||'');
-  };
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <img src="logo.png" alt="Ardito" style="width:44px;height:44px;object-fit:contain"/>
+    </a>
+    <div class="nav-links">
+      <a href="#services">What we do</a>
+      <a href="#tools">Tools</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="#contact">Work with us</a>
+      <a href="#contact" class="nav-cta">Get in touch</a>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
 
-  /*
-   * Section ordering is deliberately conservative:
-   * only direct children of an authored section host are eligible to move.
-   * Nested cards, headings, images, paragraphs, etc. are never selected.
-   */
-  const isPotentialUnit=el=>{
-    if(!el)return false;
-    if(el.hasAttribute('data-epk-track'))return true;
-    if(has(el,'hero')||has(el,'hero-row')||has(el,'hero-card')||has(el,'headline-block')||
-       has(el,'name-row')||has(el,'name-block')||has(el,'header')||has(el,'bio')||
-       has(el,'bio-card')||has(el,'bio-block')||has(el,'bio-row')||has(el,'sound')||
-       has(el,'track-card')||has(el,'track-block')||has(el,'elsewhere')||has(el,'links-card')||
-       has(el,'links-line')||has(el,'press')||has(el,'press-card')||has(el,'press-block')||
-       has(el,'press-quote')||has(el,'quote-block')||has(el,'quote-card')||has(el,'stats')||
-       has(el,'row'))return true;
-    if(has(el,'card'))return true;
-    if(has(el,'dark-card'))return true;
-    return false;
-  };
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#services" onclick="toggleMenu()">What we do</a>
+  <a href="#tools" onclick="toggleMenu()">Tools</a>
+  <a href="#pricing" onclick="toggleMenu()">Pricing</a>
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#contact" onclick="toggleMenu()">Work with us</a>
+  <a href="/dashboard" style="font-size:16px;opacity:0.4">Team login →</a>
+</div>
 
-  let host=null;
-  let pairUnits=null;
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-label">Artist Development & Release Management</div>
+    <h1 class="hero-headline">
+      Your music deserves<br/>
+      <em>to be heard.</em>
+    </h1>
+    <p class="hero-sub">Ardito works with independent artists who are serious about their releases. We handle the strategy, the outreach, and the parts most artists never get to.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">Work with us</a>
+      <a href="#tools" class="btn-secondary">Browse the tools</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    scroll
+  </div>
+</section>
 
-  /*
-   * index-dossier is a two-column grid made from alternating rail-label /
-   * content-cell siblings. Its section wrapper is the pair, not either
-   * individual cell.
-   */
-  const bodyKids=direct(body);
-  if(bodyKids.length>=2){
-    const pairs=[];
-    for(let i=0;i<bodyKids.length-1;i++){
-      const a=bodyKids[i],b=bodyKids[i+1];
-      if(has(a,'rail-label')&&has(b,'content-cell')){
-        const label=norm(a.textContent);
-        let key=null;
-        if(label==='artist')key='short_bio';
-        else if(label==='bio')key='bio';
-        else if(label==='track')key='releases';
-        else if(label==='press')key='quote';
-        else if(label==='elsewhere')key='links';
-        else if(/highlight|achievement/.test(label))key='achievements';
-        pairs.push({key,nodes:[a,b],parent:body});
-        i++;
-      }
-    }
-    if(pairs.length>=2)pairUnits=pairs;
-  }
+<div class="divider"></div>
 
-  if(!pairUnits){
-    const top=bodyKids;
-    const directByClass=(parent,name)=>direct(parent).find(el=>has(el,name));
-    const usable=parent=>direct(parent).filter(isPotentialUnit).length>=2;
+<!-- WHAT WE DO -->
+<section id="services">
+  <div class="section-inner">
+    <div class="section-label">What we do</div>
+    <h2 class="section-heading">Release management<br/>done right.</h2>
+    <p class="section-sub">From distribution setup to post-release follow-up. We handle the campaign so you can focus on the music.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-title">Release Management</div>
+        <p class="service-desc">Full campaign management for single releases. Distribution, editorial pitching, blog and radio outreach, playlist pitching, social strategy, and post-release analysis.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <div class="service-title">Artist Development</div>
+        <p class="service-desc">For artists at the start. Brand identity, release readiness, audience building, and a plan that makes sense for where you actually are.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <div class="service-title">Strategy Sessions</div>
+        <p class="service-desc">A focused 60-minute session to map your next release, fix what's not working, and leave with a clear plan. Pre-call audit included.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">04</div>
+        <div class="service-title">DIY Tools</div>
+        <p class="service-desc">Not ready to work with us yet? Our playbooks, outreach tracker, and budget calculator give you the system to run your own campaign properly.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    const content=directByClass(body,'content');
-    if(content&&usable(content)){
-      host=content;
-    }else{
-      const page=directByClass(body,'page');
-      if(page){
-        const inner=directByClass(page,'inner');
-        if(inner&&usable(inner))host=inner;
-        else if(usable(page))host=page;
-      }
-      if(!host){
-        const layout=directByClass(body,'layout');
-        const main=layout&&directByClass(layout,'main');
-        if(main&&usable(main))host=main;
-      }
-      if(!host){
-        const column=directByClass(body,'column');
-        if(column&&usable(column))host=column;
-      }
-      if(!host){
-        const wrap=directByClass(body,'wrap');
-        if(wrap&&usable(wrap))host=wrap;
-      }
-    }
-  }
+<div class="divider"></div>
 
-  const labelMatches=(el,key)=>{
-    const rl=rowLabel(el);
-    if(key==='short_bio')return rl==='01 artist'||/^01\s+artist\b/.test(rl);
-    if(key==='bio')return rl==='02 bio'||/^02\s+bio\b/.test(rl);
-    if(key==='releases')return rl==='03 track'||/^03\s+track\b/.test(rl);
-    if(key==='quote')return /^04\s+press\b/.test(rl);
-    if(key==='links')return /^08\s+elsewhere\b/.test(rl)||/\belsewhere\b/.test(rl);
-    return false;
-  };
+<!-- TOOLS -->
+<section id="tools">
+  <div class="section-inner">
+    <div class="section-label">The Tools</div>
+    <h2 class="section-heading">Do it yourself.<br/><em>Do it well.</em></h2>
+    <p class="section-sub">Built by a release manager for artists who want to run their own campaigns without guessing what comes next.</p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-tag">Playbook</div>
+        <div class="tool-title">Release Management Playbook</div>
+        <p class="tool-desc">28 days. Every action mapped to your real release date. Day-by-day briefs, tasks, and example copy - from distribution setup to post-release.</p>
+        <div class="tool-price">£14.99 <span>one-off</span></div>
+        <ul class="tool-features">
+          <li>28-day interactive checklist</li>
+          <li>Date-aware calendar</li>
+          <li>Example pitch copy included</li>
+          <li>Pre-save and distribution guides</li>
+          <li>Works for any genre or budget</li>
+        </ul>
+        <a href="https://arditox.gumroad.com/l/suiwnp" target="_blank" class="tool-btn">Get the Playbook</a>
+      </div>
+      <div class="tool-card featured">
+        <div class="tool-tag">Bundle</div>
+        <div class="tool-title">Playbook + Outreach Tracker + Budget Calculator</div>
+        <p class="tool-desc">The full DIY release toolkit. Playbook, 93+ pre-loaded curator and blog contacts filtered by genre, and a budget calculator that tells you where every pound should go.</p>
+        <div class="tool-price">£29 <span>one-off</span></div>
+        <ul class="tool-features">
+          <li>Everything in the Playbook</li>
+          <li>93+ vetted contacts across 6 genres</li>
+          <li>Blogs, playlists, radio - UK and EU</li>
+          <li>Status tracking and CSV export</li>
+          <li>Budget calculator with spend breakdown</li>
+        </ul>
+        <a href="https://arditox.gumroad.com/l/jzhenz" target="_blank" class="tool-btn">Get the Bundle</a>
+      </div>
+      <div class="tool-card">
+        <div class="tool-tag">Coming Soon</div>
+        <div class="tool-title">Gig Promo Playbook</div>
+        <p class="tool-desc">21 days to a full room. The same system as the release playbook, built for promoting live shows. Join the waitlist to be notified first.</p>
+        <div class="tool-price">£15 <span>at launch</span></div>
+        <ul class="tool-features">
+          <li>21-day gig promo system</li>
+          <li>Date-aware posting calendar</li>
+          <li>Venue and ticket link guides</li>
+          <li>Works for solo artists and bands</li>
+          <li>Reusable for every show</li>
+        </ul>
+        <a href="mailto:ardito.ldn@gmail.com?subject=Gig Playbook Waitlist" class="tool-btn">Join the Waitlist</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-  const matchesKey=(el,key)=>{
-    if(!el)return false;
-    if(key==='short_bio'){
-      return has(el,'hero')||has(el,'hero-row')||has(el,'hero-card')||has(el,'headline-block')||
-        has(el,'name-row')||has(el,'name-block')||
-        (has(el,'header')&&!!el.querySelector('.hook'))||
-        (has(el,'row')&&(labelMatches(el,key)||!!el.querySelector('.artist-name')));
-    }
-    if(key==='bio'){
-      return has(el,'bio')||has(el,'bio-card')||has(el,'bio-block')||has(el,'bio-row')||
-        (has(el,'card')&&textOfDirectLabel(el)==='about')||
-        (has(el,'row')&&(labelMatches(el,key)||!!el.querySelector('.bio-row')));
-    }
-    if(key==='releases'){
-      return el.hasAttribute('data-epk-track')||has(el,'track-card')||has(el,'track-block')||has(el,'sound')||
-        (has(el,'row')&&labelMatches(el,key));
-    }
-    if(key==='links'){
-      return has(el,'epk-runtime-social')||has(el,'elsewhere')||has(el,'links-card')||has(el,'links-line')||
-        (has(el,'card')&&/listen\s*(?:&|and)\s*follow/i.test(textOfDirectLabel(el)))||
-        (has(el,'dark-card')&&/listen\s*(?:&|and)\s*follow/i.test(textOfDirectLabel(el)))||
-        (has(el,'row')&&labelMatches(el,key));
-    }
-    if(key==='quote'){
-      return has(el,'press')||has(el,'press-card')||has(el,'press-block')||has(el,'press-quote')||
-        has(el,'quote-block')||has(el,'quote-card')||
-        (has(el,'card')&&!!el.querySelector('.quote'))||
-        (has(el,'row')&&(labelMatches(el,key)||!!el.querySelector('.press-quote')||!!el.querySelector('.press-multi')));
-    }
-    if(key==='achievements'){
-      return has(el,'stats')||el.hasAttribute('data-epk-achievements')||
-        (/highlight|achievement/i.test(String(el.className||'')));
-    }
-    return false;
-  };
+<div class="divider"></div>
 
-  const score=(el,key)=>{
-    let s=0;
-    if(key==='short_bio'){
-      if(has(el,'hero')||has(el,'hero-row')||has(el,'hero-card')||has(el,'headline-block')||has(el,'name-row')||has(el,'name-block'))s+=120;
-      if(has(el,'header'))s+=110;
-      if(has(el,'row')&&labelMatches(el,key))s+=140;
-    }else if(key==='bio'){
-      if(has(el,'bio')||has(el,'bio-card')||has(el,'bio-block')||has(el,'bio-row'))s+=120;
-      if(has(el,'row')&&labelMatches(el,key))s+=140;
-      if(has(el,'card')&&textOfDirectLabel(el)==='about')s+=110;
-    }else if(key==='releases'){
-      if(el.hasAttribute('data-epk-track'))s+=150;
-      if(has(el,'track-card')||has(el,'track-block')||has(el,'sound'))s+=120;
-      if(has(el,'row')&&labelMatches(el,key))s+=140;
-    }else if(key==='links'){
-      if(has(el,'epk-runtime-social'))s+=160;
-      if(has(el,'row')&&/^08\s+elsewhere\b/.test(rowLabel(el)))s+=150;
-      if(has(el,'elsewhere')||has(el,'links-card')||has(el,'links-line'))s+=120;
-      if((has(el,'card')||has(el,'dark-card'))&&/listen\s*(?:&|and)\s*follow/i.test(textOfDirectLabel(el)))s+=110;
-    }else if(key==='quote'){
-      if(has(el,'press')||has(el,'press-card')||has(el,'press-block')||has(el,'press-quote')||has(el,'quote-block')||has(el,'quote-card'))s+=120;
-      if(has(el,'row')&&labelMatches(el,key))s+=140;
-      if(has(el,'card')&&!!el.querySelector('.quote'))s+=110;
-    }else if(key==='achievements'){
-      if(el.hasAttribute('data-epk-achievements'))s+=150;
-      if(has(el,'stats'))s+=140;
-      if(/highlight|achievement/i.test(String(el.className||'')))s+=120;
-    }
-    return s;
-  };
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-heading">Start where you are.</h2>
+    <p class="section-sub">From the tools to the full managed service. Every tier includes everything in the one below it.</p>
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Price</th>
+          <th>What's included</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/suiwnp','_blank')">
+          <td><div class="tier-name">The Playbook</div></td>
+          <td><div class="tier-price">£14.99</div></td>
+          <td>28-day release management checklist. Day-by-day briefs, tasks, and example copy. Self-serve, no support. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jzhenz','_blank')">
+          <td><div class="tier-name">Bundle</div><span class="tier-badge">Best value</span></td>
+          <td><div class="tier-price">£29</div></td>
+          <td>Playbook + 93+ contact outreach tracker (genre-filtered, UK and EU) + budget calculator. Everything you need to run a release yourself. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jtrli','_blank')">
+          <td><div class="tier-name">Pitch Review</div></td>
+          <td><div class="tier-price">£35 <span style="font-size:12px;color:rgba(232,224,208,0.4)">intro</span></div></td>
+          <td>Everything in the Bundle, plus a written review of your pitch copy, bio, and artwork from Laura. One round of feedback, 48-hour turnaround. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.open('mailto:ardito.ldn@gmail.com?subject=Strategy Call','_blank')">
+          <td><div class="tier-name">Strategy Call</div></td>
+          <td><div class="tier-price">£120</div></td>
+          <td>Everything above, plus a 60-minute call. Pre-call intake form, tailored campaign plan, three actions to leave with. The playbook customised for your release. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
+        </tr>
+        <tr class="clickable" onclick="window.location='mailto:ardito.ldn@gmail.com?subject=Full Management Enquiry'">
+          <td><div class="tier-name">Full Management</div></td>
+          <td><div class="tier-price">Bespoke</div></td>
+          <td>Ardito runs the campaign with you. Distribution, pitching, blog and radio outreach, social strategy, post-release follow-up. Enquire for a quote. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 
-  if(pairUnits){
-    if(hasAchievements&&!pairUnits.some(u=>u.key==='achievements')){
-      const label=doc.createElement('div');
-      label.className='rail-label';
-      label.textContent='Highlights';
-      const cell=doc.createElement('div');
-      cell.className='content-cell epk-runtime-section epk-runtime-achievements';
-      cell.innerHTML=String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
-      const runtime={key:'achievements',nodes:[label,cell],parent:body,runtime:true};
-      const contactIndex=pairUnits.findIndex(u=>u.nodes[0]&&/contact/i.test(norm(u.nodes[0].textContent)));
-      if(contactIndex>=0){
-        const before=pairUnits[contactIndex].nodes[0];
-        body.insertBefore(label,before);
-        body.insertBefore(cell,before);
-      }else{
-        body.appendChild(label);
-        body.appendChild(cell);
-      }
-      pairUnits.push(runtime);
-    }
-    if(!hasAchievements){
-      const native=pairUnits.find(u=>u.key==='achievements');
-      if(native){native.nodes.forEach(n=>n.remove());pairUnits=pairUnits.filter(u=>u!==native);}
-    }
-  }else{
-    if(!host)return;
+<div class="divider"></div>
 
-    let units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
-    if(hasAchievements&&!units.some(u=>matchesKey(u.node,'achievements'))){
-      const sec=doc.createElement('section');
-      sec.className='epk-runtime-section epk-runtime-achievements';
-      sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+
-        String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
-      const anchor=direct(host).find(el=>has(el,'contact')||has(el,'footer')||has(el,'footer-row')||has(el,'sign-off')||has(el,'assets-note'))||null;
-      host.insertBefore(sec,anchor||null);
-      units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
-    }
-    if(!hasAchievements){
-      const native=direct(host).find(el=>matchesKey(el,'achievements'));
-      if(native)native.remove();
-      units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
-    }
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div>
+        <div class="section-label">About</div>
+        <h2 class="section-heading">Artist-first.<br/><em>Always.</em></h2>
+        <div class="about-text">
+          <p>Ardito is a release management and artist development agency for <strong>early-stage independent artists</strong>. We work with artists who are serious about their music and ready to put it out - not artists who already have a team.</p>
+          <p>Founded by <strong>Laura</strong>, a Music Business MA graduate (Distinction) from BIMM London with a background spanning live events co-production, touring administration, distribution, and artist management. Laura built Ardito because she kept seeing the same pattern: artists making genuinely good music who had no idea what to do with it once it was finished.</p>
+          <p>We work with artists under 5,000 followers. That's not a limitation - it's the point. Before the wave is where the work matters most.</p>
+        </div>
+        <div class="about-stats">
+          <div>
+            <div class="stat-num">28</div>
+            <div class="stat-label">Days in a full campaign</div>
+          </div>
+          <div>
+            <div class="stat-num">93+</div>
+            <div class="stat-label">Vetted contacts in the tracker</div>
+          </div>
+          <div>
+            <div class="stat-num">6</div>
+            <div class="stat-label">Genres covered</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <img src="logo.png" alt="Ardito" style="width:220px;height:220px;object-fit:contain;opacity:0.85;margin-bottom:32px"/>
+        <p style="font-size:13px;color:rgba(232,224,208,0.35);text-align:center;max-width:260px;line-height:1.6">London-based. Working with independent artists across the UK and internationally.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    const selected=[];
-    const used=new Set();
-    order.forEach(key=>{
-      let best=null,bestScore=-1;
-      units.forEach(unit=>{
-        if(used.has(unit.node))return;
-        if(!matchesKey(unit.node,key))return;
-        const s=score(unit.node,key);
-        if(s>bestScore){best=unit;bestScore=s;}
-      });
-      if(best){
-        best.key=key;
-        used.add(best.node);
-        selected.push(best);
-      }
-    });
+<div class="divider"></div>
 
-    if(selected.length<2)return;
-    const allSameParent=selected.every(u=>u.parent===host);
-    if(!allSameParent)return;
+<!-- CASE STUDIES -->
+<section id="work" style="background:var(--warm-dark)">
+  <div class="section-inner">
+    <div class="section-label">Real work</div>
+    <h2 class="section-heading" style="margin-bottom:8px">Case studies</h2>
+    <p class="section-sub" style="margin-bottom:40px">Two campaigns, same artist, five weeks apart in lead time.</p>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
 
-    selected.forEach(u=>u.nodes.forEach(n=>n.setAttribute('data-epk-section',u.key)));
+      <div style="background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;padding:40px;flex:1;min-width:320px;max-width:600px">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#3d6a3d;margin-bottom:8px">Case 002</div>
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:20px">July 2026</div>
+        <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#e8e0d0;margin-bottom:8px">Omjine — Sweethearting</h3>
+        <p style="font-size:13px;color:rgba(232,224,208,0.5);margin-bottom:24px">Seoul-based singer-songwriter. A shift toward Yeah Yeah Yeahs and The xx, built with five weeks of lead time instead of two.</p>
+        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:24px">Where Precious One tested what's possible with no runway at all, Sweethearting tested what changes when there's time to actually run a campaign properly. Full pitches, individual follow-ups, an Instagram DM push to radio and curators, and outreach into Omjine's own academic network on top of the usual press list.</p>
+        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:32px">The difference showed. Amazing Radio gave it UK and USA airplay and a top 3 Audition Poll place, BBC Introducing's upload was listened to by programming, and five more stations and outlets picked it up, including a reply from a German station written to in German. Zero replies last time, real coverage this time.</p>
+        <a href="/case-002.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.5px;padding:10px 22px;border-radius:4px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#3d6a3d'" onmouseout="this.style.background='#2d4a2d'">Read the full case study</a>
+      </div>
 
-    const marker=doc.createComment('epk-section-order');
-    const first=selected.reduce((earliest,u)=>{
-      const n=u.nodes[0];
-      if(!earliest)return n;
-      const pos=earliest.compareDocumentPosition(n);
-      return pos&Node.DOCUMENT_POSITION_FOLLOWING?earliest:n;
-    },null);
-    if(!first||first.parentElement!==host)return;
-    host.insertBefore(marker,first);
-    selected.forEach(u=>u.nodes.forEach(n=>host.insertBefore(n,marker)));
-    marker.remove();
-    return;
-  }
+      <div style="background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;padding:40px;flex:1;min-width:320px;max-width:600px">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.3);margin-bottom:8px">Case 001</div>
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:20px">April 2026</div>
+        <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#e8e0d0;margin-bottom:8px">Omjine — Precious One</h3>
+        <p style="font-size:13px;color:rgba(232,224,208,0.5);margin-bottom:24px">Seoul-based singer-songwriter. Home recorded, minimal, vocally strong. Somewhere between Cat Power and The xx.</p>
+        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:24px">Omjine came to Ardito two weeks before her single was due out with a finished track and no campaign infrastructure behind it. No mailing list, no press contacts, no outreach history. The brief came in without a fee attached — two weeks, one single, build everything from scratch.</p>
+        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:32px">What followed was a full release: PRO registration fixed, 62 contacts imported into Mailchimp, 15 personalised pitch emails to blogs and radio stations, Spotify editorial pitch submitted, platform access secured, and two email campaigns written and sent. Precious One is now her most-streamed track.</p>
+        <a href="/case-001.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.5px;padding:10px 22px;border-radius:4px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#3d6a3d'" onmouseout="this.style.background='#2d4a2d'">Read the full case study</a>
+      </div>
 
-  const selected=[];
-  const used=new Set();
-  order.forEach(key=>{
-    let best=null,bestScore=-1;
-    pairUnits.forEach(unit=>{
-      if(used.has(unit))return;
-      if(unit.key!==key)return;
-      if(unit.nodes.some(n=>!n.isConnected||n.parentElement!==body))return;
-      const s=unit.runtime?150:100;
-      if(s>bestScore){best=unit;bestScore=s;}
-    });
-    if(best){used.add(best);selected.push(best);}
-  });
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
 
-  if(selected.length<2)return;
-  selected.forEach(u=>u.nodes.forEach(n=>n.setAttribute('data-epk-section',u.key)));
+<!-- CONTACT -->
+<section id="contact" style="background:var(--green-dark)">
+  <div class="section-inner">
+    <div class="contact-inner">
+      <div class="section-label">Work with us</div>
+      <h2 class="section-heading">Ready when you are.</h2>
+      <p class="section-sub">Whether you want to run your own release or want Ardito to run it with you - start here and we'll figure out the right fit.</p>
+      <div class="contact-options">
+        <div class="contact-card">
+          <div class="contact-card-label">For artists</div>
+          <div class="contact-card-title">Start a conversation</div>
+          <p class="contact-card-desc">Tell us about your release, where you are, and what you're trying to achieve. No hard sell, no obligations.</p>
+          <a href="mailto:ardito.ldn@gmail.com?subject=I'd like to work with Ardito" class="contact-card-link">Email us</a>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-label">Strategy call</div>
+          <div class="contact-card-title">Book a session</div>
+          <p class="contact-card-desc">60 minutes, £120. Fill in the pre-call intake form and we'll come prepared. Three actions to leave with.</p>
+          <a href="/intake-form.html" class="contact-card-link">Fill in the form</a>
+        </div>
+      </div>
+      <p style="font-size:13px;color:rgba(232,224,208,0.35)">Or find us on Instagram: <a href="https://instagram.com/ardito.ldn" style="color:rgba(232,224,208,0.5);text-decoration:none">@ardito.ldn</a></p>
+    </div>
+  </div>
+</section>
 
-  const marker=doc.createComment('epk-section-order');
-  const first=selected.reduce((earliest,u)=>{
-    const n=u.nodes[0];
-    if(!earliest)return n;
-    const pos=earliest.compareDocumentPosition(n);
-    return pos&Node.DOCUMENT_POSITION_FOLLOWING?earliest:n;
-  },null);
-  if(!first||first.parentElement!==body)return;
-  body.insertBefore(marker,first);
-  selected.forEach(u=>u.nodes.forEach(n=>body.insertBefore(n,marker)));
-  marker.remove();
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo"><img src="logo.png" alt="Ardito" style="height:32px;object-fit:contain;opacity:0.5"/></div>
+    <div class="footer-links">
+      <a href="#services">What we do</a>
+      <a href="#tools">Tools</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://instagram.com/ardito.ldn">Instagram</a>
+      <a href="/dashboard" style="opacity:0.4">Team</a>
+    </div>
+    <div class="footer-copy">© 2026 Ardito. London.</div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu(){
+  document.getElementById('mobile-menu').classList.toggle('open');
 }
-function build(pk,a){let html=EPK_TEMPLATE_SOURCES[pk.template]||'';if(!html)return'';const c={...DEFAULTS,...(pk.content||{})};const headline=c.headline||a.name||'Artist Name';const image=safeUrl(c.image_url),spotify=safeUrl(c.spotify),apple=safeUrl(c.apple_music),soundcloud=safeUrl(c.soundcloud),website=safeUrl(c.website),youtube=safeUrl(c.youtube),tiktok=safeUrl(c.tiktok),hyperfollow=safeUrl(c.hyperfollow||c.distrokid),pdf=safeUrl(c.press_kit_pdf_url);const track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
-const imageFit=(c.image_fit==='contain'?'contain':'cover'),imageX=Math.max(0,Math.min(100,Number(c.image_position_x??50)||50)),imageY=Math.max(0,Math.min(100,Number(c.image_position_y??50)||50));
-const textMap={'Artist Name':headline,'ARTIST NAME':String(headline).toUpperCase(),'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'','Your one-line hook lives here.':c.short_bio||c.genre||'','This is where your bio will live. Two or three sentences, third person, telling the story so far.':c.bio||c.short_bio||'','Track Title':track,'2026':year,'Publication Name':quoteSource,'A great quote about the song from press goes here.':c.quote||'','A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE.':c.quote||'','"A great quote about the song from press goes here."':c.quote?'"'+String(c.quote).replace(/^"|"$/g,'')+'"':'','@yourhandle':c.instagram||''};
-html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,esc(headline));Object.entries(textMap).forEach(([from,to])=>html=html.split(from).join(esc(to)));
-let hasPhotoSlot=false;
-if(image){
-  html=html.replace(/<img\b([^>]*)>/gi,(full,attrs)=>{
-    if(!/\[PRESS PHOTO URL\]|\[PRESS PHOTO OR SINGLE ARTWORK URL\]/.test(attrs))return full;
-    hasPhotoSlot=true;
-    if(/\bclass\s*=\s*"/i.test(attrs)){attrs=attrs.replace(/\bclass\s*=\s*"([^"]*)"/i,(m2,cls)=>'class="'+(cls?cls+' ':'')+'ardito-epk-photo"');}
-    else{attrs=attrs+' class="ardito-epk-photo"';}
-    return '<img'+attrs+'>';
-  });
-}
-const spotifyEmbed=epkSpotifyEmbedSrc(spotify);if(spotifyEmbed){const embedHeight=(pk.template==='ledger-sheet')?144:152;html=html.split('<a href="[SPOTIFY URL]">Listen on Spotify ↗</a>').join('<iframe class="ardito-spotify-embed" src="'+esc(spotifyEmbed)+'" width="100%" height="'+embedHeight+'" style="border-radius:12px;border:0;display:block;" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>');}
-const repl={'[PRESS PHOTO URL]':image,'[PRESS PHOTO OR SINGLE ARTWORK URL]':image,'[SPOTIFY URL]':spotify,'[APPLE MUSIC URL]':apple,'[SOUNDCLOUD URL]':soundcloud,'[YOUTUBE URL]':youtube,'[TIKTOK URL]':tiktok,'[DISTROKID / HYPERFOLLOW URL]':hyperfollow,'[PRESS KIT PDF URL]':pdf};Object.entries(repl).forEach(([from,to])=>html=html.split(from).join(esc(to)));
-if(!spotify)html=html.replace(/<a id="vinyl-disc" class="vinyl vinyl-link" href="" aria-label="Listen on Spotify ↗">([\s\S]*?)<\/a>/,'<div id="vinyl-disc" class="vinyl">$1</div>');
-if(!pdf)html=html.replace(/<a[^>]+href=""[^>]*>\s*(?:Download press kit \(PDF\)|↓ Download full press kit \(PDF\))\s*<\/a>/gi,'');html=html.replace(/href="(?:\/|\.\/|\.\.\/)[^"]*"/gi,'href=""');html=html.replace(/<a[^>]*href=""[^>]*>[\s\S]*?<\/a>/gi,'');
-if(!c.short_bio&&!c.genre)html=html.replace(/<p[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/p>/gi,'').replace(/<div[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/div>/gi,'');if(!c.bio&&!c.short_bio)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:bio|bio-card|bio-block)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!c.quote)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:press-quote|quote-card|quote|press)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
-if(!track&&!spotify)html=html.replace(/<!-- EPK_TRACK_START -->[\s\S]*?<!-- EPK_TRACK_END -->/gi,'');else if(!track){html=html.replace(/<[^>]*data-epk-track-title[^>]*>[\s\S]*?<\/[^>]+>/gi,'').replace(/<[^>]*data-epk-track-meta[^>]*>[\s\S]*?<\/[^>]+>/gi,'');}
-const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||website);if(!hasStreaming)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:elsewhere|links|listen|social|platforms|connect)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!image){html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');html=html.replace(/<img[^>]+src=""[^>]*>\s*/gi,'');}
-html=epkPostProcess(html,c);
-html=html.replace(/<[^>]*>[^<]*Internal notes[^<]*<\/[^>]+>/gi,'').replace(/>[^<]*Not shown in preview[^<]*</gi,'><');const colors={...(PK_DEFAULT_COLORS[pk.template]||PK_DEFAULT_COLORS['ardito-signature']||{}),...((pk.theme&&pk.theme[pk.template])||{})};const photoRule=hasPhotoSlot?'.ardito-epk-photo{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}':'';const spacingRule=epkSpacingCss(pk.template,c.section_spacing);const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);html=html.replace('</head>','<style id="ardito-epk-runtime">:root{--bg:'+esc(colors.bg||'')+';--text:'+esc(colors.ink||'')+';--ink:'+esc(colors.ink||'')+';--accent:'+esc(colors.accent||'')+';}'+photoRule+spacingRule+sizeRule+'</style></head>');html=html.replace(/<meta[^>]+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index,follow">');return html;}
-
-function diagnosticState(code,title,detail){
-console.error('[Ardito EPK '+code+']',detail||'');
-document.title='Ardito · Press Kit · '+code;
-document.getElementById('app').innerHTML='<div class="state"><h1>'+esc(title)+'</h1><p>Diagnostic code: <strong>'+esc(code)+'</strong></p>'+(detail?'<pre>'+esc(detail)+'</pre>':'')+'</div>';
-}
-
-(async function(){
-const root=document.getElementById('app'),slug=pkSlug();
-
-if(!slug){
-diagnosticState('NO_SLUG','Press kit unavailable','No artist slug was found in the URL.');
-return;
-}
-
-let rows;
-
-try{
-rows=await api('published_epk_public?select=*&public_slug=eq.'+encodeURIComponent(slug)+'&limit=1');
-}catch(e){
-diagnosticState(
-'SUPABASE_HTTP_ERROR',
-'Press kit unavailable',
-'Supabase request failed.'+
-(e.status?' HTTP '+e.status+'.':'')+
-(e.message?'\n\n'+e.message:'')+
-(e.responseBody?'\n\n'+e.responseBody:'')
-);
-return;
-}
-
-if(!rows.length){
-diagnosticState('NO_PUBLISHED_ROW','Press kit unavailable','No published EPK row was returned for slug: '+slug);
-return;
-}
-
-const row=rows[0],pk={template:row.template,theme:row.theme,content:row.content},artist={name:row.artist_name||'Artist'};
-
-if(!pk.template||!EPK_TEMPLATE_SOURCES[pk.template]){
-diagnosticState('TEMPLATE_MISSING','Press kit unavailable','No EPK template source was found for template: '+String(pk.template||'(missing)'));
-return;
-}
-
-let doc;
-
-try{
-doc=build(pk,artist);
-}catch(e){
-diagnosticState('BUILD_FAILED','Press kit unavailable','The EPK document failed while being built.\n\n'+(e&&e.stack?e.stack:String(e)));
-return;
-}
-
-if(!doc){
-diagnosticState('BUILD_FAILED','Press kit unavailable','The EPK build returned an empty document for template: '+String(pk.template||'(missing)'));
-return;
-}
-
-try{
-const blob=new Blob([doc],{type:'text/html'}),url=URL.createObjectURL(blob);
-root.innerHTML='<iframe class="frame" title="'+esc(artist.name)+' press kit"></iframe>';
-root.querySelector('iframe').src=url;
-document.title=artist.name+' · Press Kit';
-}catch(e){
-diagnosticState('BUILD_FAILED','Press kit unavailable','The built EPK could not be rendered.\n\n'+(e&&e.stack?e.stack:String(e)));
-}
-})(); </script></body></html>
+document.getElementById('mobile-menu').addEventListener('click',function(e){
+  if(e.target===this) toggleMenu();
+});
+window.addEventListener('scroll',function(){
+  const nav=document.querySelector('nav');
+  nav.style.borderBottomColor=window.scrollY>20?'rgba(232,224,208,0.08)':'transparent';
+});
+</script>
+</body>
+</html>
