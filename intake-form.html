@@ -35,6 +35,9 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:32px;line-height:1.2;m
 .field select option{background:#111}
 .field input::placeholder,.field textarea::placeholder{color:#333}
 .hint{color:#444;font-size:12px;margin-top:6px;line-height:1.5}
+.privacy-note{color:#444;font-size:11px;line-height:1.6;margin-top:2px}
+.privacy-note a{color:#777;text-decoration:underline;text-underline-offset:2px}
+.privacy-note a:hover{color:#e8e0d0}
 .radio-group,.checklist{display:flex;flex-direction:column;gap:8px}
 .radio-option,.check-option{display:flex;align-items:center;gap:12px;background:#111;border:1px solid #222;border-radius:6px;padding:12px 14px;cursor:pointer;transition:border .15s}
 .radio-option:hover,.check-option:hover{border-color:#333}
@@ -202,6 +205,7 @@ footer{margin-top:64px;padding-top:24px;border-top:1px solid #1a1a1a;display:fle
         <option>Google search</option><option>Other</option>
       </select>
     </div>
+    <p class="privacy-note">Your information is used to prepare for and follow up on your Strategy Call. <a href="/privacy-policy.html">Privacy Policy</a></p>
     <div class="nav-btns">
       <button class="back-btn" onclick="back(4)">Back</button>
       <button class="next-btn" onclick="submit()">Submit</button>
