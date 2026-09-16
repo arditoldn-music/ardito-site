@@ -4,7 +4,6 @@
 const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN';
 const DEFAULTS={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',releases:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:[],section_spacing:'default',headshot_size:'default'};
 function safeUrl(v){const x=String(v||'').trim();return /^(https?:|mailto:|data:image\/)/i.test(x)?x:'';}function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function nlPK(v){return esc(v).replace(/\n/g,'<br>');}
 function publicHref(label,v){const raw=String(v||'').trim();if(label==='Instagram'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://instagram.com/'+raw.replace(/^@/,'');if(label==='TikTok'&&raw&&/^@?[A-Za-z0-9._]+$/.test(raw))return'https://tiktok.com/@'+raw.replace(/^@/,'');return safeUrl(raw);}
 function pkSlug(){const p=new URLSearchParams(location.search);let s=(p.get('artist')||'').trim();if(!s){const base='/epk/';const path=location.pathname;if(path.startsWith(base))s=path.slice(base.length).split('/').filter(Boolean)[0]||'';}s=s.toLowerCase();if(s&&location.search)history.replaceState(null,'','/epk/'+encodeURIComponent(s)+'/');return s;}
 async function api(path){
@@ -275,7 +274,7 @@ function epkApplySectionOrder(doc,c){
       label.textContent='Highlights';
       const cell=doc.createElement('div');
       cell.className='content-cell epk-runtime-section epk-runtime-achievements';
-      cell.innerHTML=String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+nlPK(x)+'</p>').join('');
+      cell.innerHTML=String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
       const runtime={key:'achievements',nodes:[label,cell],parent:body,runtime:true};
       const contactIndex=pairUnits.findIndex(u=>u.nodes[0]&&/contact/i.test(norm(u.nodes[0].textContent)));
       if(contactIndex>=0){
@@ -300,7 +299,7 @@ function epkApplySectionOrder(doc,c){
       const sec=doc.createElement('section');
       sec.className='epk-runtime-section epk-runtime-achievements';
       sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+
-        String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+nlPK(x)+'</p>').join('');
+        String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+esc(x)+'</p>').join('');
       const anchor=direct(host).find(el=>has(el,'contact')||has(el,'footer')||has(el,'footer-row')||has(el,'sign-off')||has(el,'assets-note'))||null;
       host.insertBefore(sec,anchor||null);
       units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
@@ -380,7 +379,7 @@ function epkApplySectionOrder(doc,c){
 function build(pk,a){let html=EPK_TEMPLATE_SOURCES[pk.template]||'';if(!html)return'';const c={...DEFAULTS,...(pk.content||{})};const headline=c.headline||a.name||'Artist Name';const image=safeUrl(c.image_url),spotify=safeUrl(c.spotify),apple=safeUrl(c.apple_music),soundcloud=safeUrl(c.soundcloud),website=safeUrl(c.website),youtube=safeUrl(c.youtube),tiktok=safeUrl(c.tiktok),hyperfollow=safeUrl(c.hyperfollow||c.distrokid),pdf=safeUrl(c.press_kit_pdf_url);const track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
 const imageFit=(c.image_fit==='contain'?'contain':'cover'),imageX=Math.max(0,Math.min(100,Number(c.image_position_x??50)||50)),imageY=Math.max(0,Math.min(100,Number(c.image_position_y??50)||50));
 const textMap={'Artist Name':headline,'ARTIST NAME':String(headline).toUpperCase(),'Your one-line hook lives here — sum up the sound in a single breath.':c.short_bio||c.genre||'','Your one-line hook lives here.':c.short_bio||c.genre||'','This is where your bio will live. Two or three sentences, third person, telling the story so far.':c.bio||c.short_bio||'','Track Title':track,'2026':year,'Publication Name':quoteSource,'A great quote about the song from press goes here.':c.quote||'','A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE.':c.quote||'','"A great quote about the song from press goes here."':c.quote?'"'+String(c.quote).replace(/^"|"$/g,'')+'"':'','@yourhandle':c.instagram||''};
-html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,esc(headline));Object.entries(textMap).forEach(([from,to])=>{const newlineAware=/^(Your one-line hook lives here — sum up the sound in a single breath\.|Your one-line hook lives here\.|This is where your bio will live\. Two or three sentences, third person, telling the story so far\.|A great quote about the song from press goes here\.|A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE\.|\"A great quote about the song from press goes here\.\")$/.test(from);html=html.split(from).join(newlineAware?nlPK(to):esc(to));});
+html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,esc(headline));Object.entries(textMap).forEach(([from,to])=>html=html.split(from).join(esc(to)));
 let hasPhotoSlot=false;
 if(image){
   html=html.replace(/<img\b([^>]*)>/gi,(full,attrs)=>{
@@ -397,9 +396,9 @@ if(!spotify)html=html.replace(/<a id="vinyl-disc" class="vinyl vinyl-link" href=
 if(!pdf)html=html.replace(/<a[^>]+href=""[^>]*>\s*(?:Download press kit \(PDF\)|↓ Download full press kit \(PDF\))\s*<\/a>/gi,'');html=html.replace(/href="(?:\/|\.\/|\.\.\/)[^"]*"/gi,'href=""');html=html.replace(/<a[^>]*href=""[^>]*>[\s\S]*?<\/a>/gi,'');
 if(!c.short_bio&&!c.genre)html=html.replace(/<p[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/p>/gi,'').replace(/<div[^>]*class="[^"]*hook[^"]*"[^>]*>[\s\S]*?<\/div>/gi,'');if(!c.bio&&!c.short_bio)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:bio|bio-card|bio-block)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!c.quote)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:press-quote|quote-card|quote|press)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');
 if(!track&&!spotify)html=html.replace(/<!-- EPK_TRACK_START -->[\s\S]*?<!-- EPK_TRACK_END -->/gi,'');else if(!track){html=html.replace(/<[^>]*data-epk-track-title[^>]*>[\s\S]*?<\/[^>]+>/gi,'').replace(/<[^>]*data-epk-track-meta[^>]*>[\s\S]*?<\/[^>]+>/gi,'');}
-const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||website);if(!hasStreaming)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:elsewhere|links|listen|social|platforms|connect)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!image){html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');html=html.replace(/<img[^>]+src=""[^>]*>\s*/gi,'');}
+const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||website||c.instagram);if(!hasStreaming)html=html.replace(/<(section|div)[^>]*class="[^"]*(?:elsewhere|links|listen|social|platforms|connect)[^"]*"[^>]*>[\s\S]*?<\/\1>/gi,'');if(!image){html=html.replace(/<div[^>]*class="[^"]*(?:photo-card|hero-photo|bio-photo)[^"]*"[^>]*>[\s\S]*?<\/div>\s*/gi,'');html=html.replace(/<img[^>]+src=""[^>]*>\s*/gi,'');}
 html=epkPostProcess(html,c);
-html=html.replace(/<[^>]*>[^<]*Internal notes[^<]*<\/[^>]+>/gi,'').replace(/>[^<]*Not shown in preview[^<]*</gi,'><');const colors={...(PK_DEFAULT_COLORS[pk.template]||PK_DEFAULT_COLORS['ardito-signature']||{}),...((pk.theme&&pk.theme[pk.template])||{})};const photoRule=hasPhotoSlot?'.ardito-epk-photo{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}':'';const spacingRule=epkSpacingCss(pk.template,c.section_spacing);const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);html=html.replace('</head>','<style id="ardito-epk-runtime">:root{--bg:'+esc(colors.bg||'')+';--text:'+esc(colors.ink||'')+';--ink:'+esc(colors.ink||'')+';--accent:'+esc(colors.accent||'')+';}'+photoRule+spacingRule+sizeRule+'</style></head>');html=html.replace(/<meta[^>]+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index,follow">');return html;}
+html=html.replace(/<[^>]*>[^<]*Internal notes[^<]*<\/[^>]+>/gi,'').replace(/>[^<]*Not shown in preview[^<]*</gi,'><');const colors={...(PK_DEFAULT_COLORS[pk.template]||PK_DEFAULT_COLORS['ardito-signature']||{}),...((pk.theme&&pk.theme[pk.template])||{})};const photoRule=hasPhotoSlot?'.ardito-epk-photo{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}':'';const spacingRule=epkSpacingCss(pk.template,c.section_spacing);const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);html=html.replace('</head>','<style id="ardito-epk-runtime">:root{--bg:'+esc(colors.bg||'')+';--text:'+esc(colors.ink||'')+';--ink:'+esc(colors.ink||'')+';--accent:'+esc(colors.accent||'')+';--text-dim:color-mix(in srgb, var(--text) 65%, var(--bg));}'+photoRule+spacingRule+sizeRule+'</style></head>');html=html.replace(/<meta[^>]+name=["']robots["'][^>]*>/i,'<meta name="robots" content="index,follow">');return html;}
 
 function diagnosticState(code,title,detail){
 console.error('[Ardito EPK '+code+']',detail||'');
