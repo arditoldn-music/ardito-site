@@ -1238,7 +1238,7 @@ function epkApplySectionOrder(doc,c){
       label.textContent='Highlights';
       const cell=doc.createElement('div');
       cell.className='content-cell epk-runtime-section epk-runtime-achievements';
-      cell.innerHTML=String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+nlPK(x)+'</p>').join('');
+      cell.innerHTML=String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+escPK(x)+'</p>').join('');
       const runtime={key:'achievements',nodes:[label,cell],parent:body,runtime:true};
       const contactIndex=pairUnits.findIndex(u=>u.nodes[0]&&/contact/i.test(norm(u.nodes[0].textContent)));
       if(contactIndex>=0){
@@ -1263,7 +1263,7 @@ function epkApplySectionOrder(doc,c){
       const sec=doc.createElement('section');
       sec.className='epk-runtime-section epk-runtime-achievements';
       sec.innerHTML='<div class="epk-runtime-title">Highlights</div>'+
-        String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+nlPK(x)+'</p>').join('');
+        String(c.achievements).split(/\n+/).filter(Boolean).map(x=>'<p>'+escPK(x)+'</p>').join('');
       const anchor=direct(host).find(el=>has(el,'contact')||has(el,'footer')||has(el,'footer-row')||has(el,'sign-off')||has(el,'assets-note'))||null;
       host.insertBefore(sec,anchor||null);
       units=direct(host).map(node=>({key:null,nodes:[node],parent:host,node}));
@@ -1358,7 +1358,7 @@ function buildPKTemplateDocument(artistId){
     '@yourhandle':c.instagram||''
   };
   html=html.replace(/Artist<br\s*\/?>(?:\s*)Name/gi,escPK(c.headline||a.name||'Artist Name'));
-  Object.entries(textMap).forEach(([from,to])=>{if(from.includes('['))return;const newlineAware=/^(Your one-line hook lives here — sum up the sound in a single breath\.|Your one-line hook lives here\.|This is where your bio will live\. Two or three sentences, third person, telling the story so far\.|A great quote about the song from press goes here\.|A GREAT QUOTE ABOUT THE SONG FROM PRESS GOES HERE\.|\"A great quote about the song from press goes here\.\")$/.test(from);html=html.split(from).join(newlineAware?nlPK(to):escPK(to));});
+  Object.entries(textMap).forEach(([from,to])=>{if(from.includes('['))return;html=html.split(from).join(escPK(to));});
   // Tag the actual artist photo element (and only that element) so image_fit/position can be
   // scoped to it later, instead of a global "body img" rule that would affect every image
   // in the template. Runs before the URL replacement below, while the placeholder token is
@@ -1421,7 +1421,7 @@ function buildPKTemplateDocument(artistId){
     html=html.replace(/<[^>]*data-epk-track-meta[^>]*>[\s\S]*?<\/[^>]+>/gi,'');
     html=html.replace(/<li>\s*<\/li>/gi,'');
   }
-  const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||c.website);
+  const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||c.website||c.instagram);
   if(!hasStreaming){
     html=html.replace(/<(section|div)[^>]*class=\"[^\"]*(?:elsewhere|links|listen|social|platforms|connect)[^\"]*\"[^>]*>[\s\S]*?<\/\1>/gi,'');
   }
@@ -1468,7 +1468,7 @@ function buildPKTemplateDocument(artistId){
   // Headshot size only applies where EPK_PHOTO_SIZE_HOOKS supports it (Ledger Sheet, Letterhead Memo).
   // Every other template ignores this entirely, same shared-hook pattern as spacing.
   const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);
-  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';}'+photoRule+spacingRule+sizeRule+'</style>';
+  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';--text-dim:color-mix(in srgb, var(--text) 65%, var(--bg));}'+photoRule+spacingRule+sizeRule+'</style>';
   html=html.replace('</head>',override+'</head>');
   // Ensure every supplied template behaves as a self-contained preview/export document.
   return html;
