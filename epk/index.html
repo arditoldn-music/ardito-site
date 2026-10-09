@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ardito · Press Kit</title><meta name="robots" content="index,follow"><style>html,body{margin:0;padding:0;min-height:100%;background:#111;color:#eee}#app{min-height:100vh}.state{font:14px/1.6 system-ui,sans-serif;max-width:760px;margin:0 auto;padding:80px 24px}.state h1{font-size:24px;margin:0 0 12px}.state p{opacity:.75}.state pre{white-space:pre-wrap;word-break:break-word;margin-top:24px;padding:16px;background:#1b1b1b;border:1px solid #333;border-radius:8px;color:#ccc}.frame{width:100%;min-height:100vh;border:0;display:block}</style><script src="/epk/epk-shared.js?v=20261009d"></script></head><body><div id="app"><div class="state"><h1>Loading press kit…</h1><p>Please wait.</p></div></div><script>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ardito · Press Kit</title><meta name="robots" content="index,follow"><style>html,body{margin:0;padding:0;min-height:100%;background:#111;color:#eee}#app{min-height:100vh}.state{font:14px/1.6 system-ui,sans-serif;max-width:760px;margin:0 auto;padding:80px 24px}.state h1{font-size:24px;margin:0 0 12px}.state p{opacity:.75}.state pre{white-space:pre-wrap;word-break:break-word;margin-top:24px;padding:16px;background:#1b1b1b;border:1px solid #333;border-radius:8px;color:#ccc}.frame{width:100%;min-height:100vh;border:0;display:block}</style><script src="/epk/epk-shared.js?v=20261009e"></script></head><body><div id="app"><div class="state"><h1>Loading press kit…</h1><p>Please wait.</p></div></div><script>
 const SB='https://rtgqiblekgeriehyapnw.supabase.co',KEY='sb_publishable_Tm3TWwYt-M-GINjhWkdkqA_CM98dpzN';
 const DEFAULTS={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',video_url:'',video_title:'',press_label:'',contact_label:'',show_updated:'yes',search_visibility:'hidden',last_updated:'',releases:'',custom_1_title:'',custom_1_text:'',custom_2_title:'',custom_2_text:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:[],section_spacing:'default',headshot_size:'default'};
 function cleanUrl(x){try{const u=new URL(x);if(!/^https?:$/.test(u.protocol))return x;[...u.searchParams.keys()].forEach(k=>{if(/^utm_/i.test(k)||/^(fbclid|igshid|igsh|gclid|mc_cid|mc_eid|si)$/i.test(k))u.searchParams.delete(k);});return u.toString();}catch(e){return x;}}function safeUrl(v){const x=String(v||'').trim();return /^(https?:|mailto:|data:image\/)/i.test(x)?(/^https?:/i.test(x)?cleanUrl(x):x):'';}function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -185,6 +185,7 @@ const pressLabel=String(c.press_label||'').trim(),contactLabel=String(c.contact_
 if(pressLabel){body.querySelectorAll('*').forEach(el=>{if(!isHead(el))return;if(!/^(press|featured in|in the press)$/.test(clean(el.textContent)))return;if(cl(el,'row-num')){const tn=[...el.childNodes].filter(x=>x.nodeType===3);const last=tn[tn.length-1];if(last)last.nodeValue=pressLabel.toUpperCase();}else setText(el,pressLabel);});}
 if(contactLabel){const tw=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let tn;const hits=[];while(tn=tw.nextNode())if(/(Management|Booking & press|For booking and press|Booking and press):/.test(tn.nodeValue))hits.push(tn);hits.forEach(t=>{t.nodeValue=t.nodeValue.replace(/(Management|Booking & press|For booking and press|Booking and press):/,contactLabel.replace(/:\s*$/,'')+':');});}
 if(c.last_updated&&String(c.show_updated||'yes')!=='no'){try{const dt=new Date(String(c.last_updated).slice(0,10)+'T00:00:00');if(!isNaN(dt.getTime())){const up=doc.createElement('p');up.className='epk-updated';up.setAttribute('style','font-size:.75em;opacity:.65;margin:2.4em 0 0');up.textContent='Last updated '+dt.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});let hostEl=null;if(bio&&bio.pair){const cells=body.querySelectorAll('.content-cell');hostEl=cells[cells.length-1];}else if(bio){hostEl=bio.nodes[0].parentElement;}else{const be=body.querySelector('.bio-text,p.bio,.bio');hostEl=be?be.parentElement:(body.querySelector(':scope > .page, :scope > .content, :scope > .wrap')||body);}if(hostEl)hostEl.appendChild(up);}}catch(_e){}}
+{const fc=(typeof epkFontCss==='function')?epkFontCss(c):null;if(fc){fc.links.forEach(h=>{const l=doc.createElement('link');l.setAttribute('rel','stylesheet');l.setAttribute('href',h);doc.head.appendChild(l);});const st=doc.createElement('style');st.id='ardito-epk-fonts';st.textContent=fc.css;doc.head.appendChild(st);}}
 if(bio)bio.head.setAttribute('data-epk-ref-head','1');
 const sc=doc.createElement('script');
 sc.textContent="(function(){try{var r=document.querySelector('[data-epk-ref-head]');if(!r)return;var cs=getComputedStyle(r),bc=getComputedStyle(document.body).color;document.querySelectorAll('.epk-fix,.epk-runtime-title').forEach(function(t){['fontFamily','fontSize','fontWeight','fontStyle','letterSpacing','textTransform','lineHeight'].forEach(function(q){t.style[q]=cs[q];});t.style.color=bc;t.style.marginBottom=cs.marginBottom;t.style.display='block';});}catch(e){}})();";
@@ -513,6 +514,7 @@ document.getElementById('app').innerHTML='<div class="state"><h1>'+esc(title)+'<
 }
 
 (async function(){
+const ONEPAGE=new URLSearchParams(location.search).has('onepage');
 const root=document.getElementById('app'),slug=pkSlug();
 
 if(!slug){
@@ -552,7 +554,7 @@ return;
 let doc;
 
 try{
-doc=build(pk,artist);
+doc=ONEPAGE?epkOnePagerHtml({c:{...DEFAULTS,...(pk.content||{})},name:artist.name,template:pk.template,colors:{...(PK_DEFAULT_COLORS[pk.template]||PK_DEFAULT_COLORS['ardito-signature']||{}),...((pk.theme&&pk.theme[pk.template])||{})}}):build(pk,artist);
 }catch(e){
 diagnosticState('BUILD_FAILED','Press kit unavailable','The EPK document failed while being built.\n\n'+(e&&e.stack?e.stack:String(e)));
 return;
