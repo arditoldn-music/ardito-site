@@ -260,6 +260,8 @@ textarea{resize:vertical;min-height:80px}
 .pk-template-name{font-size:11px;color:var(--cream)}
 .pk-template-key{font-size:9px;color:var(--cdim);margin-top:2px}
 .pk-template-badge{font-size:9px;color:var(--gtext);margin-top:7px}
+.pk-template-swatch.pk-thumb{display:block;height:210px;padding:0;position:relative;overflow:hidden}.pk-thumb-frame{position:absolute;left:0;top:0;width:1100px;height:720px;border:0;transform-origin:0 0;pointer-events:none;background:transparent}
+#pk-hover-preview{position:fixed;z-index:9999;display:none;width:420px;height:560px;overflow:hidden;border-radius:10px;border:1px solid var(--b3);box-shadow:0 24px 70px rgba(0,0,0,.55);background:#222;pointer-events:none}#pk-hover-preview iframe{position:absolute;left:0;top:0;width:1100px;height:1480px;border:0;transform-origin:0 0;transform:scale(.3818)}
 .pk-check{margin-top:10px;font-size:12px;line-height:1.55}.pk-check div{margin:2px 0}.pk-check .fix{color:#e07a6a}.pk-check .warn{color:#d7b25a}.pk-check .ok{color:var(--gtext)}
 .pk-picker>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 0}
 .pk-picker>summary::-webkit-details-marker{display:none}
@@ -741,9 +743,40 @@ function renderPressKits(){
   g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{const pk=getPressKit(a.id),status=pk?.status||'not_started',liveUrl=pk?.status==='published'?epkPublicUrl(a.id):'';return`<div class="li" style="cursor:pointer" onclick="openPressKitEditor(${jsqAttr(a.id)})"><div style="flex:1;min-width:0"><div class="an">${escPK(a.name)}</div><div class="al">${pk?.template?epkLabel(pk.template):'No template chosen yet'}${pk?.public_slug?' · Published URL set':''}</div></div><span class="tag ${PK_STATUS_TAG[status]||'td'}">${escPK(PK_STATUS_LABEL[status]||status)}</span>${liveUrl?`<a href="${escPK(liveUrl)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a><a href="${escPK(liveUrl)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">View Live EPK ↗</a>`:''}<button class="btn bg bsm" onclick="event.stopPropagation();openPressKitEditor(${jsqAttr(a.id)})">${pk?.template?'Edit':'Build'}</button></div>`;}).join('');
 }
 function closePressKitEditor(){document.getElementById('pk-workspace').classList.remove('open');document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-editor-root').innerHTML='';renderPressKits();}
-function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKImageStage(artistId);updatePKPreview(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
-window.pkPickerOpen=window.pkPickerOpen||{};function pkPickerToggle(id,open){window.pkPickerOpen[id]=!!open;}
-function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);const cur=pk&&pk.template?(EPK_TEMPLATES.find(t=>t.key===pk.template)||{}).label:'';const isOpen=!cur||window.pkPickerOpen[artistId];return`<div class="pk-section"><details class="pk-picker" ${isOpen?'open':''} ontoggle="pkPickerToggle(${jsqAttr(artistId)},this.open)"><summary><span class="pk-section-title" style="margin:0;border:0;padding:0">1 · Choose your design</span><span class="pk-picker-current">${cur?escPK(cur)+' · ':''}<span class="pk-picker-action">${cur?'Change':'Pick one'}</span></span></summary><div class="pk-template-grid" style="margin-top:12px">${EPK_TEMPLATES.filter(t=>!t.hidden||(pk&&pk.template===t.key)).map(t=>{const c=(pk?.template===t.key)?getPKColors(artistId):(PK_DEFAULT_COLORS[t.key]||PK_DEFAULT_COLORS['ardito-signature']);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate(${jsqAttr(artistId)},${jsqAttr(t.key)})"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></details></div>`;}
+function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKImageStage(artistId);updatePKPreview(artistId);pkInitThumbs(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
+window.pkPickerOpen=window.pkPickerOpen||{};function pkPickerToggle(id,open){window.pkPickerOpen[id]=!!open;if(open)setTimeout(()=>pkInitThumbs(id),60);}
+function pkInitThumbs(artistId){
+  try{
+    const root=document.getElementById('pk-editor-root');if(!root)return;
+    const thumbs=[...root.querySelectorAll('.pk-thumb[data-tkey]')];if(!thumbs.length)return;
+    const fit=th=>{const f=th.querySelector('.pk-thumb-frame');if(f&&th.clientWidth)f.style.transform='scale('+(th.clientWidth/1100)+')';};
+    const load=th=>{const f=th.querySelector('.pk-thumb-frame');if(!f||f.dataset.loaded)return;f.dataset.loaded='1';
+      const src=buildPKTemplateDocument(artistId,{template:th.dataset.tkey,thumb:true});if(src)f.srcdoc=src;fit(th);};
+    if(!('IntersectionObserver' in window)){thumbs.forEach(load);return;}
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){load(e.target);io.unobserve(e.target);}});},{rootMargin:'300px'});
+    thumbs.forEach(th=>{fit(th);io.observe(th);});
+    if(!window.__pkThumbResize){window.__pkThumbResize=true;window.addEventListener('resize',()=>{document.querySelectorAll('.pk-thumb').forEach(th=>{const f=th.querySelector('.pk-thumb-frame');if(f&&th.clientWidth)f.style.transform='scale('+(th.clientWidth/1100)+')';});});}
+  }catch(e){console.warn('thumbnail preview failed',e);}
+}
+(function(){
+  let panel=null,lastKey='';
+  const get=()=>{if(panel)return panel;panel=document.createElement('div');panel.id='pk-hover-preview';panel.innerHTML='<iframe sandbox="allow-same-origin" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>';document.body.appendChild(panel);return panel;};
+  const hide=()=>{if(panel)panel.style.display='none';};
+  document.addEventListener('mouseover',ev=>{
+    const card=ev.target.closest&&ev.target.closest('.pk-template');if(!card)return;
+    const th=card.querySelector('.pk-thumb[data-tkey]');const fr=th&&th.querySelector('.pk-thumb-frame');if(!fr||!fr.srcdoc)return;
+    const p=get(),big=p.querySelector('iframe');
+    if(lastKey!==th.dataset.tkey){big.srcdoc=fr.srcdoc;lastKey=th.dataset.tkey;}
+    const r=card.getBoundingClientRect(),W=window.innerWidth,H=window.innerHeight;
+    let left=r.right+12;if(left+420>W-8)left=r.left-432;if(left<8)left=Math.max(8,W-432);
+    const top=Math.max(12,Math.min(r.top,H-572));
+    p.style.left=left+'px';p.style.top=top+'px';p.style.display='block';
+  });
+  document.addEventListener('mouseout',ev=>{const card=ev.target.closest&&ev.target.closest('.pk-template');if(!card)return;const to=ev.relatedTarget;if(to&&card.contains(to))return;hide();});
+  window.addEventListener('scroll',hide,true);
+})();
+
+function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);const cur=pk&&pk.template?(EPK_TEMPLATES.find(t=>t.key===pk.template)||{}).label:'';const isOpen=!cur||window.pkPickerOpen[artistId];return`<div class="pk-section"><details class="pk-picker" ${isOpen?'open':''} ontoggle="pkPickerToggle(${jsqAttr(artistId)},this.open)"><summary><span class="pk-section-title" style="margin:0;border:0;padding:0">1 · Choose your design</span><span class="pk-picker-current">${cur?escPK(cur)+' · ':''}<span class="pk-picker-action">${cur?'Change':'Pick one'}</span></span></summary><div class="pk-template-grid" style="margin-top:12px">${EPK_TEMPLATES.filter(t=>!t.hidden||(pk&&pk.template===t.key)).map(t=>{const c=(pk?.template===t.key)?getPKColors(artistId):(PK_DEFAULT_COLORS[t.key]||PK_DEFAULT_COLORS['ardito-signature']);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate(${jsqAttr(artistId)},${jsqAttr(t.key)})"><div class="pk-template-swatch pk-thumb" data-tkey="${escPK(t.key)}" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><iframe class="pk-thumb-frame" sandbox="allow-same-origin" tabindex="-1" aria-hidden="true" scrolling="no" title="${escPK(t.label)} preview"></iframe></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></details></div>`;}
 function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="fg"><label class="fl">${escPK(label)}</label>${type==='textarea'?`<textarea id="${id}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">${escPK(value)}</textarea>`:`<input id="${id}" type="text" value="${escPK(value)}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">`}</div>`;}
 function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
 const PK_SECTION_LABELS={short_bio:'Short bio',bio:'Biography',quote:'Press quote',links:'Links & contact',releases:'Selected releases',achievements:'Highlights'};
@@ -1491,10 +1524,10 @@ function epkApplySectionOrder(doc,c){
   selected.forEach(u=>u.nodes.forEach(n=>body.insertBefore(n,marker)));
   marker.remove();
 }
-function buildPKTemplateDocument(artistId){
-  const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return'';
-  let html=pkTemplateSource(artistId);if(!html)return'';
-  const c=getArtistPKSeed(a),col=getPKColors(artistId),track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
+function buildPKTemplateDocument(artistId,opts){
+  const a=aArt.find(x=>x.id===artistId),pk0=getPressKit(artistId),forced=!!(opts&&opts.template),pk=forced?{...(pk0||{}),template:opts.template}:pk0;if(!a||!pk?.template)return'';
+  let html=forced?(EPK_TEMPLATE_SOURCES[pk.template]||''):pkTemplateSource(artistId);if(!html)return'';
+  const c=getArtistPKSeed(a),col=forced?(PK_DEFAULT_COLORS[pk.template]||PK_DEFAULT_COLORS['ardito-signature']):getPKColors(artistId),track=c.track_title||String(c.releases||'').split('\n').find(Boolean)?.split(' · ')[0]?.trim()||'',year=c.track_year||'',quoteSource=c.quote_source||c.press_contact||'';
   const image=pkSafeUrl(c.image_url), spotify=pkSafeUrl(c.spotify), apple=pkSafeUrl(c.apple_music), soundcloud=pkSafeUrl(c.soundcloud), website=pkSafeUrl(c.website), youtube=pkSafeUrl(c.youtube), tiktok=pkSafeUrl(c.tiktok);
   const imageFit=(c.image_fit==='contain'?'contain':'cover'),imageX=Math.max(0,Math.min(100,Number(c.image_position_x??50)||50)),imageY=Math.max(0,Math.min(100,Number(c.image_position_y??50)||50));
   const hyperfollow=pkSafeUrl(c.hyperfollow||c.distrokid||'');
@@ -1627,6 +1660,7 @@ else{html=html.replace(/(<[^>]*data-epk-track-title[^>]*>[\s\S]*?)(<\/[a-z]+>)/i
   const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);
   const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';--text-dim:color-mix(in srgb, var(--text) 65%, var(--bg));}'+photoRule+spacingRule+sizeRule+EPK_PRINT_CSS+'</style>';
   html=html.replace('</head>',override+'</head>');
+  if(opts&&opts.thumb)html=html.replace(/<iframe[\s\S]*?<\/iframe>/gi,'');
   // Ensure every supplied template behaves as a self-contained preview/export document.
   return html;
 }
