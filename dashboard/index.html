@@ -345,7 +345,7 @@ textarea{resize:vertical;min-height:80px}
 @media(max-width:600px){.page{padding:1.25rem}.pk-template-grid,.pk-color-row,.pk-live-grid{grid-template-columns:1fr}.pk-live-hero,.pk-live-body,.pk-live-footer{padding-left:24px;padding-right:24px}.pk-layout-radial-vinyl .pk-live-card{border-radius:24px;aspect-ratio:auto;min-height:0}.pk-layout-radial-vinyl .pk-live-image{width:100%;border-radius:0}.pk-layout-staggered-sheet .pk-live-name{font-size:3.4rem}.pk-layout-staggered-sheet .pk-live-body{padding-left:24px}}
 
 </style>
-<script src="/epk/epk-shared.js?v=20261009d"></script>
+<script src="/epk/epk-shared.js?v=20261009e"></script>
 </head>
 <body>
 <div id="login">
@@ -694,7 +694,7 @@ function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)
 const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
 const EPK_PUBLIC_BASE='https://ardito.co.uk/epk/';
-const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',video_url:'',video_title:'',press_label:'',contact_label:'',show_updated:'yes',search_visibility:'hidden',last_updated:'',releases:'',custom_1_title:'',custom_1_text:'',custom_2_title:'',custom_2_text:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements'],section_spacing:'default',headshot_size:'default'};
+const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',video_url:'',video_title:'',press_label:'',contact_label:'',show_updated:'yes',search_visibility:'hidden',last_updated:'',font_heading:'default',font_body:'default',heading_weight:'default',body_weight:'default',releases:'',custom_1_title:'',custom_1_text:'',custom_2_title:'',custom_2_text:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements'],section_spacing:'default',headshot_size:'default'};
 let pkDrafts={};
 function pkColorKey(artistId,templateKey){return 'ardito_epk_colors_'+artistId+'_'+(templateKey||'default');}
 function getPKRemoteContent(id){const pk=getPressKit(id);return pk&&pk.content&&typeof pk.content==='object'?pk.content:{};}
@@ -888,7 +888,7 @@ function buildPKEditor(artistId){
   c.image_fit=c.image_fit||'cover'; c.image_position_x=c.image_position_x||50; c.image_position_y=c.image_position_y||50;
    const status=pk?.status||'not_started',tpl=pk?.template||'',colors=tpl?getPKColors(artistId):PK_DEFAULT_COLORS['ardito-signature'],liveUrl=status==='published'?epkPublicUrl(artistId):'';
    let head='<div class="ph" style="margin-bottom:1rem"><div><div class="pt">'+escPK(a.name)+' · EPK Studio</div><div class="ps">Edit once, switch designs freely, preview the real template live and publish when ready.</div></div><div class="pk-actions"><span class="tag '+(PK_STATUS_TAG[status]||'td')+'">'+escPK(PK_STATUS_LABEL[status]||status)+'</span>'+(liveUrl?'<a class="btn bg" href="'+escPK(liveUrl)+'" target="_blank" rel="noopener">View Live EPK ↗</a>':'');
-  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this)">Export PDF</button>';
+  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this)">Export PDF (1 page)</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this,\'full\')">Full PDF</button>';
   head+='</div></div>';
   if(!tpl)return head+buildPKTemplatePicker(artistId)+'<div class="bc" style="padding:1.5rem"><div style="font-family:\'Playfair Display\',serif;font-size:1.1rem;margin-bottom:8px">Start with a template</div><div class="pk-note">Pick a design above. The actual supplied HTML template will be used for the live preview and export.</div></div>';
   let identity='<div class="pk-section"><div class="pk-section-title">2 · Identity</div>';
@@ -939,7 +939,10 @@ function buildPKEditor(artistId){
   const publishLabel=status==='published'?'Republish EPK':'Publish EPK';
   statusHtml+='<div class="pk-actions"><button class="btn bp" onclick="savePKNow(\''+artistId+'\')">Save EPK</button><button class="btn bg" onclick="previewPK(\''+artistId+'\')">Open preview ↗</button><button class="btn bg" onclick="publishPK(\''+artistId+'\')">'+publishLabel+'</button><button class="btn bg" onclick="runPKCheck(\''+artistId+'\')">Check readiness</button></div><div id="pk-check-result" class="pk-check"></div><div class="pk-export-note">Publish makes the EPK public at ardito.co.uk/epk/artist-slug/. The one-time public viewer must be deployed at /epk/. Unpublish removes it from the public page.</div></div>';
   const colours='<div class="pk-section"><div class="pk-section-title">8 · Template colours</div><div class="pk-color-row">'+pkColorField('pk-bg','Background',colors.bg)+pkColorField('pk-ink','Text',colors.ink)+pkColorField('pk-accent','Accent',colors.accent)+'</div><div class="pk-actions" style="margin-top:10px"><button class="btn bg bsm" onclick="resetPKColors(\''+artistId+'\')">Reset template colours</button></div><div class="pk-section-help">HEX values are editable. They are injected into the selected template CSS variables.</div></div>';
-  return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+buildPKSpacingEditor(c)+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
+const fontOpts=sel=>'<option value="default"'+(!sel||sel==='default'?' selected':'')+'>Template default</option>'+['Serif','Sans','Display','Mono','System'].map(cat=>'<optgroup label="'+cat+'">'+EPK_FONT_CHOICES.filter(f=>f.cat===cat).map(f=>'<option value="'+f.key+'"'+(sel===f.key?' selected':'')+'>'+escPK(f.label)+'</option>').join('')+'</optgroup>').join('');
+  const weightOpts=(sel,list)=>list.map(([v,l])=>'<option value="'+v+'"'+((sel||'default')===v?' selected':'')+'>'+l+'</option>').join('');
+  const fontsHtml='<div class="pk-section"><div class="pk-section-title">9 · Fonts</div><div class="fr"><div class="fg"><label class="fl">Heading font</label><select id="pk-font-heading" onchange="updatePKField(this)">'+fontOpts(c.font_heading)+'</select></div><div class="fg"><label class="fl">Heading weight</label><select id="pk-weight-heading" onchange="updatePKField(this)">'+weightOpts(c.heading_weight,[['default','Template default'],['regular','Regular'],['medium','Medium'],['bold','Bold'],['heavy','Extra bold']])+'</select></div></div><div class="fr"><div class="fg"><label class="fl">Body font</label><select id="pk-font-body" onchange="updatePKField(this)">'+fontOpts(c.font_body)+'</select></div><div class="fg"><label class="fl">Body weight</label><select id="pk-weight-body" onchange="updatePKField(this)">'+weightOpts(c.body_weight,[['default','Template default'],['light','Light'],['regular','Regular'],['medium','Medium'],['bold','Bold']])+'</select></div></div><div class="pk-section-help">Changes the fonts for this EPK, on any template. Leave "Template default" to keep the original look. Fonts load from Google Fonts and show in the PDF too.</div></div>';
+  return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+fontsHtml+buildPKSpacingEditor(c)+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
 }
 
 async function uploadPKPdf(artistId,input){
@@ -985,8 +988,8 @@ async function uploadPKPdf(artistId,input){
 
 function updatePKField(el){
   const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
-  const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-c1-title','pk-c1-text','pk-c2-title','pk-c2-text','pk-video-url','pk-video-title','pk-contact-label','pk-press-label','pk-show-updated','pk-visibility','pk-notes'];
-  const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','hyperfollow','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','custom_1_title','custom_1_text','custom_2_title','custom_2_text','video_url','video_title','contact_label','press_label','show_updated','search_visibility','notes'];
+  const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-c1-title','pk-c1-text','pk-c2-title','pk-c2-text','pk-video-url','pk-video-title','pk-contact-label','pk-press-label','pk-show-updated','pk-visibility','pk-font-heading','pk-weight-heading','pk-font-body','pk-weight-body','pk-notes'];
+  const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','hyperfollow','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','custom_1_title','custom_1_text','custom_2_title','custom_2_text','video_url','video_title','contact_label','press_label','show_updated','search_visibility','font_heading','heading_weight','font_body','body_weight','notes'];
   const map={};ids.forEach((id,i)=>{const x=document.getElementById(id);if(x)map[keys[i]]=x.value;});
   savePKContentLocal(artistId,{...getPKContent(artistId),...map});if(map.image_url!==undefined)updatePKImageStage(artistId);updatePKPreview(artistId);queuePKPersist(artistId);
 }
@@ -1233,6 +1236,7 @@ const pressLabel=String(c.press_label||'').trim(),contactLabel=String(c.contact_
 if(pressLabel){body.querySelectorAll('*').forEach(el=>{if(!isHead(el))return;if(!/^(press|featured in|in the press)$/.test(clean(el.textContent)))return;if(cl(el,'row-num')){const tn=[...el.childNodes].filter(x=>x.nodeType===3);const last=tn[tn.length-1];if(last)last.nodeValue=pressLabel.toUpperCase();}else setText(el,pressLabel);});}
 if(contactLabel){const tw=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let tn;const hits=[];while(tn=tw.nextNode())if(/(Management|Booking & press|For booking and press|Booking and press):/.test(tn.nodeValue))hits.push(tn);hits.forEach(t=>{t.nodeValue=t.nodeValue.replace(/(Management|Booking & press|For booking and press|Booking and press):/,contactLabel.replace(/:\s*$/,'')+':');});}
 if(c.last_updated&&String(c.show_updated||'yes')!=='no'){try{const dt=new Date(String(c.last_updated).slice(0,10)+'T00:00:00');if(!isNaN(dt.getTime())){const up=doc.createElement('p');up.className='epk-updated';up.setAttribute('style','font-size:.75em;opacity:.65;margin:2.4em 0 0');up.textContent='Last updated '+dt.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});let hostEl=null;if(bio&&bio.pair){const cells=body.querySelectorAll('.content-cell');hostEl=cells[cells.length-1];}else if(bio){hostEl=bio.nodes[0].parentElement;}else{const be=body.querySelector('.bio-text,p.bio,.bio');hostEl=be?be.parentElement:(body.querySelector(':scope > .page, :scope > .content, :scope > .wrap')||body);}if(hostEl)hostEl.appendChild(up);}}catch(_e){}}
+{const fc=(typeof epkFontCss==='function')?epkFontCss(c):null;if(fc){fc.links.forEach(h=>{const l=doc.createElement('link');l.setAttribute('rel','stylesheet');l.setAttribute('href',h);doc.head.appendChild(l);});const st=doc.createElement('style');st.id='ardito-epk-fonts';st.textContent=fc.css;doc.head.appendChild(st);}}
 if(bio)bio.head.setAttribute('data-epk-ref-head','1');
 const sc=doc.createElement('script');
 sc.textContent="(function(){try{var r=document.querySelector('[data-epk-ref-head]');if(!r)return;var cs=getComputedStyle(r),bc=getComputedStyle(document.body).color;document.querySelectorAll('.epk-fix,.epk-runtime-title').forEach(function(t){['fontFamily','fontSize','fontWeight','fontStyle','letterSpacing','textTransform','lineHeight'].forEach(function(q){t.style[q]=cs[q];});t.style.color=bc;t.style.marginBottom=cs.marginBottom;t.style.display='block';});}catch(e){}})();";
@@ -1667,7 +1671,32 @@ else{html=html.replace(/(<[^>]*data-epk-track-title[^>]*>[\s\S]*?)(<\/[a-z]+>)/i
 function buildPKPreview(artistId){const src=buildPKTemplateDocument(artistId);if(!src)return'<div class="pk-empty-preview">Choose a template to preview this EPK.</div>';return'<iframe class="pk-template-frame" title="EPK live preview" loading="eager" sandbox="allow-scripts allow-same-origin"></iframe>' + '<textarea class="pk-template-src" hidden>'+escPK(src)+'</textarea>';}
 function updatePKPreview(artistId){window.currentPKArtistId=artistId;const el=document.getElementById('pk-preview-'+artistId);if(!el)return;const src=buildPKTemplateDocument(artistId);el.innerHTML='';if(!src){el.innerHTML='<div class="pk-empty-preview">Choose a template to preview this EPK.</div>';return;}const iframe=document.createElement('iframe');iframe.className='pk-template-frame';iframe.title='EPK live preview';iframe.setAttribute('sandbox','allow-scripts allow-same-origin');el.appendChild(iframe);iframe.srcdoc=src;}
 function previewPK(artistId){const src=buildPKTemplateDocument(artistId);if(!src)return;const win=window.open('','_blank');if(!win){alert('Your browser blocked the preview window. Please allow pop-ups for this page.');return;}win.document.open();win.document.write(src);win.document.close();}
-function exportPKPdf(artistId,button){
+function exportPKPdf(artistId,button,mode){
+  if(mode==='full')return exportPKPdfFull(artistId,button);
+  const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return;
+  const c=getArtistPKSeed(a),col=getPKColors(artistId);
+  const originalLabel=button?.textContent||'Export PDF';if(button){button.disabled=true;button.textContent='Preparing PDF…';}
+  const restore=()=>{if(button){button.disabled=false;button.textContent=originalLabel;}};
+  let win=null;
+  try{
+    win=window.open('','_blank');
+    if(!win){restore();alert('Your browser blocked the PDF window. Please allow pop-ups for this page.');return;}
+    const html=epkOnePagerHtml({c:c,name:a.name,template:pk.template,colors:col});
+    win.document.open();win.document.write(html);win.document.close();
+    const go=async()=>{
+      if(win.closed){restore();return;}
+      if(win.document.readyState!=='complete'){await Promise.race([new Promise(r=>win.addEventListener('load',r,{once:true})),new Promise(r=>setTimeout(r,6000))]);}
+      try{if(win.document.fonts&&win.document.fonts.ready)await Promise.race([win.document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);}catch(e){}
+      const images=[...win.document.images];
+      await Promise.race([Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});}))),new Promise(r=>setTimeout(r,10000))]);
+      await new Promise(r=>setTimeout(r,300));
+      if(win.closed){restore();return;}
+      win.focus();win.print();restore();
+    };
+    go().catch(e=>{console.error('One-page PDF failed:',e);try{win.close();}catch(_e){}restore();alert('Could not prepare the one-page PDF. '+(e&&e.message||'Please try again.'));});
+  }catch(e){console.error('One-page PDF failed:',e);try{if(win&&!win.closed)win.close();}catch(_e){}restore();alert('Could not prepare the one-page PDF. '+(e&&e.message||'Please try again.'));}
+}
+function exportPKPdfFull(artistId,button){
   const src=buildPKTemplateDocument(artistId),a=aArt.find(x=>x.id===artistId),c=a?getArtistPKSeed(a):null;
   if(!src||!a)return;
   const originalLabel=button?.textContent||'Export PDF';
@@ -1698,7 +1727,7 @@ function exportPKPdf(artistId,button){
     const waitForReady=async()=>{
       if(win.closed){restore();return;}
       if(win.document.readyState!=='complete'){
-        await new Promise(resolve=>win.addEventListener('load',resolve,{once:true}));
+        await Promise.race([new Promise(resolve=>win.addEventListener('load',resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,6000))]);
       }
       try{if(win.document.fonts?.ready)await win.document.fonts.ready;}catch(e){}
       const images=[...win.document.images];
