@@ -345,7 +345,7 @@ textarea{resize:vertical;min-height:80px}
 @media(max-width:600px){.page{padding:1.25rem}.pk-template-grid,.pk-color-row,.pk-live-grid{grid-template-columns:1fr}.pk-live-hero,.pk-live-body,.pk-live-footer{padding-left:24px;padding-right:24px}.pk-layout-radial-vinyl .pk-live-card{border-radius:24px;aspect-ratio:auto;min-height:0}.pk-layout-radial-vinyl .pk-live-image{width:100%;border-radius:0}.pk-layout-staggered-sheet .pk-live-name{font-size:3.4rem}.pk-layout-staggered-sheet .pk-live-body{padding-left:24px}}
 
 </style>
-<script src="/epk/epk-shared.js?v=20261009e"></script>
+<script src="/epk/epk-shared.js?v=20261009f"></script>
 </head>
 <body>
 <div id="login">
@@ -694,7 +694,7 @@ function getPressKit(artistId){return aPressKits.find(p=>p.artist_id===artistId)
 const PK_STATUS_TAG={not_started:'td',in_progress:'ta',ready:'tg',published:'tg'};
 const PK_STATUS_LABEL={not_started:'Not started',in_progress:'In progress',ready:'Ready to publish',published:'Published'};
 const EPK_PUBLIC_BASE='https://ardito.co.uk/epk/';
-const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',video_url:'',video_title:'',press_label:'',contact_label:'',show_updated:'yes',search_visibility:'hidden',last_updated:'',font_heading:'default',font_body:'default',heading_weight:'default',body_weight:'default',releases:'',custom_1_title:'',custom_1_text:'',custom_2_title:'',custom_2_text:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements'],section_spacing:'default',headshot_size:'default'};
+const PK_DEFAULT_CONTENT={eyebrow:'PRESS KIT',headline:'',location:'',genre:'',short_bio:'',bio:'',quote:'',quote_source:'',achievements:'',image_url:'',website:'',email:'',instagram:'',spotify:'',apple_music:'',soundcloud:'',youtube:'',tiktok:'',hyperfollow:'',press_contact:'',press_email:'',video_url:'',video_title:'',press_label:'',contact_label:'',show_updated:'yes',search_visibility:'hidden',last_updated:'',font_heading:'default',font_body:'default',heading_weight:'default',body_weight:'default',bio_short:'',for_fans_of:'',ask_line:'',listen_url:'',listen_label:'',live_title:'',live_text:'',downloads_text:'',photo_credit:'',booking_name:'',booking_email:'',release_title:'',release_date:'',release_blurb:'',release_credits:'',cover_url:'',releases:'',custom_1_title:'',custom_1_text:'',custom_2_title:'',custom_2_text:'',track_title:'',track_year:'',press_kit_pdf_url:'',notes:'',section_order:['short_bio','bio','quote','links','releases','achievements'],section_spacing:'default',headshot_size:'default'};
 let pkDrafts={};
 function pkColorKey(artistId,templateKey){return 'ardito_epk_colors_'+artistId+'_'+(templateKey||'default');}
 function getPKRemoteContent(id){const pk=getPressKit(id);return pk&&pk.content&&typeof pk.content==='object'?pk.content:{};}
@@ -856,6 +856,22 @@ async function uploadPKImage(artistId,input){
   }catch(e){console.error('EPK photo upload failed:',e);setPKSaveState('Upload failed');alert('Photo upload failed. The Supabase Storage bucket "epk-assets" may need to be created and given upload/public policies. Your existing EPK data has not been changed.');}
   finally{input.value='';}
 }
+async function uploadPKCover(artistId,input){
+  const file=input&&input.files&&input.files[0];if(!file)return;
+  if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){alert('Please choose a JPG, PNG, WebP or GIF image.');input.value='';return;}
+  if(file.size>8*1024*1024){alert('Please keep the cover art under 8 MB.');input.value='';return;}
+  const safeName=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-'),path=`${artistId}/cover-${Date.now()}-${safeName}`,bucket='epk-assets';
+  setPKSaveState('Uploading cover…');
+  try{
+    const r=await fetch(`${SB}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':`Bearer ${currentSession?.access_token||''}`,'Content-Type':file.type,'x-upsert':'true'},body:file});
+    const tx=await r.text();if(!r.ok)throw new Error(tx||r.statusText);
+    const publicUrl=`${SB}/storage/v1/object/public/${bucket}/${path}`;
+    const c=getPKContent(artistId);savePKContentLocal(artistId,{...c,cover_url:publicUrl});
+    const el=document.getElementById('pk-cover-url');if(el)el.value=publicUrl;
+    updatePKPreview(artistId);await persistPKData(artistId);setPKSaveState('Cover uploaded · saved ✓');
+  }catch(e){console.error('EPK cover upload failed:',e);setPKSaveState('Upload failed');alert('Cover upload failed. The Supabase Storage bucket "epk-assets" may need to exist with upload and public policies. Your existing EPK data has not been changed.');}
+  finally{input.value='';}
+}
 let pkImageDragState=null;
 function updatePKImageStage(artistId){
   const c=getPKContent(artistId),stage=document.getElementById('pk-image-stage-'+artistId);if(!stage)return;
@@ -888,7 +904,7 @@ function buildPKEditor(artistId){
   c.image_fit=c.image_fit||'cover'; c.image_position_x=c.image_position_x||50; c.image_position_y=c.image_position_y||50;
    const status=pk?.status||'not_started',tpl=pk?.template||'',colors=tpl?getPKColors(artistId):PK_DEFAULT_COLORS['ardito-signature'],liveUrl=status==='published'?epkPublicUrl(artistId):'';
    let head='<div class="ph" style="margin-bottom:1rem"><div><div class="pt">'+escPK(a.name)+' · EPK Studio</div><div class="ps">Edit once, switch designs freely, preview the real template live and publish when ready.</div></div><div class="pk-actions"><span class="tag '+(PK_STATUS_TAG[status]||'td')+'">'+escPK(PK_STATUS_LABEL[status]||status)+'</span>'+(liveUrl?'<a class="btn bg" href="'+escPK(liveUrl)+'" target="_blank" rel="noopener">View Live EPK ↗</a>':'');
-  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this)">Export PDF (1 page)</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this,\'full\')">Full PDF</button>';
+  if(tpl) head+='<button class="btn bg" onclick="previewPK(\''+artistId+'\')">Preview ↗</button><button class="btn bg" onclick="exportPKHtml(\''+artistId+'\')">Export HTML</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this)">Export PDF (1 page)</button><button class="btn bg" onclick="exportPKPdf(\''+artistId+'\',this,\'full\')">Full PDF</button><button class="btn bg" onclick="exportPKRelease(\''+artistId+'\',this)">Release sheet</button>';
   head+='</div></div>';
   if(!tpl)return head+buildPKTemplatePicker(artistId)+'<div class="bc" style="padding:1.5rem"><div style="font-family:\'Playfair Display\',serif;font-size:1.1rem;margin-bottom:8px">Start with a template</div><div class="pk-note">Pick a design above. The actual supplied HTML template will be used for the live preview and export.</div></div>';
   let identity='<div class="pk-section"><div class="pk-section-title">2 · Identity</div>';
@@ -942,7 +958,30 @@ function buildPKEditor(artistId){
 const fontOpts=sel=>'<option value="default"'+(!sel||sel==='default'?' selected':'')+'>Template default</option>'+['Serif','Sans','Display','Mono','System'].map(cat=>'<optgroup label="'+cat+'">'+(typeof EPK_FONT_CHOICES!=='undefined'?EPK_FONT_CHOICES:[]).filter(f=>f.cat===cat).map(f=>'<option value="'+f.key+'"'+(sel===f.key?' selected':'')+'>'+escPK(f.label)+'</option>').join('')+'</optgroup>').join('');
   const weightOpts=(sel,list)=>list.map(([v,l])=>'<option value="'+v+'"'+((sel||'default')===v?' selected':'')+'>'+l+'</option>').join('');
   const fontsHtml='<div class="pk-section"><div class="pk-section-title">9 · Fonts</div><div class="fr"><div class="fg"><label class="fl">Heading font</label><select id="pk-font-heading" onchange="updatePKField(this)">'+fontOpts(c.font_heading)+'</select></div><div class="fg"><label class="fl">Heading weight</label><select id="pk-weight-heading" onchange="updatePKField(this)">'+weightOpts(c.heading_weight,[['default','Template default'],['regular','Regular'],['medium','Medium'],['bold','Bold'],['heavy','Extra bold']])+'</select></div></div><div class="fr"><div class="fg"><label class="fl">Body font</label><select id="pk-font-body" onchange="updatePKField(this)">'+fontOpts(c.font_body)+'</select></div><div class="fg"><label class="fl">Body weight</label><select id="pk-weight-body" onchange="updatePKField(this)">'+weightOpts(c.body_weight,[['default','Template default'],['light','Light'],['regular','Regular'],['medium','Medium'],['bold','Bold']])+'</select></div></div><div class="pk-section-help">Changes the fonts for this EPK, on any template. Leave "Template default" to keep the original look. Fonts load from Google Fonts and show in the PDF too.'+(typeof EPK_FONT_CHOICES==='undefined'?'<br><b>The fonts list is missing: the templates file (epk/epk-shared.js) on the site is out of date. Deploy it, then hard refresh.</b>':'')+'</div></div>';
-  return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+fontsHtml+buildPKSpacingEditor(c)+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
+  const extraHtml='<div class="pk-section"><div class="pk-section-title">10 · Listen first, short bio and the ask</div>'
+    +pkField('pk-listen-label','Main listen button: label',c.listen_label,'e.g. Baring It All (private link)','updatePKField')
+    +pkField('pk-listen-url','Main listen button: link',c.listen_url,'Private SoundCloud link to the new single','updatePKField')
+    +pkField('pk-fans','For fans of',c.for_fans_of,'Freya Ridings, Ashe, London Grammar','updatePKField')
+    +pkField('pk-ask','The ask (one line)',c.ask_line,'e.g. Booking London shows and support slots from spring 2027','updatePKField')
+    +pkField('pk-bio-short','Short bio (used by the one-page PDF)',c.bio_short,'4 to 5 sentences. If empty, the one-page PDF uses the first two paragraphs of the full bio.','updatePKField','textarea')
+    +'<div class="pk-section-help">The listen button and the Spotify and pre-save links appear in a row near the top of the page. Private links are fine: people with the link can listen.</div></div>'
+    +'<div class="pk-section"><div class="pk-section-title">11 · Live, downloads and contacts</div>'
+    +pkField('pk-live-title','Live section headline',c.live_title,'Live (default)','updatePKField')
+    +pkField('pk-live-text','Live: one line per show',c.live_text,'Fri 27 Nov 2026 · The Long Acre Sessions · London · https://tickets…','updatePKField','textarea')
+    +pkField('pk-downloads','Downloads: one line per link',c.downloads_text,'Press photos (hi-res) · https://drive.google.com/…','updatePKField','textarea')
+    +pkField('pk-photo-credit','Photo credit',c.photo_credit,'Dani Karova','updatePKField')
+    +pkField('pk-booking-name','Booking contact: name',c.booking_name,'Leave empty to show one contact','updatePKField')
+    +pkField('pk-booking-email','Booking contact: email',c.booking_email,'booking@…','updatePKField')
+    +'<div class="pk-section-help">Press contact is the one under Links. When a booking contact is added, the other becomes "Press". Use a Drive or Dropbox folder link for downloads: photos (horizontal, vertical, black and white) and cover art.</div></div>'
+    +'<div class="pk-section"><div class="pk-section-title">12 · Release sheet (one page for a single)</div>'
+    +pkField('pk-rel-title','Release title',c.release_title,'Defaults to the featured track','updatePKField')
+    +pkField('pk-rel-date','Release date',c.release_date,'e.g. 27 November 2026, or Spring 2027','updatePKField')
+    +'<div class="fg"><label class="fl">Cover art</label><input id="pk-cover-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="uploadPKCover(\''+artistId+'\',this)"></div>'
+    +pkField('pk-cover-url','Cover art URL',c.cover_url,'https://…','updatePKField')
+    +pkField('pk-rel-blurb','About the release',c.release_blurb,'2 or 3 short paragraphs. Feeling, not explanation.','updatePKField','textarea')
+    +pkField('pk-rel-credits','Credits: one per line',c.release_credits,'Produced and mixed by Ed Allen','updatePKField','textarea')
+    +'<div class="pk-section-help">Use the "Release sheet" button at the top to export a one-page A4 PDF for radio and press.</div></div>';
+  return head+buildPKTemplatePicker(artistId)+'<div class="pk-layout"><div class="pk-editor"><div class="pk-editor-head"><h3>Edit EPK</h3><div id="pk-save-state" class="pk-save-state">Ready</div></div><div class="pk-editor-body">'+identity+visual+links+story+buildPKOrderEditor(c)+statusHtml+colours+fontsHtml+extraHtml+buildPKSpacingEditor(c)+'</div></div><div class="pk-preview-wrap"><div class="pk-preview-head"><h3>Live preview</h3><div class="pk-preview-tools"><span class="pk-pill">'+escPK(epkLabel(tpl))+'</span><button class="btn bg bsm" onclick="previewPK(\''+artistId+'\')">Open ↗</button></div></div><div class="pk-preview-shell"><div class="pk-preview-device" id="pk-preview-'+artistId+'"></div></div></div></div>';
 }
 
 async function uploadPKPdf(artistId,input){
@@ -988,8 +1027,8 @@ async function uploadPKPdf(artistId,input){
 
 function updatePKField(el){
   const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
-  const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-c1-title','pk-c1-text','pk-c2-title','pk-c2-text','pk-video-url','pk-video-title','pk-contact-label','pk-press-label','pk-show-updated','pk-visibility','pk-font-heading','pk-weight-heading','pk-font-body','pk-weight-body','pk-notes'];
-  const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','hyperfollow','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','custom_1_title','custom_1_text','custom_2_title','custom_2_text','video_url','video_title','contact_label','press_label','show_updated','search_visibility','font_heading','heading_weight','font_body','body_weight','notes'];
+  const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-c1-title','pk-c1-text','pk-c2-title','pk-c2-text','pk-video-url','pk-video-title','pk-contact-label','pk-press-label','pk-show-updated','pk-visibility','pk-font-heading','pk-weight-heading','pk-font-body','pk-weight-body','pk-bio-short','pk-fans','pk-ask','pk-listen-url','pk-listen-label','pk-live-title','pk-live-text','pk-downloads','pk-photo-credit','pk-booking-name','pk-booking-email','pk-rel-title','pk-rel-date','pk-rel-blurb','pk-rel-credits','pk-cover-url','pk-notes'];
+  const keys=['eyebrow','headline','location','genre','short_bio','bio','quote','quote_source','image_url','website','email','press_contact','press_email','instagram','spotify','hyperfollow','apple_music','soundcloud','youtube','tiktok','track_title','track_year','press_kit_pdf_url','releases','achievements','custom_1_title','custom_1_text','custom_2_title','custom_2_text','video_url','video_title','contact_label','press_label','show_updated','search_visibility','font_heading','heading_weight','font_body','body_weight','bio_short','for_fans_of','ask_line','listen_url','listen_label','live_title','live_text','downloads_text','photo_credit','booking_name','booking_email','release_title','release_date','release_blurb','release_credits','cover_url','notes'];
   const map={};ids.forEach((id,i)=>{const x=document.getElementById(id);if(x)map[keys[i]]=x.value;});
   savePKContentLocal(artistId,{...getPKContent(artistId),...map});if(map.image_url!==undefined)updatePKImageStage(artistId);updatePKPreview(artistId);queuePKPersist(artistId);
 }
@@ -1045,11 +1084,14 @@ function pkReadiness(artistId){
   Object.entries(text).forEach(([k,v])=>{const s=t(v);if(!s)return;if(/\[[^\]]*\]|\btbc\b|\btbd\b/i.test(s))fix('The '+k+' still has a placeholder or TBC in it.');if(/Artist Name|Your one-line hook|Track Title|Publication Name|@yourhandle/.test(s))fix('The '+k+' has leftover template text.');if(/\u2014/.test(s))fix('The '+k+' has an em dash.');});
   const email=t(c.press_email||c.email);
   if(!email)fix('No contact email.');else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))fix('The contact email does not look valid.');
-  [['website',c.website],['Spotify',c.spotify],['Apple Music',c.apple_music],['YouTube',c.youtube],['SoundCloud',c.soundcloud],['TikTok',c.tiktok],['pre-save link',c.hyperfollow],['photo',c.image_url],['PDF',c.press_kit_pdf_url],['video',c.video_url]].forEach(([k,v])=>{const s=t(v);if(s&&!/^https?:\/\//i.test(s))fix('The '+k+' link does not start with http.');});
+  [['website',c.website],['Spotify',c.spotify],['Apple Music',c.apple_music],['YouTube',c.youtube],['SoundCloud',c.soundcloud],['TikTok',c.tiktok],['pre-save link',c.hyperfollow],['main listen link',c.listen_url],['cover art',c.cover_url],['photo',c.image_url],['PDF',c.press_kit_pdf_url],['video',c.video_url]].forEach(([k,v])=>{const s=t(v);if(s&&!/^https?:\/\//i.test(s))fix('The '+k+' link does not start with http.');});
   if(t(c.video_url)&&!/youtu(\.be|be\.com)|vimeo\.com/i.test(c.video_url))fix('The video link is not a YouTube or Vimeo link, so it will not show.');
   [1,2].forEach(n=>{if(t(c['custom_'+n+'_title'])&&!t(c['custom_'+n+'_text']))warn('Extra section '+n+' has a headline but no text, so it will not show.');});
   if(!t(c.image_url))warn('No press photo.');
   if(!t(c.short_bio))warn('No one-line hook.');
+  if(!t(c.bio_short))warn('No short bio: the one-page PDF will only show the first two paragraphs of the full bio.');else if(t(c.bio_short).split(/\s+/).length>110)warn('The short bio is over 110 words. Aim for 4 or 5 sentences.');
+  if(!t(c.listen_url)&&!t(c.spotify))warn('Nothing to listen to near the top: add a main listen link.');
+  if(!t(c.live_text)&&!t(c.video_url))warn('No live proof: add a live clip or some dates.');
   if(bio&&bio.length<250)warn('The bio is very short.');
   if(bio.length>600&&!/\n\s*\n/.test(bio))warn('The bio is one long block. Add blank lines between paragraphs.');
   if(!t(c.spotify))warn('No Spotify link.');
@@ -1089,7 +1131,7 @@ function resetPKColors(artistId){const pk=getPressKit(artistId);if(!pk?.template
 async function savePKNow(artistId){await persistPKData(artistId);setPKSaveState('Saved ✓');}
 function pkLink(label,url){if(!url)return'';const href=/^https?:\/\//i.test(url)?url:'https://'+url.replace(/^@/,'');return`<a class="pk-live-link" href="${escPK(href)}" target="_blank" rel="noopener">${escPK(label)} ↗</a>`;}
 function pkSectionHtml(key,c,artistId){if(key==='short_bio'&&c.short_bio)return`<section class="pk-live-section"><div class="pk-live-short">${nlPK(c.short_bio)}</div></section>`;if(key==='bio'&&c.bio)return`<section class="pk-live-section"><div class="pk-live-label">Biography</div><div class="pk-live-bio">${nlPK(c.bio)}</div></section>`;if(key==='quote'&&c.quote)return`<section class="pk-live-section"><div class="pk-live-quote">${nlPK(c.quote)}</div></section>`;if(key==='links'){const links=[pkLink('Website',c.website),pkLink('Email',c.email),pkLink('Instagram',c.instagram),pkLink('Spotify',c.spotify),pkLink('Apple Music',c.apple_music),pkLink('SoundCloud',c.soundcloud),pkLink('YouTube',c.youtube),pkLink('TikTok',c.tiktok)].join('');return links?`<section class="pk-live-section"><div class="pk-live-label">Listen / connect</div><div class="pk-live-grid">${links}</div></section>`:'';}if(key==='releases'){const rels=(c.releases||pkReleasesText(artistId)).split('\n').filter(Boolean);return rels.length?`<section class="pk-live-section"><div class="pk-live-label">Selected releases</div>${rels.map(r=>`<div class="pk-live-release">${nlPK(r)}</div>`).join('')}</section>`:'';}if(key==='achievements'&&c.achievements)return`<section class="pk-live-section"><div class="pk-live-label">Highlights</div><div class="pk-live-highlights">${nlPK(c.achievements)}</div></section>`;return'';}
-function epkCleanUrl(x){try{const u=new URL(x);if(!/^https?:$/.test(u.protocol))return x;[...u.searchParams.keys()].forEach(k=>{if(/^utm_/i.test(k)||/^(fbclid|igshid|igsh|gclid|mc_cid|mc_eid|si)$/i.test(k))u.searchParams.delete(k);});return u.toString();}catch(e){return x;}}
+function epkCleanUrl(x){try{const u=new URL(x);if(!/^https?:$/.test(u.protocol))return x;const h=u.hostname.replace(/^www\./,'');if(/(^|\.)(tiktok\.com|instagram\.com|open\.spotify\.com|linktr\.ee|facebook\.com)$/.test(h)||(/(^|\.)youtube\.com$/.test(h)&&/^\/(@|channel\/|c\/|user\/)/.test(u.pathname))){u.search='';return u.toString();}[...u.searchParams.keys()].forEach(k=>{if(/^utm_/i.test(k)||/^(fbclid|igshid|igsh|gclid|mc_cid|mc_eid|si|_r|_t|is_from_webapp|sender_device)$/i.test(k))u.searchParams.delete(k);});return u.toString();}catch(e){return x;}}
 function pkSafeUrl(v){const x=String(v||'').trim();if(!x)return'';return /^(https?:|mailto:)/i.test(x)?(/^https?:/i.test(x)?epkCleanUrl(x):x):'';}
 function epkSlugify(name){return String(name||'artist').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'artist';}
 function epkPublicUrl(artistId){const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId),slug=pk?.public_slug||epkSlugify(a?.name);if(!a||!slug)return'';return EPK_PUBLIC_BASE+encodeURIComponent(slug)+'/'; }
@@ -1100,7 +1142,7 @@ function pkSlug(){const p=new URLSearchParams(location.search);let s=(p.get('art
 async function api(path){const r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:KEY,Authorization:'Bearer '+KEY}});const t=await r.text();if(!r.ok)throw new Error(t||r.statusText);return t?JSON.parse(t):[];}
 const EPK_ACHIEVEMENTS_PLACEHOLDER='A key stat · a placement or credit · anything else worth flagging';
 const EPK_ICONS={Website:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>',Instagram:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>',Spotify:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7 10.2c3.8-1 7.1-.5 10 1M7.7 13c3-.8 5.8-.4 8.2.8M8.5 15.7c2-.5 3.9-.2 5.6.6"/></svg>',"Apple Music":'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4v12.2a3.3 3.3 0 1 1-1.7-2.9V6.2l7-1.6v10.6a3.3 3.3 0 1 1-1.7-2.9V4.6L15 5.4z"/></svg>',SoundCloud:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15.5h1M7 15.5h1M10 15.5h1M13 15.5h1M16 15.5h.5a3.5 3.5 0 1 0-1-6.8 5 5 0 0 0-9.5 2.1A3 3 0 0 0 6 16h12"/></svg>',YouTube:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12s0-4.5-1.1-5.8C18.8 5 12 5 12 5s-6.8 0-7.9 1.2C3 7.5 3 12 3 12s0 4.5 1.1 5.8C5.2 19 12 19 12 19s6.8 0 7.9-1.2C21 16.5 21 12 21 12z"/><path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none"/></svg>',TikTok:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v10.2a3.8 3.8 0 1 1-2.5-3.6V7.1c1.2 1.6 2.8 2.6 5 2.8V7.3c-1.2-.2-2.1-1.3-2.5-3.3z"/></svg>',Hyperfollow:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 12.5 12 16l3.5-3.5M12 4v12M5 19h14"/></svg>'};
-function epkSocialHtml(c){const defs=[['Website',c.website],['Instagram',c.instagram],['Spotify',c.spotify],['Apple Music',c.apple_music],['SoundCloud',c.soundcloud],['YouTube',c.youtube],['TikTok',c.tiktok],['Hyperfollow',c.hyperfollow||c.distrokid]];const items=defs.map(([label,value])=>{const href=publicHref(label,value);return href?'<a class="epk-social-link" href="'+escPK(href)+'" target="_blank" rel="noopener noreferrer" aria-label="'+escPK(label)+'">'+EPK_ICONS[label]+'<span>'+escPK(label)+'</span></a>':''}).join('');return items?'<div class="epk-social-links" aria-label="Listen and follow">'+items+'</div>':'';}
+function epkSocialHtml(c){const defs=[['Spotify',c.spotify],['Instagram',c.instagram],['YouTube',c.youtube],['Apple Music',c.apple_music],['SoundCloud',c.soundcloud],['TikTok',c.tiktok],['Website',c.website],['Hyperfollow',c.hyperfollow||c.distrokid]];const items=defs.map(([label,value])=>{const href=publicHref(label,value);return href?'<a class="epk-social-link" href="'+escPK(href)+'" target="_blank" rel="noopener noreferrer" aria-label="'+escPK(label)+'">'+EPK_ICONS[label]+'<span>'+escPK(label)+'</span></a>':''}).join('');return items?'<div class="epk-social-links" aria-label="Listen and follow">'+items+'</div>':'';}
 function epkPostProcess(html,c){const doc=new DOMParser().parseFromString(html,'text/html');const body=doc.body;const normalize=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();const ach=String(c.achievements||'').trim();const placeholder=normalize(EPK_ACHIEVEMENTS_PLACEHOLDER);if(!ach){[...body.querySelectorAll('*')].filter(el=>normalize(el.textContent).includes(placeholder)).forEach(el=>{let block=el.closest('section,[class*="stats"],[class*="highlight"],[class*="achievement"]');if(!block){for(let n=el;n&&n!==body;n=n.parentElement){if(n.parentElement===body)break;if(/^(section|article|div)$/i.test(n.tagName)&&normalize(n.textContent).length<500){block=n;break;}}}if(block&&block!==body)block.remove();});[...body.querySelectorAll('section,div,article')].filter(el=>/\b(highlights?|achievements?)\b/i.test(normalize(el.textContent).split(' ').slice(0,8).join(' '))&&!normalize(el.textContent).includes(placeholder)&&!el.querySelector('[data-epk-achievements]')).forEach(()=>{});}else{[...body.querySelectorAll('*')].filter(el=>normalize(el.textContent).includes(placeholder)).forEach(el=>{if(el.children.length===0)epkSetLines(el,ach,doc);else{const walker=doc.createTreeWalker(el,NodeFilter.SHOW_TEXT);const nodes=[];let n;while(n=walker.nextNode())nodes.push(n);const first=nodes.find(t=>normalize(t.nodeValue).includes('a key stat'));if(first){const strong=first.parentElement&&first.parentElement.closest('strong');if(strong){epkSetLines(strong,ach,doc);nodes.filter(t=>t!==first&&t.parentNode).forEach(t=>{if(normalize(t.nodeValue).includes('· a placement or credit · anything else worth flagging'))t.remove();});}}}});}
 const social=epkSocialHtml(c);let target=null;
 if(social){
@@ -1141,7 +1183,7 @@ if(social){
   if(target){target.classList.add('epk-runtime-social');target.innerHTML=social;}
 }
 const email=String(c.press_email||c.email||'').trim().replace(/^mailto:/i,'').toLowerCase();if(email){const same=[...body.querySelectorAll('a[href^="mailto:"]')].filter(a=>a.getAttribute('href').replace(/^mailto:/i,'').toLowerCase()===email);if(same.length>1){const keep=same.find(a=>a.closest('.contact,[class*="contact"],[class*="management"],[class*="press"]'))||same[0];same.forEach(a=>{if(a!==keep){const parent=a.parentElement;a.remove();if(parent&&normalize(parent.textContent)==='')parent.remove();}});}}
-body.querySelectorAll('[data-epk-internal-notes],.internal-notes').forEach(el=>el.remove());body.querySelectorAll('*').forEach(el=>{if(/internal notes/i.test(normalize(el.textContent))&&normalize(el.textContent).length<300)el.remove();});epkApplySectionOrder(doc,c);epkExtras(doc,c);const style=doc.createElement('style');style.textContent='.epk-social-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.75rem}.epk-social-link{display:inline-flex!important;align-items:center;gap:.45rem;padding:.48rem .68rem;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:999px;text-decoration:none!important;color:inherit!important;font:inherit;font-size:.82em;line-height:1;transition:transform .15s ease,background .15s ease}.epk-social-link:hover{transform:translateY(-1px);background:color-mix(in srgb,currentColor 9%,transparent)}.epk-social-link svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}.epk-needs-style{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.78em;margin:2.4em 0 .8em}.epk-extra-section{margin:2.4em 0}.ardito-spotify-embed{max-width:100%!important;min-width:0!important;width:100%!important;flex:1 1 100%!important}.top:has(.ardito-spotify-embed),.track-top:has(.ardito-spotify-embed){flex-wrap:wrap}html,body{overflow-wrap:anywhere}html{overflow-x:clip}.track-list li{padding-top:7px!important;padding-bottom:7px!important}@media print{.epk-video{display:none}}';doc.head.appendChild(style);return'<!doctype html>\n'+doc.documentElement.outerHTML;}
+body.querySelectorAll('[data-epk-internal-notes],.internal-notes').forEach(el=>el.remove());body.querySelectorAll('*').forEach(el=>{if(/internal notes/i.test(normalize(el.textContent))&&normalize(el.textContent).length<300)el.remove();});epkApplySectionOrder(doc,c);epkExtras(doc,c);const style=doc.createElement('style');style.textContent='.epk-social-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.75rem}.epk-social-link{display:inline-flex!important;align-items:center;gap:.45rem;padding:.48rem .68rem;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:999px;text-decoration:none!important;color:inherit!important;font:inherit;font-size:.82em;line-height:1;transition:transform .15s ease,background .15s ease}.epk-social-link:hover{transform:translateY(-1px);background:color-mix(in srgb,currentColor 9%,transparent)}.epk-social-link svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}.epk-needs-style{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.78em;margin:2.4em 0 .8em}.epk-extra-section{margin:2.4em 0}.epk-listen-first{margin-top:14px}.epk-listen-primary{background:var(--accent)!important;color:var(--bg)!important;border-color:var(--accent)!important}.epk-listen-primary span{font-weight:600}.epk-list p:last-child{margin-bottom:0}.ardito-spotify-embed{max-width:100%!important;min-width:0!important;width:100%!important;flex:1 1 100%!important}.top:has(.ardito-spotify-embed),.track-top:has(.ardito-spotify-embed){flex-wrap:wrap}html,body{overflow-wrap:anywhere}html{overflow-x:clip}.track-list li{padding-top:7px!important;padding-bottom:7px!important}@media print{.epk-video{display:none}}';doc.head.appendChild(style);return'<!doctype html>\n'+doc.documentElement.outerHTML;}
 function epkExtras(doc,c){try{
 const body=doc.body;
 const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
@@ -1182,13 +1224,19 @@ return'';};
 const mkVideo=src=>{const w=doc.createElement('div');w.className='epk-video';w.setAttribute('style','position:relative;width:100%;aspect-ratio:16/9;background:#000');const f=doc.createElement('iframe');f.setAttribute('src',src);f.setAttribute('title','Video');f.setAttribute('loading','lazy');f.setAttribute('allowfullscreen','');f.setAttribute('referrerpolicy','strict-origin-when-cross-origin');f.setAttribute('style','position:absolute;inset:0;width:100%;height:100%;border:0');w.appendChild(f);return w;};
 let lastFallback=null;
 const items=[];
+const isU=x=>/^https?:\/\//i.test(x);
+const mkEntries=txt=>String(txt||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const q=l.split(' \u00b7 ').map(x=>x.trim()).filter(Boolean);const url=q.find(isU)||'';const rest=q.filter(x=>!isU(x)).join(' \u00b7 ');return {text:rest||url,url:url?(publicHref('Link',url)||''):''};});
+const mkList=entries=>{const w=doc.createElement('div');w.className='epk-list';entries.forEach(en=>{const p=doc.createElement('p');p.setAttribute('style','margin:0 0 .5em');if(en.url){const a=doc.createElement('a');a.setAttribute('href',en.url);a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');a.textContent=en.text;p.appendChild(a);}else{p.textContent=en.text;}if(en.strong)p.style.fontWeight='600';if(en.dim)p.style.opacity='.7';w.appendChild(p);});return w;};
+
 const achText=String(c.achievements||'').trim();
 if(achText){const first=norm(achText.split(/\r?\n/).find(x=>x.trim())||'').slice(0,28);if(first&&!norm(body.textContent).includes(first))items.push({title:'Highlights',text:achText});}
+{const ask=String(c.ask_line||'').trim(),liveE=mkEntries(c.live_text);if(ask||liveE.length){const ents=(ask?[{text:ask,strong:true}]:[]).concat(liveE);items.push({title:String(c.live_title||'').trim()||'Live',text:'',build:()=>mkList(ents)});}}
+{const dl=mkEntries(c.downloads_text),cr=String(c.photo_credit||'').trim().replace(/^photo:?\s*/i,'');if(dl.length||cr){const ents=dl.concat(cr?[{text:'Photo: '+cr,dim:true}]:[]);items.push({title:'Downloads',text:'',build:()=>mkList(ents)});}}
 {const vid=videoEmbed(c.video_url);if(vid)items.push({title:String(c.video_title||'').trim()||'Watch',text:'',video:vid});}
 [1,2].forEach(n=>items.push({title:String(c['custom_'+n+'_title']||'').trim(),text:String(c['custom_'+n+'_text']||'').trim()}));
 items.forEach(it=>{
 const title=it.title,text=it.text;
-if(!text&&!it.video)return;
+if(!text&&!it.video&&!it.build)return;
 const paras=text.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
 const fill=el=>{el.textContent='';paras.forEach((pp,pi)=>{if(pi){el.appendChild(doc.createElement('br'));el.appendChild(doc.createElement('br'));}pp.split(/\r?\n/).forEach((l,i)=>{if(i)el.appendChild(doc.createElement('br'));el.appendChild(doc.createTextNode(l));});});};
 let nodes,parent;
@@ -1203,13 +1251,13 @@ let p=holder.querySelector('p')||holder.querySelector('.bio-text');
 if(!p){p=doc.createElement('p');holder.appendChild(p);}
 holder.querySelectorAll('p').forEach(e=>{if(e!==p)e.remove();});
 fill(p);
-if(it.video)p.replaceWith(mkVideo(it.video));
+if(it.video)p.replaceWith(mkVideo(it.video));else if(it.build)p.replaceWith(it.build());
 parent=bio.nodes[0].parentElement;
 }else{
 const bioEl=body.querySelector('.bio-text,p.bio,.bio');
 const sec=doc.createElement('section');sec.className='epk-extra-section';
 if(title)sec.appendChild(mkHead(title));
-const p=doc.createElement('p');if(bioEl&&bioEl.tagName==='P')p.className=bioEl.className;fill(p);sec.appendChild(it.video?mkVideo(it.video):p);
+const p=doc.createElement('p');if(bioEl&&bioEl.tagName==='P')p.className=bioEl.className;fill(p);sec.appendChild(it.video?mkVideo(it.video):(it.build?it.build():p));
 nodes=[sec];
 if(bioEl){parent=bioEl.parentElement;const endEl=[...parent.children].find(ch=>/(^|[\s_-])(enclosure|sign-off|contact|footer)/.test(String(ch.getAttribute('class')||'').toLowerCase()));if(endEl){parent.insertBefore(sec,endEl);}else{const ref=lastFallback&&lastFallback.parentElement===parent?lastFallback:bioEl;parent.insertBefore(sec,ref.nextSibling);}lastFallback=sec;return;}
 parent=body.querySelector(':scope > .page, :scope > .content')||body;
@@ -1224,15 +1272,23 @@ if(bio&&cl(bio.head,'row-num')&&(String(c.custom_1_text||'').trim()||String(c.cu
 if(pc||pe){const tw2=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let t2;const nodes2=[];while(t2=tw2.nextNode())nodes2.push(t2);
 nodes2.forEach(t=>{if(pc&&t.nodeValue.indexOf('Laura, Ardito')>-1)t.nodeValue=t.nodeValue.replace('Laura, Ardito',pc);if(pe&&t.nodeValue.indexOf('ardito.ldn@gmail.com')>-1)t.nodeValue=t.nodeValue.replace('ardito.ldn@gmail.com',pe);});
 if(pe)body.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(/ardito\.ldn@gmail\.com/i.test(a.getAttribute('href')))a.setAttribute('href','mailto:'+pe);});}}
+{const bn=String(c.booking_name||'').trim(),be=String(c.booking_email||'').trim().replace(/^mailto:/i,'');
+if(bn||be){const ms=[...body.querySelectorAll('a[href^="mailto:"]')],mailA=ms[ms.length-1];
+if(mailA){const blk=mailA.closest('p,div,li')||mailA.parentNode;const np=blk.cloneNode(false);np.classList.add('epk-booking');np.appendChild(doc.createTextNode('Booking: '+bn+(bn&&be?' ':'')));if(be){const a=doc.createElement('a');a.setAttribute('href','mailto:'+be);a.textContent=be;np.appendChild(a);}blk.parentNode.insertBefore(np,blk.nextSibling);}}}
 {const parts=[String(c.location||'').trim(),String(c.short_bio||'').trim()?String(c.genre||'').trim():''].filter(Boolean);
 if(parts.length){const hookEl=body.querySelector('.hook,[class*="hook"],.tagline,.standfirst');const anchorEl=hookEl||body.querySelector('h1');
 if(anchorEl&&anchorEl.parentNode){const m=doc.createElement('p');m.className='epk-meta';m.setAttribute('style','font-size:.78em;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin:10px 0 0;overflow-wrap:anywhere');m.textContent=parts.join('  \u00b7  ');anchorEl.parentNode.insertBefore(m,anchorEl.nextSibling);}}}
+{const ff=String(c.for_fans_of||'').trim();if(ff){const a0=body.querySelector('.epk-meta')||body.querySelector('.hook,[class*="hook"],.tagline,.standfirst')||body.querySelector('h1');if(a0&&a0.parentNode){const f=doc.createElement('p');f.className='epk-fans';f.setAttribute('style','font-size:.86em;opacity:.85;margin:8px 0 0;overflow-wrap:anywhere');f.textContent='For fans of '+ff.replace(/^for fans of\s*/i,'');a0.parentNode.insertBefore(f,a0.nextSibling);}}}
+{const lu=publicHref('Listen',c.listen_url),dL=[];if(lu)dL.push({label:String(c.listen_label||'').trim()||'Listen',href:lu,primary:true});
+[['Spotify',c.spotify],['YouTube',c.youtube],['Hyperfollow',c.hyperfollow||c.distrokid]].forEach(([l,v])=>{const h=publicHref(l,v);if(h&&h!==lu)dL.push({label:l==='Hyperfollow'?'Pre-save':l,href:h,icon:l});});
+if(dL.length){const anchorEl=body.querySelector('.epk-fans')||body.querySelector('.epk-meta')||body.querySelector('.hook,[class*="hook"],.tagline,.standfirst')||body.querySelector('h1');
+if(anchorEl&&anchorEl.parentNode){const row=doc.createElement('div');row.className='epk-social-links epk-listen-first';dL.forEach(x=>{const a=doc.createElement('a');a.className='epk-social-link'+(x.primary?' epk-listen-primary':'');a.setAttribute('href',x.href);a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');if(x.icon&&typeof EPK_ICONS!=='undefined'&&EPK_ICONS[x.icon])a.innerHTML=EPK_ICONS[x.icon];const sp=doc.createElement('span');sp.textContent=x.label;a.appendChild(sp);row.appendChild(a);});anchorEl.parentNode.insertBefore(row,anchorEl.nextSibling);}}}
 {const row=body.querySelector('.links-row');
 if(row&&!body.querySelector('.epk-runtime-social')){const proto=row.querySelector('a');
-const defs=[['Website',c.website],['Instagram',c.instagram],['Spotify',c.spotify],['Apple Music',c.apple_music],['YouTube',c.youtube],['SoundCloud',c.soundcloud],['TikTok',c.tiktok],['Pre-save',c.hyperfollow||c.distrokid]];
+const defs=[['Spotify',c.spotify],['Instagram',c.instagram],['YouTube',c.youtube],['Apple Music',c.apple_music],['SoundCloud',c.soundcloud],['TikTok',c.tiktok],['Website',c.website],['Pre-save',c.hyperfollow||c.distrokid]];
 const made=[];defs.forEach(([label,v])=>{const href=publicHref(label==='Pre-save'?'Hyperfollow':label,v);if(!href)return;const a=proto?proto.cloneNode(false):doc.createElement('a');a.setAttribute('href',href);a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');a.textContent=label;made.push(a);});
 if(proto||made.length){row.textContent='';made.forEach(a=>row.appendChild(a));}}}
-const pressLabel=String(c.press_label||'').trim(),contactLabel=String(c.contact_label||'').trim();
+const pressLabel=String(c.press_label||'').trim(),contactLabel=String(c.contact_label||'').trim()||((String(c.booking_name||'').trim()||String(c.booking_email||'').trim())?'Press':'');
 if(pressLabel){body.querySelectorAll('*').forEach(el=>{if(!isHead(el))return;if(!/^(press|featured in|in the press)$/.test(clean(el.textContent)))return;if(cl(el,'row-num')){const tn=[...el.childNodes].filter(x=>x.nodeType===3);const last=tn[tn.length-1];if(last)last.nodeValue=pressLabel.toUpperCase();}else setText(el,pressLabel);});}
 if(contactLabel){const tw=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let tn;const hits=[];while(tn=tw.nextNode())if(/(Management|Booking & press|For booking and press|Booking and press):/.test(tn.nodeValue))hits.push(tn);hits.forEach(t=>{t.nodeValue=t.nodeValue.replace(/(Management|Booking & press|For booking and press|Booking and press):/,contactLabel.replace(/:\s*$/,'')+':');});}
 if(c.last_updated&&String(c.show_updated||'yes')!=='no'){try{const dt=new Date(String(c.last_updated).slice(0,10)+'T00:00:00');if(!isNaN(dt.getTime())){const up=doc.createElement('p');up.className='epk-updated';up.setAttribute('style','font-size:.75em;opacity:.65;margin:2.4em 0 0');up.textContent='Last updated '+dt.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});let hostEl=null;if(bio&&bio.pair){const cells=body.querySelectorAll('.content-cell');hostEl=cells[cells.length-1];}else if(bio){hostEl=bio.nodes[0].parentElement;}else{const be=body.querySelector('.bio-text,p.bio,.bio');hostEl=be?be.parentElement:(body.querySelector(':scope > .page, :scope > .content, :scope > .wrap')||body);}if(hostEl)hostEl.appendChild(up);}}catch(_e){}}
@@ -1696,6 +1752,30 @@ function exportPKPdf(artistId,button,mode){
     };
     go().catch(e=>{console.error('One-page PDF failed:',e);try{win.close();}catch(_e){}restore();alert('Could not prepare the one-page PDF. '+(e&&e.message||'Please try again.'));});
   }catch(e){console.error('One-page PDF failed:',e);try{if(win&&!win.closed)win.close();}catch(_e){}restore();alert('Could not prepare the one-page PDF. '+(e&&e.message||'Please try again.'));}
+}
+function exportPKRelease(artistId,button){
+  const a=aArt.find(x=>x.id===artistId),pk=getPressKit(artistId);if(!a||!pk?.template)return;
+  if(typeof epkReleaseSheetHtml!=='function'){alert('The release sheet needs the latest epk/epk-shared.js on the site. Deploy that file and hard refresh.');return;}
+  const c=getArtistPKSeed(a),col=getPKColors(artistId);
+  const originalLabel=button?.textContent||'Release sheet';if(button){button.disabled=true;button.textContent='Preparing…';}
+  const restore=()=>{if(button){button.disabled=false;button.textContent=originalLabel;}};
+  let win=null;
+  try{
+    win=window.open('','_blank');
+    if(!win){restore();alert('Your browser blocked the PDF window. Please allow pop-ups for this page.');return;}
+    win.document.open();win.document.write(epkReleaseSheetHtml({c:c,name:a.name,template:pk.template,colors:col}));win.document.close();
+    const go=async()=>{
+      if(win.closed){restore();return;}
+      if(win.document.readyState!=='complete'){await Promise.race([new Promise(r=>win.addEventListener('load',r,{once:true})),new Promise(r=>setTimeout(r,6000))]);}
+      try{if(win.document.fonts&&win.document.fonts.ready)await Promise.race([win.document.fonts.ready,new Promise(r=>setTimeout(r,5000))]);}catch(e){}
+      const images=[...win.document.images];
+      await Promise.race([Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.addEventListener('load',r,{once:true});img.addEventListener('error',r,{once:true});}))),new Promise(r=>setTimeout(r,10000))]);
+      await new Promise(r=>setTimeout(r,300));
+      if(win.closed){restore();return;}
+      win.focus();win.print();restore();
+    };
+    go().catch(e=>{console.error('Release sheet failed:',e);try{win.close();}catch(_e){}restore();alert('Could not prepare the release sheet. '+(e&&e.message||'Please try again.'));});
+  }catch(e){console.error('Release sheet failed:',e);try{if(win&&!win.closed)win.close();}catch(_e){}restore();alert('Could not prepare the release sheet. '+(e&&e.message||'Please try again.'));}
 }
 function exportPKPdfFull(artistId,button){
   const src=buildPKTemplateDocument(artistId),a=aArt.find(x=>x.id===artistId),c=a?getArtistPKSeed(a):null;
