@@ -343,7 +343,7 @@ textarea{resize:vertical;min-height:80px}
 @media(max-width:600px){.page{padding:1.25rem}.pk-template-grid,.pk-color-row,.pk-live-grid{grid-template-columns:1fr}.pk-live-hero,.pk-live-body,.pk-live-footer{padding-left:24px;padding-right:24px}.pk-layout-radial-vinyl .pk-live-card{border-radius:24px;aspect-ratio:auto;min-height:0}.pk-layout-radial-vinyl .pk-live-image{width:100%;border-radius:0}.pk-layout-staggered-sheet .pk-live-name{font-size:3.4rem}.pk-layout-staggered-sheet .pk-live-body{padding-left:24px}}
 
 </style>
-<script src="/epk/epk-shared.js"></script>
+<script src="/epk/epk-shared.js?v=20261009d"></script>
 </head>
 <body>
 <div id="login">
@@ -743,7 +743,7 @@ function renderPressKits(){
 function closePressKitEditor(){document.getElementById('pk-workspace').classList.remove('open');document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-editor-root').innerHTML='';renderPressKits();}
 function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;root.innerHTML=buildPKEditor(artistId);updatePKImageStage(artistId);updatePKPreview(artistId);root.scrollIntoView({behavior:'smooth',block:'start'});}
 window.pkPickerOpen=window.pkPickerOpen||{};function pkPickerToggle(id,open){window.pkPickerOpen[id]=!!open;}
-function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);const cur=pk&&pk.template?(EPK_TEMPLATES.find(t=>t.key===pk.template)||{}).label:'';const isOpen=!cur||window.pkPickerOpen[artistId];return`<div class="pk-section"><details class="pk-picker" ${isOpen?'open':''} ontoggle="pkPickerToggle(${jsqAttr(artistId)},this.open)"><summary><span class="pk-section-title" style="margin:0;border:0;padding:0">1 · Choose your design</span><span class="pk-picker-current">${cur?escPK(cur)+' · ':''}<span class="pk-picker-action">${cur?'Change':'Pick one'}</span></span></summary><div class="pk-template-grid" style="margin-top:12px">${EPK_TEMPLATES.map(t=>{const c=(pk?.template===t.key)?getPKColors(artistId):(PK_DEFAULT_COLORS[t.key]||PK_DEFAULT_COLORS['ardito-signature']);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate(${jsqAttr(artistId)},${jsqAttr(t.key)})"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></details></div>`;}
+function buildPKTemplatePicker(artistId){const pk=getPressKit(artistId);const cur=pk&&pk.template?(EPK_TEMPLATES.find(t=>t.key===pk.template)||{}).label:'';const isOpen=!cur||window.pkPickerOpen[artistId];return`<div class="pk-section"><details class="pk-picker" ${isOpen?'open':''} ontoggle="pkPickerToggle(${jsqAttr(artistId)},this.open)"><summary><span class="pk-section-title" style="margin:0;border:0;padding:0">1 · Choose your design</span><span class="pk-picker-current">${cur?escPK(cur)+' · ':''}<span class="pk-picker-action">${cur?'Change':'Pick one'}</span></span></summary><div class="pk-template-grid" style="margin-top:12px">${EPK_TEMPLATES.filter(t=>!t.hidden||(pk&&pk.template===t.key)).map(t=>{const c=(pk?.template===t.key)?getPKColors(artistId):(PK_DEFAULT_COLORS[t.key]||PK_DEFAULT_COLORS['ardito-signature']);return`<div class="pk-template ${pk?.template===t.key?'active':''}" onclick="choosePKTemplate(${jsqAttr(artistId)},${jsqAttr(t.key)})"><div class="pk-template-swatch" style="background:${escPK(c.bg)};border-color:${escPK(c.accent)};color:${escPK(c.accent)}"><i></i><i style="width:38px"></i></div><div class="pk-template-name">${escPK(t.label)}</div><div class="pk-template-key">${escPK(t.kind)}</div>${pk?.template===t.key?'<div class="pk-template-badge">✓ Selected</div>':''}</div>`;}).join('')}</div></details></div>`;}
 function pkField(id,label,value,placeholder,fn,type='input'){return`<div class="fg"><label class="fl">${escPK(label)}</label>${type==='textarea'?`<textarea id="${id}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">${escPK(value)}</textarea>`:`<input id="${id}" type="text" value="${escPK(value)}" placeholder="${escPK(placeholder)}" oninput="${fn}(this)">`}</div>`;}
 function pkColorField(id,label,value){return`<div class="fg"><label class="fl">${escPK(label)}</label><div class="pk-color-field"><input id="${id}" type="color" value="${escPK(value)}" oninput="updatePKColor(this)"><input id="${id}-text" type="text" value="${escPK(value)}" maxlength="7" oninput="updatePKColorText(this)" placeholder="#000000"></div></div>`;}
 const PK_SECTION_LABELS={short_bio:'Short bio',bio:'Biography',quote:'Press quote',links:'Links & contact',releases:'Selected releases',achievements:'Highlights'};
@@ -1105,7 +1105,7 @@ if(social){
   if(target){target.classList.add('epk-runtime-social');target.innerHTML=social;}
 }
 const email=String(c.press_email||c.email||'').trim().replace(/^mailto:/i,'').toLowerCase();if(email){const same=[...body.querySelectorAll('a[href^="mailto:"]')].filter(a=>a.getAttribute('href').replace(/^mailto:/i,'').toLowerCase()===email);if(same.length>1){const keep=same.find(a=>a.closest('.contact,[class*="contact"],[class*="management"],[class*="press"]'))||same[0];same.forEach(a=>{if(a!==keep){const parent=a.parentElement;a.remove();if(parent&&normalize(parent.textContent)==='')parent.remove();}});}}
-body.querySelectorAll('[data-epk-internal-notes],.internal-notes').forEach(el=>el.remove());body.querySelectorAll('*').forEach(el=>{if(/internal notes/i.test(normalize(el.textContent))&&normalize(el.textContent).length<300)el.remove();});epkApplySectionOrder(doc,c);epkExtras(doc,c);const style=doc.createElement('style');style.textContent='.epk-social-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.75rem}.epk-social-link{display:inline-flex!important;align-items:center;gap:.45rem;padding:.48rem .68rem;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:999px;text-decoration:none!important;color:inherit!important;font:inherit;font-size:.82em;line-height:1;transition:transform .15s ease,background .15s ease}.epk-social-link:hover{transform:translateY(-1px);background:color-mix(in srgb,currentColor 9%,transparent)}.epk-social-link svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}.epk-needs-style{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.78em;margin:2.4em 0 .8em}.epk-extra-section{margin:2.4em 0}.track-list li{padding-top:7px!important;padding-bottom:7px!important}@media print{.epk-video{display:none}}';doc.head.appendChild(style);return'<!doctype html>\n'+doc.documentElement.outerHTML;}
+body.querySelectorAll('[data-epk-internal-notes],.internal-notes').forEach(el=>el.remove());body.querySelectorAll('*').forEach(el=>{if(/internal notes/i.test(normalize(el.textContent))&&normalize(el.textContent).length<300)el.remove();});epkApplySectionOrder(doc,c);epkExtras(doc,c);const style=doc.createElement('style');style.textContent='.epk-social-links{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.75rem}.epk-social-link{display:inline-flex!important;align-items:center;gap:.45rem;padding:.48rem .68rem;border:1px solid color-mix(in srgb,currentColor 28%,transparent);border-radius:999px;text-decoration:none!important;color:inherit!important;font:inherit;font-size:.82em;line-height:1;transition:transform .15s ease,background .15s ease}.epk-social-link:hover{transform:translateY(-1px);background:color-mix(in srgb,currentColor 9%,transparent)}.epk-social-link svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}.epk-needs-style{display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.78em;margin:2.4em 0 .8em}.epk-extra-section{margin:2.4em 0}.ardito-spotify-embed{max-width:100%!important;min-width:0!important;width:100%!important;flex:1 1 100%!important}.top:has(.ardito-spotify-embed),.track-top:has(.ardito-spotify-embed){flex-wrap:wrap}html,body{overflow-wrap:anywhere}html{overflow-x:clip}.track-list li{padding-top:7px!important;padding-bottom:7px!important}@media print{.epk-video{display:none}}';doc.head.appendChild(style);return'<!doctype html>\n'+doc.documentElement.outerHTML;}
 function epkExtras(doc,c){try{
 const body=doc.body;
 const norm=s=>String(s||'').replace(/\s+/g,' ').trim().toLowerCase();
@@ -1175,7 +1175,7 @@ const sec=doc.createElement('section');sec.className='epk-extra-section';
 if(title)sec.appendChild(mkHead(title));
 const p=doc.createElement('p');if(bioEl&&bioEl.tagName==='P')p.className=bioEl.className;fill(p);sec.appendChild(it.video?mkVideo(it.video):p);
 nodes=[sec];
-if(bioEl){parent=bioEl.parentElement;const ref=lastFallback&&lastFallback.parentElement===parent?lastFallback:bioEl;parent.insertBefore(sec,ref.nextSibling);lastFallback=sec;return;}
+if(bioEl){parent=bioEl.parentElement;const endEl=[...parent.children].find(ch=>/(^|[\s_-])(enclosure|sign-off|contact|footer)/.test(String(ch.getAttribute('class')||'').toLowerCase()));if(endEl){parent.insertBefore(sec,endEl);}else{const ref=lastFallback&&lastFallback.parentElement===parent?lastFallback:bioEl;parent.insertBefore(sec,ref.nextSibling);}lastFallback=sec;return;}
 parent=body.querySelector(':scope > .page, :scope > .content')||body;
 }
 const anchor=contactOf(parent);
@@ -1183,10 +1183,23 @@ nodes.forEach(x=>parent.insertBefore(x,anchor||null));
 });
 if(bio&&cl(bio.head,'row-num')&&(String(c.custom_1_text||'').trim()||String(c.custom_2_text||'').trim())){let k=0;body.querySelectorAll('.row-num').forEach(rn=>{const f=[...rn.childNodes].find(x=>x.nodeType===3);if(f&&/^\s*(\d+|\+)\s*$/.test(f.nodeValue)){k++;f.nodeValue=String(k).padStart(2,'0');}});}
 
+
+{const pc=String(c.press_contact||'').trim(),pe=String(c.press_email||c.email||'').trim().replace(/^mailto:/i,'');
+if(pc||pe){const tw2=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let t2;const nodes2=[];while(t2=tw2.nextNode())nodes2.push(t2);
+nodes2.forEach(t=>{if(pc&&t.nodeValue.indexOf('Laura, Ardito')>-1)t.nodeValue=t.nodeValue.replace('Laura, Ardito',pc);if(pe&&t.nodeValue.indexOf('ardito.ldn@gmail.com')>-1)t.nodeValue=t.nodeValue.replace('ardito.ldn@gmail.com',pe);});
+if(pe)body.querySelectorAll('a[href^="mailto:"]').forEach(a=>{if(/ardito\.ldn@gmail\.com/i.test(a.getAttribute('href')))a.setAttribute('href','mailto:'+pe);});}}
+{const parts=[String(c.location||'').trim(),String(c.short_bio||'').trim()?String(c.genre||'').trim():''].filter(Boolean);
+if(parts.length){const hookEl=body.querySelector('.hook,[class*="hook"],.tagline,.standfirst');const anchorEl=hookEl||body.querySelector('h1');
+if(anchorEl&&anchorEl.parentNode){const m=doc.createElement('p');m.className='epk-meta';m.setAttribute('style','font-size:.78em;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin:10px 0 0;overflow-wrap:anywhere');m.textContent=parts.join('  \u00b7  ');anchorEl.parentNode.insertBefore(m,anchorEl.nextSibling);}}}
+{const row=body.querySelector('.links-row');
+if(row&&!body.querySelector('.epk-runtime-social')){const proto=row.querySelector('a');
+const defs=[['Website',c.website],['Instagram',c.instagram],['Spotify',c.spotify],['Apple Music',c.apple_music],['YouTube',c.youtube],['SoundCloud',c.soundcloud],['TikTok',c.tiktok],['Pre-save',c.hyperfollow||c.distrokid]];
+const made=[];defs.forEach(([label,v])=>{const href=publicHref(label==='Pre-save'?'Hyperfollow':label,v);if(!href)return;const a=proto?proto.cloneNode(false):doc.createElement('a');a.setAttribute('href',href);a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');a.textContent=label;made.push(a);});
+if(proto||made.length){row.textContent='';made.forEach(a=>row.appendChild(a));}}}
 const pressLabel=String(c.press_label||'').trim(),contactLabel=String(c.contact_label||'').trim();
 if(pressLabel){body.querySelectorAll('*').forEach(el=>{if(!isHead(el))return;if(!/^(press|featured in|in the press)$/.test(clean(el.textContent)))return;if(cl(el,'row-num')){const tn=[...el.childNodes].filter(x=>x.nodeType===3);const last=tn[tn.length-1];if(last)last.nodeValue=pressLabel.toUpperCase();}else setText(el,pressLabel);});}
-if(contactLabel){const tw=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let tn;const hits=[];while(tn=tw.nextNode())if(/Management:/.test(tn.nodeValue))hits.push(tn);hits.forEach(t=>{t.nodeValue=t.nodeValue.replace('Management:',contactLabel.replace(/:\s*$/,'')+':');});}
-if(c.last_updated&&String(c.show_updated||'yes')!=='no'){try{const dt=new Date(String(c.last_updated).slice(0,10)+'T00:00:00');if(!isNaN(dt.getTime())){const up=doc.createElement('p');up.className='epk-updated';up.setAttribute('style','font-size:.75em;opacity:.65;margin:2.4em 0 0');up.textContent='Last updated '+dt.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});let hostEl=null;if(bio&&bio.pair){const cells=body.querySelectorAll('.content-cell');hostEl=cells[cells.length-1];}else if(bio){hostEl=bio.nodes[0].parentElement;}else{hostEl=body.querySelector(':scope > .page, :scope > .content, :scope > .wrap')||body;}if(hostEl)hostEl.appendChild(up);}}catch(_e){}}
+if(contactLabel){const tw=doc.createTreeWalker(body,NodeFilter.SHOW_TEXT);let tn;const hits=[];while(tn=tw.nextNode())if(/(Management|Booking & press|For booking and press|Booking and press):/.test(tn.nodeValue))hits.push(tn);hits.forEach(t=>{t.nodeValue=t.nodeValue.replace(/(Management|Booking & press|For booking and press|Booking and press):/,contactLabel.replace(/:\s*$/,'')+':');});}
+if(c.last_updated&&String(c.show_updated||'yes')!=='no'){try{const dt=new Date(String(c.last_updated).slice(0,10)+'T00:00:00');if(!isNaN(dt.getTime())){const up=doc.createElement('p');up.className='epk-updated';up.setAttribute('style','font-size:.75em;opacity:.65;margin:2.4em 0 0');up.textContent='Last updated '+dt.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});let hostEl=null;if(bio&&bio.pair){const cells=body.querySelectorAll('.content-cell');hostEl=cells[cells.length-1];}else if(bio){hostEl=bio.nodes[0].parentElement;}else{const be=body.querySelector('.bio-text,p.bio,.bio');hostEl=be?be.parentElement:(body.querySelector(':scope > .page, :scope > .content, :scope > .wrap')||body);}if(hostEl)hostEl.appendChild(up);}}catch(_e){}}
 if(bio)bio.head.setAttribute('data-epk-ref-head','1');
 const sc=doc.createElement('script');
 sc.textContent="(function(){try{var r=document.querySelector('[data-epk-ref-head]');if(!r)return;var cs=getComputedStyle(r),bc=getComputedStyle(document.body).color;document.querySelectorAll('.epk-fix,.epk-runtime-title').forEach(function(t){['fontFamily','fontSize','fontWeight','fontStyle','letterSpacing','textTransform','lineHeight'].forEach(function(q){t.style[q]=cs[q];});t.style.color=bc;t.style.marginBottom=cs.marginBottom;t.style.display='block';});}catch(e){}})();";
@@ -1612,7 +1625,7 @@ else{html=html.replace(/(<[^>]*data-epk-track-title[^>]*>[\s\S]*?)(<\/[a-z]+>)/i
   // Headshot size only applies where EPK_PHOTO_SIZE_HOOKS supports it (Ledger Sheet, Letterhead Memo).
   // Every other template ignores this entirely, same shared-hook pattern as spacing.
   const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);
-  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';--text-dim:color-mix(in srgb, var(--text) 65%, var(--bg));}'+photoRule+spacingRule+sizeRule+'</style>';
+  const override='<style id="ardito-epk-runtime">:root{--bg:'+escPK(col.bg)+';--text:'+escPK(col.ink)+';--ink:'+escPK(col.ink)+';--accent:'+escPK(col.accent)+';--text-dim:color-mix(in srgb, var(--text) 65%, var(--bg));}'+photoRule+spacingRule+sizeRule+EPK_PRINT_CSS+'</style>';
   html=html.replace('</head>',override+'</head>');
   // Ensure every supplied template behaves as a self-contained preview/export document.
   return html;
@@ -1636,31 +1649,7 @@ function exportPKPdf(artistId,button){
     win.document.write(src);
     win.document.close();
     win.document.title=filename;
-    const printCss=win.document.createElement('style');
-    printCss.id='ardito-epk-pdf-print';
-    printCss.textContent='@page{size:A4 portrait;margin:12mm 12mm 14mm}\n'+
-      '@media print{\n'+
-      'html,body{width:auto!important;height:auto!important;min-height:0!important;overflow:visible!important}\n'+
-      'body{padding:0!important;margin:0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}\n'+
-      '.page,.column,.content{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}\n'+
-      '.page{padding:0 0 10mm!important}\n'+
-      '.column{padding:0 0 10mm!important}\n'+
-      '.content{padding:0!important}\n'+
-      '*,*::before,*::after{animation:none!important;transition:none!important}\n'+
-      'img{break-inside:avoid;page-break-inside:avoid}\n'+
-      'h1,h2,h3,h4,h5,h6,p,blockquote,li{orphans:3;widows:3}\n'+
-      '.hero,img,.card,.track-card,.quote-card,.links-card,.footer-card,.bio-card,.press-quote,.photo-card,figure{break-inside:avoid;page-break-inside:avoid}\n'+
-      'h1,h2,h3,h4,h5,h6{break-after:avoid;page-break-after:avoid}\n'+
-      '.footer,.pk-live-footer{break-inside:avoid;page-break-inside:avoid;margin-top:24px!important}\n'+
-      '.wrap:has(.folio){position:relative!important;display:block!important}\n'+
-      '.wrap:has(.folio) .folio{position:absolute!important;left:0!important;top:0!important;width:26px!important;height:100%!important;overflow:hidden!important;padding-top:36px!important}\n'+
-      '.wrap:has(.folio) .rule{position:absolute!important;left:44px!important;top:0!important;bottom:0!important;width:1px!important;height:auto!important;display:block!important}\n'+
-      '.wrap:has(.folio) .main{margin-left:63px!important}\n'+
-      '.ardito-spotify-embed{display:none!important}\n'+
-      '.ardito-spotify-print-link{display:inline-block!important;text-decoration:underline!important;overflow-wrap:anywhere!important;word-break:break-word!important}\n'+
-      'a{overflow-wrap:anywhere;word-break:break-word}\n'+
-      '}';
-    win.document.head.appendChild(printCss);
+    /* Print layout comes from the shared EPK_PRINT_CSS already inside the built document (A4, 16mm margins on every page). */
     if(spotify){
       win.document.querySelectorAll('.ardito-spotify-embed').forEach(frame=>{
         const link=win.document.createElement('a');
