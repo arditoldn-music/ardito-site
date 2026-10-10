@@ -179,31 +179,31 @@ const EPK_PRINT_CSS="@media print {\n  /* 1. Zero page margin: Chrome has no roo
 /* Fonts an artist can pick for an EPK (Heading font, Body font, weights). Only values in this list are ever applied,
    so nothing typed into the editor can inject CSS. Weights listed are the ones each font really has on Google Fonts. */
 const EPK_FONT_CHOICES=[
- {key:'playfair',label:'Playfair Display',cat:'Serif',css:"'Playfair Display', Georgia, 'Times New Roman', serif",gf:'Playfair+Display',w:[400,500,600,700,800]},
- {key:'cormorant',label:'Cormorant Garamond',cat:'Serif',css:"'Cormorant Garamond', Garamond, Georgia, serif",gf:'Cormorant+Garamond',w:[300,400,500,600,700]},
- {key:'baskerville',label:'Libre Baskerville',cat:'Serif',css:"'Libre Baskerville', Baskerville, Georgia, serif",gf:'Libre+Baskerville',w:[400,700]},
- {key:'sourceserif',label:'Source Serif 4',cat:'Serif',css:"'Source Serif 4', 'Source Serif Pro', Georgia, serif",gf:'Source+Serif+4',w:[300,400,500,600,700,800]},
- {key:'lora',label:'Lora',cat:'Serif',css:"'Lora', Georgia, serif",gf:'Lora',w:[400,500,600,700]},
- {key:'fraunces',label:'Fraunces',cat:'Serif',css:"'Fraunces', Georgia, serif",gf:'Fraunces',w:[300,400,500,600,700,800]},
- {key:'dmserif',label:'DM Serif Display',cat:'Serif',css:"'DM Serif Display', Georgia, serif",gf:'DM+Serif+Display',w:[400]},
- {key:'bodoni',label:'Bodoni Moda',cat:'Serif',css:"'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif",gf:'Bodoni+Moda',w:[400,500,600,700,800]},
- {key:'inter',label:'Inter',cat:'Sans',css:"'Inter', 'Helvetica Neue', Arial, sans-serif",gf:'Inter',w:[300,400,500,600,700,800]},
- {key:'dmsans',label:'DM Sans',cat:'Sans',css:"'DM Sans', 'Helvetica Neue', Arial, sans-serif",gf:'DM+Sans',w:[300,400,500,600,700,800]},
- {key:'worksans',label:'Work Sans',cat:'Sans',css:"'Work Sans', 'Helvetica Neue', Arial, sans-serif",gf:'Work+Sans',w:[300,400,500,600,700,800]},
- {key:'publicsans',label:'Public Sans',cat:'Sans',css:"'Public Sans', 'Helvetica Neue', Arial, sans-serif",gf:'Public+Sans',w:[300,400,500,600,700,800]},
- {key:'montserrat',label:'Montserrat',cat:'Sans',css:"'Montserrat', 'Helvetica Neue', Arial, sans-serif",gf:'Montserrat',w:[300,400,500,600,700,800]},
- {key:'poppins',label:'Poppins',cat:'Sans',css:"'Poppins', 'Helvetica Neue', Arial, sans-serif",gf:'Poppins',w:[300,400,500,600,700,800]},
- {key:'raleway',label:'Raleway',cat:'Sans',css:"'Raleway', 'Helvetica Neue', Arial, sans-serif",gf:'Raleway',w:[300,400,500,600,700,800]},
- {key:'nunito',label:'Nunito',cat:'Sans',css:"'Nunito', 'Helvetica Neue', Arial, sans-serif",gf:'Nunito',w:[300,400,500,600,700,800]},
- {key:'barlow',label:'Barlow',cat:'Sans',css:"'Barlow', 'Helvetica Neue', Arial, sans-serif",gf:'Barlow',w:[300,400,500,600,700,800]},
- {key:'librefranklin',label:'Libre Franklin',cat:'Sans',css:"'Libre Franklin', 'Helvetica Neue', Arial, sans-serif",gf:'Libre+Franklin',w:[300,400,500,600,700,800]},
+ {key:'playfair',label:'Playfair Display',cat:'Serif',css:"'Playfair Display', Georgia, 'Times New Roman', serif",gf:'Playfair+Display',w:[400,500,600,700,800],i:1},
+ {key:'cormorant',label:'Cormorant Garamond',cat:'Serif',css:"'Cormorant Garamond', Garamond, Georgia, serif",gf:'Cormorant+Garamond',w:[300,400,500,600,700],i:1},
+ {key:'baskerville',label:'Libre Baskerville',cat:'Serif',css:"'Libre Baskerville', Baskerville, Georgia, serif",gf:'Libre+Baskerville',w:[400,700],i:1},
+ {key:'sourceserif',label:'Source Serif 4',cat:'Serif',css:"'Source Serif 4', 'Source Serif Pro', Georgia, serif",gf:'Source+Serif+4',w:[300,400,500,600,700,800],i:1},
+ {key:'lora',label:'Lora',cat:'Serif',css:"'Lora', Georgia, serif",gf:'Lora',w:[400,500,600,700],i:1},
+ {key:'fraunces',label:'Fraunces',cat:'Serif',css:"'Fraunces', Georgia, serif",gf:'Fraunces',w:[300,400,500,600,700,800],i:1},
+ {key:'dmserif',label:'DM Serif Display',cat:'Serif',css:"'DM Serif Display', Georgia, serif",gf:'DM+Serif+Display',w:[400],i:1},
+ {key:'bodoni',label:'Bodoni Moda',cat:'Serif',css:"'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif",gf:'Bodoni+Moda',w:[400,500,600,700,800],i:1},
+ {key:'inter',label:'Inter',cat:'Sans',css:"'Inter', 'Helvetica Neue', Arial, sans-serif",gf:'Inter',w:[300,400,500,600,700,800],i:1},
+ {key:'dmsans',label:'DM Sans',cat:'Sans',css:"'DM Sans', 'Helvetica Neue', Arial, sans-serif",gf:'DM+Sans',w:[300,400,500,600,700,800],i:1},
+ {key:'worksans',label:'Work Sans',cat:'Sans',css:"'Work Sans', 'Helvetica Neue', Arial, sans-serif",gf:'Work+Sans',w:[300,400,500,600,700,800],i:1},
+ {key:'publicsans',label:'Public Sans',cat:'Sans',css:"'Public Sans', 'Helvetica Neue', Arial, sans-serif",gf:'Public+Sans',w:[300,400,500,600,700,800],i:1},
+ {key:'montserrat',label:'Montserrat',cat:'Sans',css:"'Montserrat', 'Helvetica Neue', Arial, sans-serif",gf:'Montserrat',w:[300,400,500,600,700,800],i:1},
+ {key:'poppins',label:'Poppins',cat:'Sans',css:"'Poppins', 'Helvetica Neue', Arial, sans-serif",gf:'Poppins',w:[300,400,500,600,700,800],i:1},
+ {key:'raleway',label:'Raleway',cat:'Sans',css:"'Raleway', 'Helvetica Neue', Arial, sans-serif",gf:'Raleway',w:[300,400,500,600,700,800],i:1},
+ {key:'nunito',label:'Nunito',cat:'Sans',css:"'Nunito', 'Helvetica Neue', Arial, sans-serif",gf:'Nunito',w:[300,400,500,600,700,800],i:1},
+ {key:'barlow',label:'Barlow',cat:'Sans',css:"'Barlow', 'Helvetica Neue', Arial, sans-serif",gf:'Barlow',w:[300,400,500,600,700,800],i:1},
+ {key:'librefranklin',label:'Libre Franklin',cat:'Sans',css:"'Libre Franklin', 'Helvetica Neue', Arial, sans-serif",gf:'Libre+Franklin',w:[300,400,500,600,700,800],i:1},
  {key:'spacegrotesk',label:'Space Grotesk',cat:'Display',css:"'Space Grotesk', 'Helvetica Neue', Arial, sans-serif",gf:'Space+Grotesk',w:[300,400,500,600,700]},
- {key:'archivo',label:'Archivo',cat:'Display',css:"'Archivo', 'Helvetica Neue', Arial, sans-serif",gf:'Archivo',w:[300,400,500,600,700,800]},
- {key:'rubik',label:'Rubik',cat:'Display',css:"'Rubik', 'Helvetica Neue', Arial, sans-serif",gf:'Rubik',w:[300,400,500,600,700,800]},
+ {key:'archivo',label:'Archivo',cat:'Display',css:"'Archivo', 'Helvetica Neue', Arial, sans-serif",gf:'Archivo',w:[300,400,500,600,700,800],i:1},
+ {key:'rubik',label:'Rubik',cat:'Display',css:"'Rubik', 'Helvetica Neue', Arial, sans-serif",gf:'Rubik',w:[300,400,500,600,700,800],i:1},
  {key:'oswald',label:'Oswald',cat:'Display',css:"'Oswald', 'Arial Narrow', Arial, sans-serif",gf:'Oswald',w:[300,400,500,600,700]},
  {key:'bebas',label:'Bebas Neue',cat:'Display',css:"'Bebas Neue', 'Arial Narrow', Arial, sans-serif",gf:'Bebas+Neue',w:[400]},
- {key:'spacemono',label:'Space Mono',cat:'Mono',css:"'Space Mono', 'IBM Plex Mono', Menlo, Consolas, monospace",gf:'Space+Mono',w:[400,700]},
- {key:'plexmono',label:'IBM Plex Mono',cat:'Mono',css:"'IBM Plex Mono', Menlo, Consolas, monospace",gf:'IBM+Plex+Mono',w:[300,400,500,600,700]},
+ {key:'spacemono',label:'Space Mono',cat:'Mono',css:"'Space Mono', 'IBM Plex Mono', Menlo, Consolas, monospace",gf:'Space+Mono',w:[400,700],i:1},
+ {key:'plexmono',label:'IBM Plex Mono',cat:'Mono',css:"'IBM Plex Mono', Menlo, Consolas, monospace",gf:'IBM+Plex+Mono',w:[300,400,500,600,700],i:1},
  {key:'georgia',label:'Georgia (no download)',cat:'System',css:"Georgia, 'Times New Roman', serif",gf:'',w:[400,700]},
  {key:'helvetica',label:'Helvetica / Arial (no download)',cat:'System',css:"'Helvetica Neue', Helvetica, Arial, sans-serif",gf:'',w:[400,700]}
 ];
@@ -217,7 +217,7 @@ function epkFontCss(c){
   const hwEff=nearest(hf,hw),bwEff=nearest(bf,bw);
   const fam={};
   [[hf,hwEff],[bf,bwEff]].forEach(([f,w])=>{if(!f||!f.gf)return;const o=fam[f.key]||(fam[f.key]={f:f,w:new Set()});[400,700].forEach(x=>{if(f.w.indexOf(x)>-1)o.w.add(x);});if(w&&f.w.indexOf(w)>-1)o.w.add(w);if(!o.w.size)o.w.add(f.w[0]);});
-  const parts=Object.keys(fam).map(k=>'family='+fam[k].f.gf+':wght@'+Array.from(fam[k].w).sort((a,b)=>a-b).join(';'));
+  const parts=Object.keys(fam).map(k=>{const f=fam[k].f,ws=Array.from(fam[k].w).sort((a,b)=>a-b);if(f.i)return 'family='+f.gf+':ital,wght@'+ws.map(w=>'0,'+w).concat(['1,400']).join(';');return 'family='+f.gf+':wght@'+ws.join(';');});
   const links=parts.length?['https://fonts.googleapis.com/css2?'+parts.join('&')+'&display=swap']:[];
   const HEAD='h1,h2,h3,.block-title,.label,.rail-label,.row-num,.section-title,.epk-extra-title,.epk-runtime-title';
   const BODY='body,body p,body li,body a,body span,body div,body blockquote';
@@ -277,7 +277,7 @@ function epkOpData(o){
 }
 function epkOpCss(d,extra){
   const col=d.col,f=d.font,esc=d.esc;
-  return ':root{--bg:'+esc(col.bg||'#ffffff')+';--text:'+esc(col.ink||'#111111')+';--accent:'+esc(col.accent||'#555555')+';--dim:color-mix(in srgb,var(--text) 62%,var(--bg));--rule:color-mix(in srgb,var(--text) 18%,transparent);--head:'+f.head+';--body:'+f.body+';--fs:'+(extra&&extra.indexOf('/*big*/')>-1?'10.8':'9.4')+'pt}'
+  return ':root{--bg:'+esc(col.bg||'#ffffff')+';--text:'+esc(col.ink||'#111111')+';--accent:'+esc(col.accent||'#555555')+';--dim:color-mix(in srgb,var(--text) 62%,var(--bg));--rule:color-mix(in srgb,var(--text) 18%,transparent);--head:'+f.head+';--body:'+f.body+';--fs:'+(extra&&extra.indexOf('/*big*/')>-1?'10.8':'10.4')+'pt}'
   +'@page{size:A4 portrait;margin:0}*{box-sizing:border-box}html{background:#8a8a8a}html,body{margin:0;padding:0}'
   +'body{width:210mm;height:297mm;margin:0 auto;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--body);font-weight:'+f.bodyW+';font-size:var(--fs);line-height:1.42;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow-wrap:anywhere}'
   +'.sheet{width:210mm;height:297mm;padding:13mm 14mm 11mm;display:flex;flex-direction:column}'
@@ -285,7 +285,7 @@ function epkOpCss(d,extra){
   +'h2{font-family:var(--body);font-weight:700;font-size:calc(var(--fs)*.8);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 2.2mm}'
   +'p{margin:0 0 1.8mm}ul{margin:0;padding:0;list-style:none}li{padding:.7mm 0;border-bottom:1px solid var(--rule)}li:last-child{border-bottom:0}'
   +'a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule)}'
-  +'.lk{display:flex;justify-content:space-between;gap:3mm;padding:.8mm 0;border-bottom:1px solid var(--rule)}.lk span{color:var(--dim);flex:none}.lk a{text-align:right;border-bottom:0;overflow-wrap:anywhere}'
+  +'.lk{display:flex;justify-content:space-between;gap:3mm;padding:.8mm 0;border-bottom:1px solid var(--rule);white-space:nowrap}.lk span{color:var(--dim);flex:none}.lk a{text-align:right;border-bottom:0;min-width:0;overflow:hidden;text-overflow:ellipsis}'
   +'.rl{display:flex;justify-content:space-between;gap:4mm;padding:.7mm 0;border-bottom:1px solid var(--rule)}.rl em{font-style:normal;color:var(--dim);flex:none}'
   +'blockquote{margin:0;font-style:italic;font-size:calc(var(--fs)*1.12);line-height:1.38}cite{display:block;margin-top:1.4mm;font-style:normal;font-size:calc(var(--fs)*.85);color:var(--dim)}'
   +'footer{display:flex;justify-content:space-between;gap:6mm;padding-top:3mm;border-top:1px solid var(--rule);font-size:calc(var(--fs)*.74);color:var(--dim)}'
@@ -302,18 +302,20 @@ function epkOpWrap(d,css,body,title,fitSel,start){
 function epkOnePagerHtml(o){
   const d=epkOpData(o),c=d.c,esc=d.esc,t=d.t,nl=d.nl,sec=d.sec;
   const paras=t(c.bio_short||c.bio).split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-  const hl=t(c.achievements).split(/\r?\n/).map(x=>x.replace(/^\s*[-\u2022*]\s+/,'').trim()).filter(Boolean).slice(0,6);
+  const hl=t(c.achievements).split(/\r?\n/).map(x=>x.replace(/^\s*[-\u2022*]\s+/,'').trim()).filter(Boolean);
   const rel=t(c.releases).split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const q=l.split(' \u00b7 ').map(x=>x.trim());return {name:q[0],meta:q.slice(1).filter(x=>!/^https?:\/\//i.test(x)&&!/^\[.*\]$/.test(x)).join(' \u00b7 ')};}).filter(r=>r.name);
   const quote=t(c.quote),qsrc=t(c.quote_source),pressLabel=t(c.press_label)||'Press';
   const customs=[1,2].map(n=>{const tt=t(c['custom_'+n+'_title']),tx=t(c['custom_'+n+'_text']);return tx?sec(tt||'More','<p>'+nl(tx)+'</p>',n===1?2:1):'';}).join('');
   const liveBody=(d.ask?'<p><b>'+esc(d.ask)+'</b></p>':'')+d.entries(c.live_text)+(d.vid?'<p>'+esc(d.vidTitle==='Watch'?'Live clip':d.vidTitle)+': <a href="'+esc(d.vid)+'">'+esc(d.shortU(d.vid,30))+'</a></p>':'');
-  const dlBody=d.entries(c.downloads_text)+(d.credit?'<p class="dimp">Photo: '+esc(d.credit)+'</p>':'');
+  const relPdfHref=d.href('Link',c.release_pdf_url);
+  const dlEntries=d.entries(c.downloads_text)+(relPdfHref?'<p><a href="'+esc(relPdfHref)+'">Release sheet (PDF)</a></p>':'');
+  const dlBody=dlEntries?dlEntries+(d.credit?'<p class="dimp">Photo: '+esc(d.credit)+'</p>':''):'';
   const shortBio=!!t(c.bio_short);
   const exclude=d.lis.map(x=>x[0]);
   const followRows=d.linkList.filter(x=>exclude.indexOf(x[0])<0).map(x=>'<div class="lk"><span>'+esc(x[0])+'</span><a href="'+esc(x[1])+'">'+esc(d.shortU(x[1],30))+'</a></div>').join('');
   const bioHtml=paras.map((p,i)=>'<p'+((!shortBio&&i>=2)?' data-drop="'+(3+(paras.length-1-i))+'"':'')+'>'+nl(p)+'</p>').join('');
   const liveSec=liveBody?sec(t(c.live_title)||'Live',liveBody):'',dlSec=dlBody?sec('Downloads',dlBody,9):'';
-  const left=(paras.length?sec('Bio','<div class="bio">'+bioHtml+'</div>'):'')+(hl.length?sec('Highlights','<ul>'+hl.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'):'')+(shortBio?liveSec+dlSec:'')+customs;
+  const left=(paras.length?sec('Bio','<div class="bio">'+bioHtml+'</div>'):'')+(hl.length?sec('Highlights','<ul>'+hl.map((x,i)=>'<li'+(i>=6?' data-drop="'+(5+(hl.length-1-i)/10)+'"':'')+'>'+esc(x)+'</li>').join('')+'</ul>'):'')+(shortBio?liveSec+dlSec:'')+customs;
   const right=(rel.length?sec('Releases',rel.map(r=>'<div class="rl"><span>'+esc(r.name)+'</span><em>'+esc(r.meta)+'</em></div>').join('')):'')
     +(shortBio?'':liveSec)
     +(quote?sec(pressLabel,'<blockquote>\u201c'+nl(quote.replace(/^["\u201c]|["\u201d]$/g,''))+'\u201d</blockquote>'+(qsrc?'<cite>'+esc(qsrc)+'</cite>':''),8):'')
@@ -323,12 +325,12 @@ function epkOnePagerHtml(o){
   const extra='header{display:flex;gap:7mm;align-items:flex-end;justify-content:space-between;padding-bottom:5mm;border-bottom:1.4px solid var(--accent);margin-bottom:5mm}'
    +'h1{font-size:calc(var(--fs)*3.15)}.hook{margin:2.2mm 0 0;font-size:calc(var(--fs)*1.2);line-height:1.35;color:var(--dim)}.meta{margin-top:2mm;font-size:calc(var(--fs)*.8);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.fans{margin:1.8mm 0 0;font-size:calc(var(--fs)*.95);font-style:italic;color:var(--dim)}'
    +'.ph img{display:block;width:36mm;height:46mm;object-fit:cover}.ph .cr{margin-top:1.2mm;font-size:calc(var(--fs)*.68);color:var(--dim);text-align:right}'
-   +'.cols{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.6fr 1fr;gap:9mm}'
+   +'.cols{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.5fr 1fr;gap:9mm}'
    +'.cols section{margin:0 0 5mm;padding-top:4.5mm;border-top:1px solid var(--rule)}.cols>div>section:first-child{border-top:0;padding-top:0}'
    +'.bio p{text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto}.dimp{color:var(--dim);font-size:calc(var(--fs)*.85)}';
   const listen=d.lis.length?'<div class="listen"><b>Listen</b>'+d.lis.map(([l,h],i)=>'<a href="'+esc(h)+'">'+esc(l)+'</a>').join('')+'</div>':'';
   const body='<div class="sheet"><header><div><h1>'+esc(d.name)+'</h1>'+(d.hook?'<p class="hook">'+esc(d.hook)+'</p>':'')+(d.meta?'<div class="meta">'+esc(d.meta)+'</div>':'')+(d.fans?'<p class="fans">For fans of '+esc(d.fans)+'</p>':'')+'</div>'+(d.img?'<div class="ph"><img src="'+esc(d.img)+'" alt="">'+(d.credit?'<div class="cr">Photo: '+esc(d.credit)+'</div>':'')+'</div>':'')+'</header>'+listen+'<div class="cols"><div>'+left+'</div><div>'+right+'</div></div><footer><span>'+esc(d.name)+' - Press kit</span><span>'+esc(d.upd)+'</span></footer></div>';
-  return epkOpWrap(d,epkOpCss(d,extra),body,d.name+' - EPK','.cols',9.4);
+  return epkOpWrap(d,epkOpCss(d,extra),body,d.name+' - EPK','.cols',10.4);
 }
 function epkReleaseSheetHtml(o){
   const d=epkOpData(o),c=d.c,esc=d.esc,t=d.t,nl=d.nl,sec=d.sec;
@@ -342,13 +344,17 @@ function epkReleaseSheetHtml(o){
   const extra='.top{display:grid;grid-template-columns:'+(d.cover?'78mm 1fr':'1fr')+';gap:9mm;align-items:start;padding-bottom:6mm;border-bottom:1.4px solid var(--accent);margin-bottom:6mm}'
    +'.cover img{display:block;width:78mm;height:78mm;object-fit:cover}.kick{font-size:calc(var(--fs)*.85);letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 3mm}'
    +'h1{font-size:calc(var(--fs)*3.4)}.by{margin:2.5mm 0 0;font-size:calc(var(--fs)*1.35);color:var(--text)}.date{margin:2mm 0 0;font-size:calc(var(--fs)*1.1);color:var(--accent);font-weight:700}.fans{margin:4mm 0 0;font-style:italic;color:var(--dim)}'
-   +'/*big*/.lk{display:block}.lk span{display:block;font-size:calc(var(--fs)*.78);letter-spacing:.1em;text-transform:uppercase}.lk a{text-align:left}.cols{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.4fr 1fr;gap:9mm}.cols section{margin:0 0 5mm;padding-top:4.5mm;border-top:1px solid var(--rule)}.cols>div>section:first-child{border-top:0;padding-top:0}'
+   +'/*big*/.player{display:flex;align-items:center;gap:4mm;margin-top:6mm;padding:3.4mm 4.2mm;border:1.2px solid var(--rule);border-radius:3.2mm;background:color-mix(in srgb,var(--text) 7%,var(--bg));color:inherit;text-decoration:none}.player .art{width:16mm;height:16mm;object-fit:cover;border-radius:1.6mm;flex:none;display:block}.player .ph0{background:color-mix(in srgb,var(--text) 22%,var(--bg))}.player .pmeta{flex:1;min-width:0;display:block}.player .ttl{display:block;font-weight:700;font-size:calc(var(--fs)*1.08);line-height:1.2}.player .pby{display:block;font-size:calc(var(--fs)*.85);color:var(--dim);margin-top:.4mm}.player .bar{display:block;position:relative;height:1.1mm;border-radius:1mm;background:color-mix(in srgb,var(--text) 20%,transparent);margin-top:2.6mm}.player .bar i{position:absolute;left:0;top:50%;width:2.6mm;height:2.6mm;margin-top:-1.3mm;border-radius:50%;background:var(--accent)}.player .ptime{display:flex;justify-content:space-between;margin-top:1.4mm;font-size:calc(var(--fs)*.72);color:var(--dim)}.player .ptime em{font-style:normal}.player .ptime .src{color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase}.player .play{width:12mm;height:12mm;border-radius:50%;background:var(--accent);flex:none;position:relative}.player .play:after{content:\'\';position:absolute;left:4.8mm;top:3.5mm;border-left:3.8mm solid var(--bg);border-top:2.5mm solid transparent;border-bottom:2.5mm solid transparent}.lk{display:block;white-space:normal}.lk span{display:block;font-size:calc(var(--fs)*.78);letter-spacing:.1em;text-transform:uppercase}.lk a{text-align:left}.cols{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:1.4fr 1fr;gap:9mm}.cols section{margin:0 0 5mm;padding-top:4.5mm;border-top:1px solid var(--rule)}.cols>div>section:first-child{border-top:0;padding-top:0}'
    +'.bio p,.blurb p{text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto}';
-  const listenRows=d.lis.length?d.lis.map(([l,h])=>'<div class="lk"><span>'+esc(l)+'</span><a href="'+esc(h)+'">'+esc(d.shortU(h,34))+'</a></div>').join(''):'';
+  const relListen=d.href('Link',c.release_listen_url);
+  const playerEntry=relListen?['Listen',relListen]:(d.t(c.listen_url)?d.lis[0]:(d.lis.find(x=>x[0]==='Spotify')||null));
+  const platform=h=>/soundcloud\.com/i.test(h)?'SoundCloud':/open\.spotify\.com/i.test(h)?'Spotify':/youtube\.com|youtu\.be/i.test(h)?'YouTube':/distrokid|hyperfollow/i.test(h)?'Pre-save':'';
+  const playerHtml=playerEntry?'<a class="player" href="'+esc(playerEntry[1])+'">'+(d.cover?'<img class="art" src="'+esc(d.cover)+'" alt="">':'<span class="art ph0"></span>')+'<span class="pmeta"><span class="ttl">'+esc(title)+'</span><span class="pby">'+esc(d.name)+'</span><span class="bar"><i></i></span><span class="ptime"><em>0:00</em><em class="src">'+(platform(playerEntry[1])?'Listen on '+esc(platform(playerEntry[1])):'Listen')+'</em></span></span><span class="play"></span></a>':'';
+  const listenRows=d.lis.filter(x=>!playerEntry||x[1]!==playerEntry[1]).map(([l,h])=>'<div class="lk"><span>'+esc(l)+'</span><a href="'+esc(h)+'">'+esc(d.shortU(h,34))+'</a></div>').join('');
   const left=(blurb.length?sec('About the release','<div class="blurb">'+blurb.map(p=>'<p>'+nl(p)+'</p>').join('')+'</div>'):'')
     +(credits.length?sec('Credits','<ul>'+credits.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'):'')
     +(quote?sec('In her words','<blockquote>\u201c'+nl(quote.replace(/^["\u201c]|["\u201d]$/g,''))+'\u201d</blockquote>'+(qsrc?'<cite>'+esc(qsrc)+'</cite>':''),2):'');
   const right=(listenRows?sec('Listen',listenRows):'')+(about?sec('The artist','<p>'+nl(about)+'</p>',3):'')+sec('Contact',d.contactHtml);
-  const body='<div class="sheet"><div class="top">'+(d.cover?'<div class="cover"><img src="'+esc(d.cover)+'" alt=""></div>':'')+'<div><p class="kick">New release</p><h1>'+esc(title)+'</h1><p class="by">'+esc(d.name)+'</p>'+(date?'<p class="date">'+esc(date)+'</p>':'')+(d.fans?'<p class="fans">For fans of '+esc(d.fans)+'</p>':'')+'</div></div><div class="cols"><div>'+left+'</div><div>'+right+'</div></div><footer><span>'+esc(d.name)+' - '+esc(title)+'</span><span>'+esc(d.upd)+'</span></footer></div>';
+  const body='<div class="sheet"><div class="top">'+(d.cover?'<div class="cover"><img src="'+esc(d.cover)+'" alt=""></div>':'')+'<div><p class="kick">New release</p><h1>'+esc(title)+'</h1><p class="by">'+esc(d.name)+'</p>'+(date?'<p class="date">'+esc(date)+'</p>':'')+(d.fans?'<p class="fans">For fans of '+esc(d.fans)+'</p>':'')+playerHtml+'</div></div><div class="cols"><div>'+left+'</div><div>'+right+'</div></div><footer><span>'+esc(d.name)+' - '+esc(title)+'</span><span>'+esc(d.upd)+'</span></footer></div>';
   return epkOpWrap(d,epkOpCss(d,extra),body,title+' - '+d.name,'.cols',10.8);
 }
