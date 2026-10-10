@@ -262,8 +262,8 @@ function epkOpData(o){
   [['Spotify',c.spotify],['Pre-save',c.hyperfollow||c.distrokid],['YouTube',c.youtube]].forEach(([l,v])=>{const h=href(l==='Pre-save'?'Hyperfollow':l,v);if(h&&h!==listenUrl)lis.push([l,h]);});
   const contactName=t(c.press_contact)||'Laura, Ardito',contactMail=t(c.press_email||c.email).replace(/^mailto:/i,'')||'ardito.ldn@gmail.com';
   const bookName=t(c.booking_name),bookMail=t(c.booking_email).replace(/^mailto:/i,'');
-  const hasBook=!!(bookName||bookMail);
-  const contactLabel=(t(c.contact_label)||(hasBook?'Press':'Management')).replace(/:\s*$/,'');
+  const merged=!!bookMail&&bookMail.toLowerCase()===contactMail.toLowerCase();const hasBook=!!(bookName||bookMail)&&!merged;
+  const contactLabel=(t(c.contact_label)||(merged?'Booking and press':(hasBook?'Press':'Management'))).replace(/:\s*$/,'');
   const contactHtml=(hasBook?'<p>Booking: '+esc(bookName)+(bookName&&bookMail?'<br>':'')+(bookMail?'<a href="mailto:'+esc(bookMail)+'">'+esc(bookMail)+'</a>':'')+'</p>':'')+'<p>'+esc(contactLabel)+': '+esc(contactName)+'<br><a href="mailto:'+esc(contactMail)+'">'+esc(contactMail)+'</a></p>';
   let upd='';if(t(c.last_updated)&&t(c.show_updated)!=='no'){const d=new Date(t(c.last_updated).slice(0,10)+'T00:00:00');if(!isNaN(d.getTime()))upd='Last updated '+d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});}
   const sec=(title,inner,drop,cls)=>'<section'+(cls?' class="'+cls+'"':'')+(drop?' data-drop="'+drop+'"':'')+'><h2>'+esc(title)+'</h2>'+inner+'</section>';
