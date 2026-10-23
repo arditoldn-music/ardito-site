@@ -439,7 +439,7 @@ textarea{resize:vertical;min-height:80px}
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#c87941;display:inline-block"></span>Deadline</span>
           </div>
           <div class="ha"><div class="vt"><button class="vb active" onclick="setCV('cal',this)">Calendar</button><button class="vb" onclick="setCV('list',this)">List</button><button class="vb" onclick="setCV('year',this)">Year</button></div>
-          <button class="btn bp" onclick="openLM()">+ New</button></div>
+          <button class="btn bg" onclick="openFeed()">Sync to Google</button><button class="btn bp" onclick="openLM()">+ New</button></div>
         </div>
       </div>
       <div class="cc"><div class="mn"><button onclick="chM(-1)">‹</button><div class="ml" id="mlbl"></div><button onclick="chM(1)">›</button></div><select id="cal-art" onchange="renderCal();if(cvMode==='list')renderListV()" style="width:auto;min-width:170px"></select></div>
@@ -555,6 +555,21 @@ textarea{resize:vertical;min-height:80px}
     <div class="fg"><label class="fl">Status</label><select id="l-status"><option value="planned">Planned</option><option value="ready">Ready</option><option value="posted">Done</option></select></div>
     <div class="fg"><label class="fl">Caption / details</label><textarea id="l-cap"></textarea></div>
     <div class="ma"><button class="btn bg" onclick="closeM('lmod')">Cancel</button><button class="btn bd bsm" id="ldel" style="display:none" onclick="delLib()">Delete</button><button class="btn bp" onclick="saveLib()">Save</button></div>
+  </div>
+</div>
+
+<!-- CALENDAR FEED MODAL -->
+<div class="mo" id="fmod">
+  <div class="md">
+    <div class="mt">Sync to Google Calendar</div>
+    <div style="font-size:13px;color:var(--cmid);line-height:1.6;margin-bottom:14px">This link puts your dashboard dates into Google Calendar. It is one way, so you edit here and Google follows. Google only checks the link every 12 to 24 hours, so changes can take up to a day to show up.</div>
+    <div class="fg"><label class="fl">Your feed link</label><input type="text" id="f-url" readonly onclick="this.select()"></div>
+    <div style="font-size:12px;color:var(--cdim);line-height:1.7;margin-bottom:14px">
+      In Google Calendar on a computer: click + next to "Other calendars", choose "From URL", paste the link and add it. Give it its own colour so it stands apart from your work calendar.<br>
+      On an iPhone or Mac: <a id="f-apple" href="#" style="color:var(--gtext)">add it to Apple Calendar</a>, which refreshes much faster.<br>
+      Treat the link like a password. Anyone who has it can see your release dates.
+    </div>
+    <div class="ma"><button class="btn bg" onclick="closeM('fmod')">Close</button><button class="btn bd bsm" onclick="regenFeed()">New link</button><button class="btn bp" onclick="copyFeed()">Copy link</button></div>
   </div>
 </div>
 
@@ -2085,6 +2100,37 @@ async function archiveArtist(id,flag){
   try{await db('artists','PATCH',{archived:flag},id);}catch(e){alert('Could not save. Has the archive column been added in Supabase yet? '+e.message);return;}
   aArt=aArt.map(x=>x.id===id?{...x,archived:flag}:x);
   showRL();renderRoster();renderCal();renderHome();renderReleases();renderLib();
+}
+
+// CALENDAR FEED (Google Calendar subscription)
+let feedToken='';
+function feedUrl(){return `${location.origin}/feed/${feedToken}.ics`;}
+function showFeed(){
+  document.getElementById('f-url').value=feedUrl();
+  document.getElementById('f-apple').href=feedUrl().replace(/^https?:/,'webcal:');
+}
+async function openFeed(){
+  document.getElementById('fmod').classList.add('open');
+  document.getElementById('f-url').value='Loading...';
+  try{
+    const t=await db('rpc/get_calendar_feed_token','POST',{});
+    if(!t||typeof t!=='string')throw new Error('No link found. Has calendar_feed.sql been run in Supabase?');
+    feedToken=t;showFeed();
+  }catch(e){document.getElementById('f-url').value='';alert('Could not load the feed link. '+e.message);closeM('fmod');}
+}
+async function regenFeed(){
+  if(!confirm('Make a new link? The old one stops working straight away and you will need to subscribe again in Google Calendar.'))return;
+  try{
+    const t=await db('rpc/regenerate_calendar_feed_token','POST',{});
+    if(!t||typeof t!=='string')throw new Error('No link returned.');
+    feedToken=t;showFeed();
+  }catch(e){alert('Could not make a new link. '+e.message);}
+}
+function copyFeed(){
+  const el=document.getElementById('f-url');el.select();
+  const done=()=>{const b=event&&event.target;if(b){const o=b.textContent;b.textContent='Copied';setTimeout(()=>{b.textContent=o;},1500);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(el.value).then(done).catch(()=>{document.execCommand('copy');done();});}
+  else{document.execCommand('copy');done();}
 }
 
 // CALENDAR LINKS (artist filter, names, next up)
