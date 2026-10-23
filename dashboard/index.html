@@ -112,18 +112,17 @@ textarea{resize:vertical;min-height:80px}
 .cd.today .cdn{color:var(--gbright);font-weight:600}
 /* YEAR VIEW */
 .yr-wrap{overflow:auto;max-height:78vh;border:1px solid var(--b1);border-radius:8px;background:var(--surface)}
-.yr-grid{display:grid;grid-template-columns:48px repeat(12,minmax(230px,1fr));grid-auto-rows:minmax(56px,auto)}
+.yr-grid{display:grid;grid-template-columns:repeat(12,minmax(230px,1fr));grid-auto-rows:minmax(56px,auto)}
 .yr-h{position:sticky;top:0;z-index:3;background:var(--s2);padding:10px 12px;font-family:'Playfair Display',serif;font-size:14px;color:var(--cream);border-bottom:1px solid var(--b2);border-left:1px solid var(--b1)}
-.yr-corner{left:0;z-index:4;border-left:none}
-.yr-wd{position:sticky;left:0;z-index:2;background:var(--s2);font-size:10px;letter-spacing:.1em;color:var(--cdim);padding:9px 6px;border-top:1px solid var(--b1)}
-.yr-wd.we{background:#222a22;color:var(--cream)}
 .yr-c{display:flex;gap:7px;align-items:flex-start;padding:5px 8px;border-top:1px solid var(--b1);border-left:1px solid var(--b1);min-width:0;cursor:pointer}
 .yr-c.out{cursor:default;background:transparent}
-.yr-c.we{background:rgba(255,255,255,.04)}
+.yr-c.we{background:rgba(255,255,255,.05)}
+.yr-c.we .yr-n small{color:var(--cmid)}
 .yr-c:not(.out):hover{background:rgba(255,255,255,.08)}
 .yr-c.today{box-shadow:inset 0 0 0 2px var(--gbright)}
 .yr-c.drag-over{background:rgba(74,124,74,.18)}
-.yr-n{font-size:13px;font-weight:500;color:var(--cdim);min-width:20px;text-align:right;padding-top:3px}
+.yr-n{display:flex;flex-direction:column;align-items:center;font-size:14px;font-weight:500;color:var(--cmid);min-width:30px;line-height:1.15;padding-top:2px}
+.yr-n small{font-size:9px;letter-spacing:.08em;color:var(--cdim);font-weight:400}
 .yr-c.today .yr-n{color:var(--gbright);font-weight:700}
 .yr-e{flex:1;min-width:0}
 .yr-c .cp{font-size:12.5px;line-height:1.35;padding:4px 8px;margin-bottom:3px}
@@ -2170,16 +2169,14 @@ function renderYear(){
   const last=months[11];
   document.getElementById('mlbl').textContent=`${sm[cM]} ${cY} to ${sm[last.m]} ${last.y}`;
   const t=todayStr();
-  let h='<div class="yr-wrap"><div class="yr-grid"><div class="yr-h yr-corner"></div>'+months.map(x=>`<div class="yr-h">${fm[x.m]} ${x.y}</div>`).join('');
-  for(let r=0;r<37;r++){
-    const wd=r%7,we=wd>=5;
-    h+=`<div class="yr-wd${we?' we':''}">${wdn[wd]}</div>`;
+  let h='<div class="yr-wrap"><div class="yr-grid">'+months.map(x=>`<div class="yr-h">${fm[x.m]} ${x.y}</div>`).join('');
+  for(let r=0;r<31;r++){
     months.forEach(x=>{
-      const first=(new Date(x.y,x.m,1).getDay()+6)%7;
-      const dn=r-first+1,tot=new Date(x.y,x.m+1,0).getDate();
-      if(dn<1||dn>tot){h+=`<div class="yr-c out${we?' we':''}"></div>`;return;}
+      const dn=r+1,tot=new Date(x.y,x.m+1,0).getDate();
+      if(dn>tot){h+='<div class="yr-c out"></div>';return;}
+      const wd=(new Date(x.y,x.m,dn).getDay()+6)%7,we=wd>=5;
       const ds=`${x.y}-${String(x.m+1).padStart(2,'0')}-${String(dn).padStart(2,'0')}`;
-      h+=`<div class="yr-c${we?' we':''}${ds===t?' today':''}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')"><span class="yr-n">${dn}</span><div class="yr-e">${calPills(ds)}</div></div>`;
+      h+=`<div class="yr-c${we?' we':''}${ds===t?' today':''}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')"><span class="yr-n"><small>${wdn[wd]}</small>${dn}</span><div class="yr-e">${calPills(ds)}</div></div>`;
     });
   }
   h+='</div></div>';
