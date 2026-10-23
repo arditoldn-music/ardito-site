@@ -130,6 +130,11 @@ textarea{resize:vertical;min-height:80px}
 /* Meeting - purple */
 .pm{background:rgba(120,60,180,.2);color:#b08ad4}
 .dot-meeting{background:#9b59d4}
+/* Release - cream, Deadline - amber */
+.prel{background:#e8e0d0;color:#0d0d0d;font-weight:500}
+.dot-release{background:#0d0d0d;border:1px solid #0d0d0d}
+.pdead{background:rgba(200,121,65,.25);color:#e0956a}
+.dot-deadline{background:#c87941}
 /* Artist - blue */
 .pa{background:rgba(26,80,140,.3);color:#7aaad4}
 .dot-artist{background:#3a7fd4}
@@ -404,7 +409,7 @@ textarea{resize:vertical;min-height:80px}
 
     <!-- CALENDAR -->
     <div class="page" id="page-calendar">
-      <div class="ph"><div><div class="pt">Posting Calendar</div><div class="ps">Plan and track content</div></div>
+      <div class="ph"><div><div class="pt">Calendar</div><div class="ps">Plan and track content</div></div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#4a7c4a;display:inline-block"></span>Explains</span>
@@ -413,12 +418,14 @@ textarea{resize:vertical;min-height:80px}
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#7aaad4;display:inline-block"></span>Updates</span>
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#9b59d4;display:inline-block"></span>Meeting</span>
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#3a7fd4;display:inline-block"></span>Artist</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#e8e0d0;display:inline-block"></span>Release</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#c87941;display:inline-block"></span>Deadline</span>
           </div>
           <div class="ha"><div class="vt"><button class="vb active" onclick="setCV('cal',this)">Calendar</button><button class="vb" onclick="setCV('list',this)">List</button></div>
           <button class="btn bp" onclick="openLM()">+ New</button></div>
         </div>
       </div>
-      <div class="cc"><div class="mn"><button onclick="chM(-1)">‹</button><div class="ml" id="mlbl"></div><button onclick="chM(1)">›</button></div></div>
+      <div class="cc"><div class="mn"><button onclick="chM(-1)">‹</button><div class="ml" id="mlbl"></div><button onclick="chM(1)">›</button></div><select id="cal-art" onchange="renderCal();if(cvMode==='list')renderListV()" style="width:auto;min-width:170px"></select></div>
       <div id="cv"><div class="cg" id="cgrid"></div></div>
       <div id="lv" style="display:none"><div id="litems"></div></div>
     </div>
@@ -519,10 +526,11 @@ textarea{resize:vertical;min-height:80px}
     <div class="mt" id="lmt">New post</div>
     <div class="fg"><label class="fl">Title</label><input type="text" id="l-title" placeholder="What's this?"></div>
     <div class="fr">
-      <div class="fg"><label class="fl">Type</label><select id="l-type" onchange="updateSeriesOptions()"><option value="post">Post</option><option value="meeting">Meeting</option><option value="artist">Artist</option></select></div>
+      <div class="fg"><label class="fl">Type</label><select id="l-type" onchange="updateSeriesOptions();checkPostDay()"><option value="post">Post</option><option value="meeting">Meeting</option><option value="artist">Artist</option><option value="deadline">Deadline</option></select></div>
       <div class="fg"><label class="fl">Date</label><input type="date" id="l-date" onchange="checkPostDay()"></div>
     </div>
     <div id="l-day-hint" style="font-size:11px;margin-bottom:12px;margin-top:-8px"></div>
+    <div class="fg"><label class="fl">Artist</label><select id="l-artist"></select></div>
     <div class="fg" id="l-series-wrap"><label class="fl">Series</label><select id="l-series"><option value="">None</option><option>Ardito Explains</option><option>Hot Take</option><option>Recent Updates</option><option>Video</option></select></div>
     <div class="fg" id="l-format-wrap"><label class="fl">Format</label><select id="l-format"><option value="">Unknown</option><option>Single image</option><option>Carousel 3 slides</option><option>Carousel 4 slides</option><option>Carousel 5 slides</option><option>Reel</option></select></div>
     <div class="fg"><label class="fl">Notes</label><input type="text" id="l-topic" placeholder="Artist name, meeting name, or topic"></div>
@@ -739,8 +747,8 @@ function setPKSaveState(text){const el=document.getElementById('pk-save-state');
 function renderPressKits(){
   const g=document.getElementById('pkgrid');
   document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-workspace').classList.remove('open');
-  if(!aArt.length){g.innerHTML='<div class="empty"><div class="ei">🗂️</div><div>Add an artist first, then build their press kit</div></div>';return;}
-  g.innerHTML=[...aArt].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{const pk=getPressKit(a.id),status=pk?.status||'not_started',liveUrl=pk?.status==='published'?epkPublicUrl(a.id):'';return`<div class="li" style="cursor:pointer" onclick="openPressKitEditor(${jsqAttr(a.id)})"><div style="flex:1;min-width:0"><div class="an">${escPK(a.name)}</div><div class="al">${pk?.template?epkLabel(pk.template):'No template chosen yet'}${pk?.public_slug?' · Published URL set':''}</div></div><span class="tag ${PK_STATUS_TAG[status]||'td'}">${escPK(PK_STATUS_LABEL[status]||status)}</span>${liveUrl?`<a href="${escPK(liveUrl)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a><a href="${escPK(liveUrl)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">View Live EPK ↗</a>`:''}<button class="btn bg bsm" onclick="event.stopPropagation();openPressKitEditor(${jsqAttr(a.id)})">${pk?.template?'Edit':'Build'}</button></div>`;}).join('');
+  if(!liveArt().length){g.innerHTML='<div class="empty"><div class="ei">🗂️</div><div>Add an artist first, then build their press kit</div></div>';return;}
+  g.innerHTML=[...liveArt()].sort((a,b)=>a.name.localeCompare(b.name)).map(a=>{const pk=getPressKit(a.id),status=pk?.status||'not_started',liveUrl=pk?.status==='published'?epkPublicUrl(a.id):'';return`<div class="li" style="cursor:pointer" onclick="openPressKitEditor(${jsqAttr(a.id)})"><div style="flex:1;min-width:0"><div class="an">${escPK(a.name)}</div><div class="al">${pk?.template?epkLabel(pk.template):'No template chosen yet'}${pk?.public_slug?' · Published URL set':''}</div></div><span class="tag ${PK_STATUS_TAG[status]||'td'}">${escPK(PK_STATUS_LABEL[status]||status)}</span>${liveUrl?`<a href="${escPK(liveUrl)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">Open ↗</a><a href="${escPK(liveUrl)}" target="_blank" rel="noopener" class="btn bg bsm" onclick="event.stopPropagation()">View Live EPK ↗</a>`:''}<button class="btn bg bsm" onclick="event.stopPropagation();openPressKitEditor(${jsqAttr(a.id)})">${pk?.template?'Edit':'Build'}</button></div>`;}).join('');
 }
 function closePressKitEditor(){document.getElementById('pk-workspace').classList.remove('open');document.getElementById('pk-list-view').style.display='block';document.getElementById('pk-editor-root').innerHTML='';renderPressKits();}
 function openPressKitEditor(artistId){const a=aArt.find(x=>x.id===artistId);if(!a)return;document.getElementById('pk-list-view').style.display='none';document.getElementById('pk-workspace').classList.add('open');window.currentPKArtistId=artistId;const root=document.getElementById('pk-editor-root');root.dataset.artistId=artistId;try{root.innerHTML=buildPKEditor(artistId);updatePKImageStage(artistId);updatePKPreview(artistId);pkInitThumbs(artistId);}catch(err){console.error('EPK editor failed to open:',err);root.innerHTML='<div class="empty" style="padding:2rem;max-width:640px"><div style="font-size:1.05rem;margin-bottom:8px">Could not open this press kit.</div><div style="opacity:.8;line-height:1.6">'+escPK(String(err&&err.message||err))+'<br><br>If this says something is not defined, the templates file (epk/epk-shared.js) on the site is older than the dashboard. Deploy all three files from the same update, then hard refresh (Cmd+Shift+R).</div></div>';}root.scrollIntoView({behavior:'smooth',block:'start'});}
@@ -2011,6 +2019,7 @@ function renderHome(){
   // tasks
   let tasks=[];
   aRel.forEach(r=>{
+    if(isArch(r.artist_id))return;
     const myTasks=aRelTasks.filter(t=>t.release_id===r.id).sort((a,b)=>a.sort_order-b.sort_order);
     if(!myTasks.length)return;
     const phaseMap=new Map();
@@ -2037,15 +2046,65 @@ function renderHome(){
   ht.innerHTML=tasks.length?tasks.slice(0,5).map(t=>`<div class="bi"><div class="pd ${t.u?'dr':'da'}"></div><div class="bit"><div class="bit-t">${escPK(t.l)}</div><div class="bit-s">${escPK(t.s)}</div></div></div>`).join(''):'<div class="bem">No urgent release tasks</div>';
   // followups
   const CHASE_STAGES=['Active','In Conversation'];
-  const fu=aArt.filter(a=>CHASE_STAGES.includes(a.stage)).map(a=>{const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
+  const fu=aArt.filter(a=>!a.archived&&CHASE_STAGES.includes(a.stage)).map(a=>{const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
   document.getElementById('h-followups').innerHTML=fu.length?fu.slice(0,5).map(a=>`<div class="bi"><div class="pd ${a.ds>21?'dr':'da'}"></div><div class="bit"><div class="bit-t">${escPK(a.name)}${a.ds>21?' · overdue':''}</div><div class="bit-s">${escPK(a.next_step||a.stage)}${a.ds<999?' · '+a.ds+'d since contact':''}</div></div></div>`).join(''):'<div class="bem">All artists up to date</div>';
   // posts
-  const wp=aLib.filter(p=>{if(!p.post_date)return false;const d=new Date(p.post_date+'T12:00:00');return d>=now&&d<=we;});
-  document.getElementById('h-posts').innerHTML=wp.length?wp.map(p=>{const d=new Date(p.post_date+'T12:00:00');return`<div class="bi"><div class="pd ${p.status==='posted'?'dg':p.status==='ready'?'da':'dd'}"></div><div class="bit"><div class="bit-t">${escPK(p.title)}</div><div class="bit-s">${d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})} · ${escPK(p.series||'Post')} · ${escPK(p.status)}</div></div></div>`;}).join(''):'<div class="bem">No posts scheduled this week</div>';
+  const wp=aLib.filter(p=>{if(!p.post_date||isArch(p.artist_id))return false;const d=new Date(p.post_date+'T12:00:00');return d>=now&&d<=we;});
+  document.getElementById('h-posts').innerHTML=wp.length?wp.map(p=>{const d=new Date(p.post_date+'T12:00:00');return`<div class="bi"><div class="pd ${p.status==='posted'?'dg':p.status==='ready'?'da':'dd'}"></div><div class="bit"><div class="bit-t">${escPK(p.title)}</div><div class="bit-s">${d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})} · ${artName(p.artist_id)?escPK(artName(p.artist_id))+' · ':''}${escPK(p.series||(p.type&&p.type!=='post'?p.type:'Post'))} · ${escPK(p.status)}</div></div></div>`;}).join(''):'<div class="bem">No posts scheduled this week</div>';
   // ideas
   const pi=aIdeas.filter(i=>i.status==='pending'||i.status==='yes').slice(0,4);
   document.getElementById('h-ideas').innerHTML=pi.length?pi.map(i=>`<div class="bi"><div class="pd ${i.status==='yes'?'dg':'dd'}"></div><div class="bit"><div class="bit-t">${escPK(i.title)}</div><div class="bit-s">${escPK(i.series||'No series')}</div></div></div>`).join(''):'<div class="bem">No ideas queued up</div>';
 }
+
+// ARCHIVE
+let showArch=false;
+function isArch(aid){if(!aid)return false;const a=aArt.find(x=>String(x.id)===String(aid));return !!(a&&a.archived);}
+function liveArt(){return aArt.filter(a=>!a.archived);}
+function togArch(){showArch=!showArch;renderRoster();}
+async function archiveArtist(id,flag){
+  const a=aArt.find(x=>x.id===id);if(!a)return;
+  if(flag&&!confirm(`Archive ${a.name}? They will drop off the roster, calendar, dropdowns and home page. Nothing is deleted and you can restore them any time.`))return;
+  try{await db('artists','PATCH',{archived:flag},id);}catch(e){alert('Could not save. Has the archive column been added in Supabase yet? '+e.message);return;}
+  aArt=aArt.map(x=>x.id===id?{...x,archived:flag}:x);
+  showRL();renderRoster();renderCal();renderHome();renderReleases();renderLib();
+}
+
+// CALENDAR LINKS (artist filter, names, next up)
+function calArtVal(){const el=document.getElementById('cal-art');return el?el.value:'';}
+function calPass(artistId){if(isArch(artistId))return false;const v=calArtVal();if(!v)return true;if(v==='__none')return !artistId;return String(artistId)===v;}
+function fillCalArt(){const el=document.getElementById('cal-art');if(!el)return;const cur=el.value;el.innerHTML='<option value="">All artists</option><option value="__none">Ardito only</option>'+liveArt().map(a=>`<option value="${escPK(a.id)}">${escPK(a.name)}</option>`).join('');el.value=[...el.options].some(o=>o.value===cur)?cur:'';}
+function artName(id){const a=aArt.find(x=>String(x.id)===String(id));return a?a.name:'';}
+function todayStr(){const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;}
+function calForArtist(aid){nav('calendar');const el=document.getElementById('cal-art');if(el){el.value=String(aid);renderCal();if(cvMode==='list')renderListV();}}
+function stripArtPrefix(t,aid){const fn=(artName(aid).split(' ')[0]||'')+':';return(fn.length>1&&(t||'').toLowerCase().startsWith(fn.toLowerCase()))?t.slice(fn.length).trim():(t||'');}
+function artItems(aid){
+  const e=aLib.filter(p=>String(p.artist_id)===String(aid)&&p.post_date).map(p=>({k:'e',id:p.id,t:p.title,d:p.post_date,type:p.type||'post',st:p.status}));
+  const r=aRel.filter(x=>String(x.artist_id)===String(aid)&&x.release_date).map(x=>({k:'r',id:x.id,t:x.release_name,d:x.release_date,type:'release',st:x.status==='Released'?'posted':'planned'}));
+  return [...e,...r].sort((a,b)=>a.d.localeCompare(b.d));
+}
+function nextUp(aid){
+  const t=todayStr();
+  const c=artItems(aid).filter(x=>x.d>=t&&x.st!=='posted')[0];
+  if(!c)return'';
+  return ' · Next: '+escPK(stripArtPrefix(c.t,aid))+', '+new Date(c.d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+function artCalHtml(aid){
+  const t=todayStr(),ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const all=artItems(aid);
+  const over=all.filter(x=>x.d<t&&x.st!=='posted'&&x.k==='e');
+  const up=all.filter(x=>x.d>=t);
+  const shown=[...over,...up.slice(0,12)];
+  if(!shown.length)return '<div style="color:var(--cdim);font-size:13px;padding:.5rem 0">Nothing scheduled for this artist yet.</div>';
+  const row=x=>{
+    const d=new Date(x.d+'T12:00:00'),done=x.st==='posted',od=x.d<t&&!done&&x.k==='e';
+    const chk=x.k==='e'?`<div onclick="event.stopPropagation();togglePosted(${jsqAttr(x.id)},${jsqAttr(x.st)})" style="width:18px;height:18px;border-radius:50%;border:1.5px solid ${done?'var(--gbright)':'var(--b3)'};background:${done?'var(--gbright)':'transparent'};flex-shrink:0;cursor:pointer"></div>`:'<div style="width:18px;flex-shrink:0"></div>';
+    const open=x.k==='r'?`openRM(${jsqAttr(x.id)})`:`openLM(${jsqAttr(x.id)},event)`;
+    return `<div class="li" style="padding:.7rem 1rem;cursor:pointer${done?';opacity:.5':''}" onclick="${open}">${chk}<div class="db"><div class="dbd">${d.getDate()}</div><div class="dbm">${ms[d.getMonth()]}</div></div><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--cream)">${escPK(stripArtPrefix(x.t,aid))}</div><div style="font-size:11px;color:var(--cdim);margin-top:2px">${escPK(x.type)}${od?' · <span class="tag ta">overdue</span>':''}${x.d===t?' · today':''}</div></div></div>`;
+  };
+  const more=up.length>12?`<div style="font-size:12px;color:var(--cdim);padding:4px 2px">${up.length-12} more in the calendar</div>`:'';
+  return shown.map(row).join('')+more;
+}
+function refreshArtCal(){const e=document.getElementById('artcal');if(e&&e.dataset.aid)e.innerHTML=artCalHtml(e.dataset.aid);}
 
 // CALENDAR
 function chM(d){cM+=d;if(cM>11){cM=0;cY++;}if(cM<0){cM=11;cY--;}renderCal();}
@@ -2054,6 +2113,8 @@ function setCV(v,btn){cvMode=v;document.querySelectorAll('.vb').forEach(b=>b.cla
 function pCls(s,st,type){
   if(type==='meeting')return'pm'+(st==='posted'?' ppost':'');
   if(type==='artist')return'pa'+(st==='posted'?' ppost':'');
+  if(type==='release')return'prel'+(st==='posted'?' ppost':'');
+  if(type==='deadline')return'pdead'+(st==='posted'?' ppost':'');
   const v=(s||'').toLowerCase().replace(/\s/g,'');
   let c=v.includes('explain')?'pe':v.includes('hot')?'ph2':v.includes('video')?'pv':v.includes('recent')||v.includes('update')?'pu':'po';
   if(st==='posted')c+=' ppost';
@@ -2062,12 +2123,15 @@ function pCls(s,st,type){
 function pDot(s,type){
   if(type==='meeting')return'dot-meeting';
   if(type==='artist')return'dot-artist';
+  if(type==='release')return'dot-release';
+  if(type==='deadline')return'dot-deadline';
   const v=(s||'').toLowerCase().replace(/\s/g,'');
   return v.includes('explain')?'dot-explains':v.includes('hot')?'dot-hot':v.includes('video')?'dot-video':v.includes('recent')||v.includes('update')?'dot-recent':'dot-post';
 }
 function pLabel(s,type,title){
   if(type==='meeting')return escPK((s||'Meeting')+(title?' — '+title.slice(0,20):''));
   if(type==='artist')return escPK((s||'Artist')+(title?' — '+title.slice(0,20):''));
+  if(type==='release'||type==='deadline')return escPK((title||'').slice(0,40)||(type==='release'?'Release':'Deadline'));
   const cat=s||'Post';
   return escPK(title?cat+': '+title.slice(0,22):cat);
 }
@@ -2075,6 +2139,7 @@ function pLabel(s,type,title){
 function renderCal(){
   const POST_DAYS={0:'7pm',2:'9am',4:'7pm',6:'10am'};
   const ms=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  fillCalArt();
   document.getElementById('mlbl').textContent=`${ms[cM]} ${cY}`;
   const g=document.getElementById('cgrid');
   const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -2088,9 +2153,10 @@ function renderCal(){
     const dow=dt.getDay();
     const bestTime=POST_DAYS[dow];
     const it=today.getDate()===d&&today.getMonth()===cM&&today.getFullYear()===cY;
-    const dp=aLib.filter(p=>p.post_date===ds);
-    const pills=dp.map(p=>`<span class="cp ${pCls(p.series,p.status,p.type)}" draggable="true" data-id="${escPK(p.id)}" onclick="openLM(${jsqAttr(p.id)},event)" ondragstart="dragStart(event,${jsqAttr(p.id)})" ondragend="dragEnd(event)"><span class="cp-dot ${pDot(p.series,p.type)}"></span>${pLabel(p.series,p.type,p.title)}</span>`).join('');
-    h+=`<div class="cd${it?' today':''}${bestTime?' post-day':''}" data-date="${ds}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')""><div class="cdn">${d}</div>${pills}</div>`;
+    const dp=aLib.filter(p=>p.post_date===ds&&calPass(p.artist_id));
+    const rp=aRel.filter(r=>r.release_date===ds&&calPass(r.artist_id)).map(r=>`<span class="cp prel" title="${escPK(artName(r.artist_id))}" onclick="openRM(${jsqAttr(r.id)})"><span class="cp-dot dot-release"></span>${escPK((artName(r.artist_id)?artName(r.artist_id).split(' ')[0]+': ':'')+r.release_name)}</span>`).join('');
+    const pills=dp.map(p=>`<span class="cp ${pCls(p.series,p.status,p.type)}" title="${escPK(artName(p.artist_id))}" draggable="true" data-id="${escPK(p.id)}" onclick="openLM(${jsqAttr(p.id)},event)" ondragstart="dragStart(event,${jsqAttr(p.id)})" ondragend="dragEnd(event)"><span class="cp-dot ${pDot(p.series,p.type)}"></span>${pLabel(p.series,p.type,p.title)}</span>`).join('');
+    h+=`<div class="cd${it?' today':''}${bestTime?' post-day':''}" data-date="${ds}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')""><div class="cdn">${d}</div>${rp}${pills}</div>`;
   }
   g.innerHTML=h;
 }
@@ -2133,8 +2199,9 @@ function calCellClick(e,ds){
 function renderListV(){
   const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const el=document.getElementById('litems');
-  if(!aLib.length){el.innerHTML='<div class="empty"><div class="ei">📅</div><div>No posts yet</div></div>';return;}
-  el.innerHTML=aLib.map(p=>{const d=p.post_date?new Date(p.post_date+'T12:00:00'):null;return`<div class="li"><div class="db" style="${!d?'opacity:0':''}">${d?`<div class="dbd">${d.getDate()}</div><div class="dbm">${ms[d.getMonth()]}</div>`:''}</div><div style="flex:1"><div style="font-size:13px;color:var(--cream)">${escPK(p.title)}</div><div style="font-size:11px;color:var(--cdim);margin-top:3px">${escPK(p.series||'')} ${p.format?'· '+escPK(p.format):''} · <span class="tag ${p.status==='posted'?'tg':'ta'}">${escPK(p.status)}</span></div></div><button class="btn bg bsm" onclick="openLM(${jsqAttr(p.id)},event)">Edit</button></div>`;}).join('');
+  const items=[...aLib.filter(p=>calPass(p.artist_id)).map(p=>({...p,_k:'e'})),...aRel.filter(r=>r.release_date&&calPass(r.artist_id)).map(r=>({id:r.id,title:r.release_name,post_date:r.release_date,type:'release',status:r.status==='Released'?'posted':'planned',artist_id:r.artist_id,_k:'r'}))].sort((a,b)=>(a.post_date||'').localeCompare(b.post_date||''));
+  if(!items.length){el.innerHTML='<div class="empty"><div class="ei">📅</div><div>Nothing here yet</div></div>';return;}
+  el.innerHTML=items.map(p=>{const d=p.post_date?new Date(p.post_date+'T12:00:00'):null;const an=artName(p.artist_id);const open=p._k==='r'?`openRM(${jsqAttr(p.id)})`:`openLM(${jsqAttr(p.id)},event)`;return`<div class="li"><div class="db" style="${!d?'opacity:0':''}">${d?`<div class="dbd">${d.getDate()}</div><div class="dbm">${ms[d.getMonth()]}</div>`:''}</div><div style="flex:1"><div style="font-size:13px;color:var(--cream)">${escPK(p.title)}</div><div style="font-size:11px;color:var(--cdim);margin-top:3px">${an?escPK(an)+' · ':''}${p.type&&p.type!=='post'?escPK(p.type)+' · ':''}${escPK(p.series||'')} ${p.format?'· '+escPK(p.format)+' ·':''} <span class="tag ${p.status==='posted'?'tg':'ta'}">${escPK(p.status)}</span></div></div><button class="btn bg bsm" onclick="${open}">Edit</button></div>`;}).join('');
 }
 
 // ROSTER
@@ -2146,25 +2213,30 @@ const STAGE_TAG={Watching:'ta','In Conversation':'tc',Active:'tg',Paused:'tr',Al
 function renderRoster(){
   const g=document.getElementById('rgrid');
   if(!aArt.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ei">🎤</div><div>No artists yet</div><br><button class="btn bp" onclick="openAM()">Add your first artist</button></div>';return;}
-  const sorted=[...aArt].sort((a,b)=>{
+  const archN=aArt.filter(a=>a.archived).length;
+  const tog=archN?`<div style="margin-bottom:10px"><button class="btn bg bsm" onclick="togArch()">${showArch?'Hide':'Show'} archived (${archN})</button></div>`:'';
+  const sorted=aArt.filter(a=>showArch||!a.archived).sort((a,b)=>{
+    if(!!a.archived!==!!b.archived)return a.archived?1:-1;
     const oa=STAGE_ORDER[a.stage]??99,ob=STAGE_ORDER[b.stage]??99;
     if(oa!==ob)return oa-ob;
     const da=a.last_contact?new Date(a.last_contact):new Date(a.created_at||0);
     const db=b.last_contact?new Date(b.last_contact):new Date(b.created_at||0);
     return db-da;
   });
-  g.innerHTML=sorted.map(a=>{
+  g.innerHTML=tog+sorted.map(a=>{
     const ini=escPK(a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase());
     const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
     const ds=l?Math.floor((new Date()-l)/86400000):null;
     const ov=ds&&ds>14;
-    return`<div class="li" style="cursor:pointer" onclick="showAD(${jsqAttr(a.id)})">
+    return`<div class="li" style="cursor:pointer${a.archived?';opacity:.55':''}" onclick="showAD(${jsqAttr(a.id)})">
       <div class="av">${ini}</div>
       <div style="flex:1;min-width:0">
         <div class="an">${escPK(a.name)}</div>
-        <div class="al">${escPK(a.location||'')}${l?' · Last contact '+l.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):' · No contact logged'}${ov?`<span class="of"> · ${ds}d ago</span>`:''}</div>
+        <div class="al">${escPK(a.location||'')}${l?' · Last contact '+l.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):' · No contact logged'}${ov?`<span class="of"> · ${ds}d ago</span>`:''}${nextUp(a.id)}</div>
       </div>
       <span class="tag ${STAGE_TAG[a.stage]||'td'}">${escPK(a.stage||'—')}</span>
+      ${a.archived?'<span class="tag td">Archived</span>':''}
+      <button class="btn bg bsm" onclick="event.stopPropagation();archiveArtist(${jsqAttr(a.id)},${a.archived?'false':'true'})">${a.archived?'Restore':'Archive'}</button>
       <button class="btn bg bsm" onclick="event.stopPropagation();openAM(${jsqAttr(a.id)})">Edit</button>
     </div>`;
   }).join('');
@@ -2180,7 +2252,7 @@ function showAD(id){
   const l=a.last_contact?new Date(a.last_contact+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):' —';
   const rHtml=rels.length?rels.map((r,i)=>buildRelCard(r,true,false)).join(''):`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No releases yet. <button class="btn bg bsm" onclick="openRMFA(${jsqAttr(id)})">Add one</button></div>`;
   document.getElementById('adcont').innerHTML=`
-    <div class="adh"><div class="ada">${ini}</div><div><h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream)">${escPK(a.name)}</h2><div style="font-size:13px;color:var(--cdim);margin-top:2px">${escPK(a.location||'')} ${a.stage?'· <span class="tag '+(st[a.stage]||'td')+'">'+escPK(a.stage)+'</span>':''}</div></div><button class="btn bg bsm" style="margin-left:auto" onclick="openAM(${jsqAttr(a.id)})">Edit</button></div>
+    <div class="adh"><div class="ada">${ini}</div><div><h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream)">${escPK(a.name)}</h2><div style="font-size:13px;color:var(--cdim);margin-top:2px">${escPK(a.location||'')} ${a.stage?'· <span class="tag '+(st[a.stage]||'td')+'">'+escPK(a.stage)+'</span>':''}</div></div><div style="margin-left:auto;display:flex;gap:6px"><button class="btn bg bsm" onclick="archiveArtist(${jsqAttr(a.id)},${a.archived?'false':'true'})">${a.archived?'Restore':'Archive'}</button><button class="btn bg bsm" onclick="openAM(${jsqAttr(a.id)})">Edit</button></div></div>
     <div class="adg">
       <div class="dc"><div class="dct">Contact details</div>
         <div class="dr2"><span class="dk">Email</span><span class="dv">${escPK(a.email||' —')}</span></div>
@@ -2212,6 +2284,8 @@ function showAD(id){
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Contact log</h3><button class="btn bp bsm" onclick="openLogM(${jsqAttr(id)})">+ Add note</button></div>
     <div id="logcont-${htmlId(id)}" style="margin-bottom:2rem"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Calendar</h3><div style="display:flex;gap:6px">${a.archived?'':`<button class="btn bg bsm" onclick="calForArtist(${jsqAttr(id)})">Open in calendar</button>`}<button class="btn bp bsm" onclick="openLM(null,null,'',${jsqAttr(id)})">+ Add entry</button></div></div>
+    <div id="artcal" data-aid="${escPK(id)}" style="margin-bottom:2rem">${artCalHtml(id)}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream)">Releases</h3><button class="btn bp bsm" onclick="openRMFA(${jsqAttr(id)})">+ New release</button></div>
     ${rHtml}`;
   loadLog(id);
@@ -2347,8 +2421,9 @@ function togWeek(rid,wk){
 
 function renderReleases(){
   const el=document.getElementById('rcont');
-  if(!aRel.length){el.innerHTML='<div class="empty"><div class="ei">🚀</div><div>No releases yet. Add an artist first, then add their release.</div></div>';return;}
-  el.innerHTML=aRel.map((r,i)=>buildRelCard(r,false,false)).join('');
+  const rl=aRel.filter(r=>!isArch(r.artist_id));
+  if(!rl.length){el.innerHTML='<div class="empty"><div class="ei">🚀</div><div>No releases yet. Add an artist first, then add their release.</div></div>';return;}
+  el.innerHTML=rl.map((r,i)=>buildRelCard(r,false,false)).join('');
 }
 
 async function togT(rid,k,cur,artId){
@@ -2371,6 +2446,7 @@ function renderLib(){
   const f=[{k:'all',l:'All'},{k:'explains',l:'Ardito Explains'},{k:'hot',l:'Hot Take'},{k:'video',l:'Video'},{k:'recent',l:'Recent Updates'}];
   document.getElementById('lfilt').innerHTML=f.map(x=>`<button class="fb ${libF===x.k?'active':''}" onclick="setLF(${jsqAttr(x.k)})">${x.l}</button>`).join('');
   let filtered=libF==='all'?[...aLib]:aLib.filter(p=>{const s=(p.series||'').toLowerCase().replace(' ','');return s.includes(libF)||s.includes(libF.replace('hot','hottake'));});
+  filtered=filtered.filter(p=>!isArch(p.artist_id));
   // sort: unposted first (by date), posted last (by date)
   filtered.sort((a,b)=>{
     const ap=a.status==='posted',bp=b.status==='posted';
@@ -2398,7 +2474,7 @@ async function togglePosted(id,currentStatus){
   const newStatus=currentStatus==='posted'?'planned':'posted';
   await db('content_library','PATCH',{status:newStatus},id);
   aLib=aLib.map(p=>p.id===id?{...p,status:newStatus}:p);
-  renderLib();renderCal();renderHome();
+  renderLib();renderCal();renderHome();refreshArtCal();
 }
 
 function renderIdeas(){
@@ -2603,13 +2679,13 @@ async function runBrain(){
   newsItems.sort(()=>Math.random()-0.5);
   const newsSummary=newsItems.slice(0,12).join('\n');
 
-  const artistSummary=aArt.map(a=>{
+  const artistSummary=liveArt().map(a=>{
     const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
     const days=l?Math.floor((now-l)/86400000):null;
     return `- ${a.name} (${a.location||'unknown location'}, stage: ${a.stage}, priority: ${a.priority}). Last contact: ${days!==null?days+'d ago':'never'}. Next step: ${a.next_step||'none set'}. Notes: ${a.notes||'none'}.`;
   }).join('\n');
 
-  const relSummary=aRel.map(r=>{
+  const relSummary=aRel.filter(r=>!isArch(r.artist_id)).map(r=>{
     const a=aArt.find(x=>x.id===r.artist_id);
     const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
     const days=rd?Math.ceil((rd-now)/86400000):null;
@@ -2669,7 +2745,7 @@ Under ROSTER PULSE, only flag time-since-last-contact as a problem for artists w
 
 Keep it tight. Be direct. Sound like a smart colleague, not a report. No em dashes anywhere.`;
 
-  const onboardSummary=aArt.map(a=>{
+  const onboardSummary=liveArt().map(a=>{
     const tasks=aOnboard.filter(t=>t.artist_id===a.id);
     if(!tasks.length)return null;
     const missing=tasks.filter(t=>!t.done&&!t.na);
@@ -2772,7 +2848,7 @@ async function runAutoScout(){
   out.innerHTML=`<div style="color:var(--cdim);font-size:12px;padding:.5rem 0">Scanning roster for outreach opportunities...</div>`;
 
   const now=new Date();
-  const rosterContext=aArt.map(a=>{
+  const rosterContext=liveArt().map(a=>{
     const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
     const days=l?Math.floor((now-l)/86400000):null;
     return`${a.name} (${a.location||'unknown'}, ${a.stage}, last contact: ${days!==null?days+'d ago':'never'}, next step: ${a.next_step||'none'})`;
@@ -2916,7 +2992,8 @@ function checkPostDay(){
   const val=document.getElementById('l-date').value;
   const hint=document.getElementById('l-day-hint');
   if(!hint)return;
-  if(!val){hint.textContent='';return;}
+  const tp=document.getElementById('l-type').value;
+  if(!val||tp!=='post'){hint.textContent='';return;}
   const dt=new Date(val+'T12:00:00');
   const dow=dt.getDay();
   const best=POST_DAYS[dow];
@@ -2929,7 +3006,7 @@ function checkPostDay(){
     hint.style.color='var(--atext)';
   }
 }
-function openLM(id,e,ds){
+function openLM(id,e,ds,aid){
   if(e)e.stopPropagation();
   eLib=id||null;
   const it=id?aLib.find(x=>x.id===id):null;
@@ -2944,19 +3021,25 @@ function openLM(id,e,ds){
   document.getElementById('l-date').value=it?.post_date||ds||'';
   document.getElementById('l-status').value=it?.status||'planned';
   document.getElementById('l-cap').value=it?.caption||'';
+  const af=calArtVal();
+  const pre=String(it?it.artist_id||'':(aid||(af&&af!=='__none'?af:'')));
+  document.getElementById('l-artist').innerHTML='<option value="">No artist (Ardito)</option>'+aArt.filter(a=>!a.archived||String(a.id)===pre).map(a=>`<option value="${escPK(a.id)}" ${pre===String(a.id)?'selected':''}>${escPK(a.name)}</option>`).join('');
   updateSeriesOptions();
   checkPostDay();
   document.getElementById('lmod').classList.add('open');
 }
 async function saveLib(){
   const d={title:document.getElementById('l-title').value,type:document.getElementById('l-type').value||'post',series:document.getElementById('l-series').value,format:document.getElementById('l-format').value,topic:document.getElementById('l-topic').value,post_date:document.getElementById('l-date').value||null,status:document.getElementById('l-status').value,caption:document.getElementById('l-cap').value};
+  const lAid=document.getElementById('l-artist').value;
+  const lPrev=eLib?aLib.find(x=>x.id===eLib):null;
+  if(lAid||(lPrev&&lPrev.artist_id))d.artist_id=lAid||null;
   if(!d.title)return alert('Title required');
   if(eLib){await db('content_library','PATCH',d,eLib);aLib=aLib.map(l=>l.id===eLib?{...l,...d}:l);}
   else{const r=await db('content_library','POST',d);if(r&&r[0])aLib.push(r[0]);}
   aLib.sort((a,b)=>(a.post_date||'').localeCompare(b.post_date||''));
-  closeM('lmod');renderLib();renderCal();renderHome();
+  closeM('lmod');renderLib();renderCal();renderHome();refreshArtCal();
 }
-async function delLib(){if(!confirm('Delete?'))return;await db('content_library','DELETE',null,eLib);aLib=aLib.filter(l=>l.id!==eLib);closeM('lmod');renderLib();renderCal();}
+async function delLib(){if(!confirm('Delete?'))return;await db('content_library','DELETE',null,eLib);aLib=aLib.filter(l=>l.id!==eLib);closeM('lmod');renderLib();renderCal();refreshArtCal();}
 
 function openAM(id){
   eArt=id||null;const a=id?aArt.find(x=>x.id===id):null;
@@ -2978,7 +3061,14 @@ async function saveArtist(){
   closeM('amod');renderRoster();renderHome();
   if(document.getElementById('adv').style.display!=='none'&&eArt)showAD(eArt);
 }
-async function delArtist(){if(!confirm('Delete artist and all their releases?'))return;await db('artists','DELETE',null,eArt);aArt=aArt.filter(a=>a.id!==eArt);closeM('amod');showRL();renderRoster();}
+async function delArtist(){
+  const a=aArt.find(x=>x.id===eArt);if(!a)return;
+  const nr=aRel.filter(r=>r.artist_id===eArt).length,ne=aLib.filter(p=>String(p.artist_id)===String(eArt)).length;
+  if(!confirm(`Permanently delete ${a.name}? This also deletes ${nr} release${nr===1?'':'s'} and ${ne} calendar entr${ne===1?'y':'ies'}, and it can't be undone. Use Archive instead if you might want them back.`))return;
+  try{await db('artists','DELETE',null,eArt);}catch(e){alert('Could not delete. '+e.message);return;}
+  aArt=aArt.filter(x=>x.id!==eArt);aRel=aRel.filter(r=>r.artist_id!==eArt);aLib=aLib.filter(p=>String(p.artist_id)!==String(eArt));
+  closeM('amod');showRL();renderRoster();renderCal();renderHome();renderReleases();renderLib();
+}
 
 function openRM(id){
   eRel=id||null;const r=id?aRel.find(x=>x.id===id):null;
@@ -2992,7 +3082,7 @@ function openRM(id){
   document.getElementById('r-tier').value=r?.tier||'single';
   document.getElementById('r-tier').disabled=!!r;
   document.getElementById('r-tier-note').style.display=r?'block':'none';
-  document.getElementById('r-art').innerHTML=aArt.map(a=>`<option value="${escPK(a.id)}" ${r?.artist_id===a.id?'selected':''}>${escPK(a.name)}</option>`).join('');
+  document.getElementById('r-art').innerHTML=aArt.filter(a=>!a.archived||a.id===r?.artist_id).map(a=>`<option value="${escPK(a.id)}" ${r?.artist_id===a.id?'selected':''}>${escPK(a.name)}</option>`).join('');
   document.getElementById('rmod').classList.add('open');
 }
 function openRMFA(aid){openRM(null);document.getElementById('r-art').value=aid;}
@@ -3010,11 +3100,11 @@ async function saveRelease(){
       if(r[0].id)await seedReleaseTasks(r[0].id,tier);
     }
   }
-  closeM('rmod');
+  closeM('rmod');renderCal();
   if(document.getElementById('adv').style.display!=='none')showAD(artId);
   else renderReleases();
 }
-async function delRelease(){if(!confirm('Delete release?'))return;const r=aRel.find(x=>x.id===eRel);await db('releases','DELETE',null,eRel);aRel=aRel.filter(x=>x.id!==eRel);closeM('rmod');if(r&&document.getElementById('adv').style.display!=='none')showAD(r.artist_id);else renderReleases();}
+async function delRelease(){if(!confirm('Delete release?'))return;const r=aRel.find(x=>x.id===eRel);await db('releases','DELETE',null,eRel);aRel=aRel.filter(x=>x.id!==eRel);closeM('rmod');renderCal();if(r&&document.getElementById('adv').style.display!=='none')showAD(r.artist_id);else renderReleases();}
 
 function openIM(id){
   eIdea=id||null;const i=id?aIdeas.find(x=>x.id===id):null;
