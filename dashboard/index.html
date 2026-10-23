@@ -104,14 +104,31 @@ textarea{resize:vertical;min-height:80px}
 .vb.active{background:var(--gmid);color:var(--cream)}
 .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .ch{text-align:center;padding:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--cdim)}
-.cd{background:var(--surface);border:1px solid var(--b1);border-radius:6px;min-height:88px;padding:7px;cursor:pointer;transition:border-color .15s}
+.cd{background:var(--surface);border:1px solid var(--b1);border-radius:6px;min-height:104px;padding:7px;cursor:pointer;transition:border-color .15s}
 .cd:hover{border-color:var(--b2)}
 .cd.empty{background:transparent;border-color:transparent;cursor:default}
 .post-time{font-size:9px;color:var(--gtext);margin-top:2px;letter-spacing:.03em}
 .cdn{font-size:11px;color:var(--cdim);margin-bottom:4px}
 .cd.today .cdn{color:var(--gbright);font-weight:600}
+/* YEAR VIEW */
+.yr-wrap{overflow:auto;max-height:78vh;border:1px solid var(--b1);border-radius:8px;background:var(--surface)}
+.yr-grid{display:grid;grid-template-columns:48px repeat(12,minmax(230px,1fr));grid-auto-rows:minmax(56px,auto)}
+.yr-h{position:sticky;top:0;z-index:3;background:var(--s2);padding:10px 12px;font-family:'Playfair Display',serif;font-size:14px;color:var(--cream);border-bottom:1px solid var(--b2);border-left:1px solid var(--b1)}
+.yr-corner{left:0;z-index:4;border-left:none}
+.yr-wd{position:sticky;left:0;z-index:2;background:var(--s2);font-size:10px;letter-spacing:.1em;color:var(--cdim);padding:9px 6px;border-top:1px solid var(--b1)}
+.yr-wd.we{background:#222a22;color:var(--cream)}
+.yr-c{display:flex;gap:7px;align-items:flex-start;padding:5px 8px;border-top:1px solid var(--b1);border-left:1px solid var(--b1);min-width:0;cursor:pointer}
+.yr-c.out{cursor:default;background:transparent}
+.yr-c.we{background:rgba(255,255,255,.04)}
+.yr-c:not(.out):hover{background:rgba(255,255,255,.08)}
+.yr-c.today{box-shadow:inset 0 0 0 2px var(--gbright)}
+.yr-c.drag-over{background:rgba(74,124,74,.18)}
+.yr-n{font-size:13px;font-weight:500;color:var(--cdim);min-width:20px;text-align:right;padding-top:3px}
+.yr-c.today .yr-n{color:var(--gbright);font-weight:700}
+.yr-e{flex:1;min-width:0}
+.yr-c .cp{font-size:12.5px;line-height:1.35;padding:4px 8px;margin-bottom:3px}
 /* CALENDAR PILLS */
-.cp{display:flex;font-size:9px;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;cursor:grab;align-items:flex-start;gap:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal}
+.cp{display:flex;font-size:11px;padding:3px 6px;border-radius:3px;margin-bottom:2px;overflow:hidden;cursor:grab;align-items:flex-start;gap:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal}
 .cp.dragging{opacity:0.4;cursor:grabbing}
 .cd.drag-over{border-color:var(--gbright);background:rgba(74,124,74,.1)}
 .cp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -421,13 +438,14 @@ textarea{resize:vertical;min-height:80px}
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#e8e0d0;display:inline-block"></span>Release</span>
             <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--cdim)"><span style="width:8px;height:8px;border-radius:50%;background:#c87941;display:inline-block"></span>Deadline</span>
           </div>
-          <div class="ha"><div class="vt"><button class="vb active" onclick="setCV('cal',this)">Calendar</button><button class="vb" onclick="setCV('list',this)">List</button></div>
+          <div class="ha"><div class="vt"><button class="vb active" onclick="setCV('cal',this)">Calendar</button><button class="vb" onclick="setCV('list',this)">List</button><button class="vb" onclick="setCV('year',this)">Year</button></div>
           <button class="btn bp" onclick="openLM()">+ New</button></div>
         </div>
       </div>
       <div class="cc"><div class="mn"><button onclick="chM(-1)">‹</button><div class="ml" id="mlbl"></div><button onclick="chM(1)">›</button></div><select id="cal-art" onchange="renderCal();if(cvMode==='list')renderListV()" style="width:auto;min-width:170px"></select></div>
       <div id="cv"><div class="cg" id="cgrid"></div></div>
       <div id="lv" style="display:none"><div id="litems"></div></div>
+      <div id="yv" style="display:none"></div>
     </div>
 
     <!-- ROSTER -->
@@ -2108,7 +2126,7 @@ function refreshArtCal(){const e=document.getElementById('artcal');if(e&&e.datas
 
 // CALENDAR
 function chM(d){cM+=d;if(cM>11){cM=0;cY++;}if(cM<0){cM=11;cY--;}renderCal();}
-function setCV(v,btn){cvMode=v;document.querySelectorAll('.vb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('cv').style.display=v==='cal'?'block':'none';document.getElementById('lv').style.display=v==='list'?'block':'none';if(v==='list')renderListV();}
+function setCV(v,btn){cvMode=v;document.querySelectorAll('.vb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('cv').style.display=v==='cal'?'block':'none';document.getElementById('lv').style.display=v==='list'?'block':'none';document.getElementById('yv').style.display=v==='year'?'block':'none';if(v==='cal')renderCal();if(v==='list')renderListV();if(v==='year')renderYear();}
 
 function pCls(s,st,type){
   if(type==='meeting')return'pm'+(st==='posted'?' ppost':'');
@@ -2129,11 +2147,43 @@ function pDot(s,type){
   return v.includes('explain')?'dot-explains':v.includes('hot')?'dot-hot':v.includes('video')?'dot-video':v.includes('recent')||v.includes('update')?'dot-recent':'dot-post';
 }
 function pLabel(s,type,title){
-  if(type==='meeting')return escPK((s||'Meeting')+(title?' — '+title.slice(0,20):''));
-  if(type==='artist')return escPK((s||'Artist')+(title?' — '+title.slice(0,20):''));
-  if(type==='release'||type==='deadline')return escPK((title||'').slice(0,40)||(type==='release'?'Release':'Deadline'));
+  if(type==='meeting')return escPK(title||s||'Meeting');
+  if(type==='artist')return escPK(title||s||'Artist');
+  if(type==='release'||type==='deadline')return escPK(title||(type==='release'?'Release':'Deadline'));
   const cat=s||'Post';
-  return escPK(title?cat+': '+title.slice(0,22):cat);
+  return escPK(title?cat+': '+title:cat);
+}
+
+function calPills(ds){
+  const dp=aLib.filter(p=>p.post_date===ds&&calPass(p.artist_id));
+  const rp=aRel.filter(r=>r.release_date===ds&&calPass(r.artist_id)).map(r=>`<span class="cp prel" title="${escPK(artName(r.artist_id))}" onclick="openRM(${jsqAttr(r.id)})"><span class="cp-dot dot-release"></span>${escPK((artName(r.artist_id)?artName(r.artist_id).split(' ')[0]+': ':'')+r.release_name)}</span>`).join('');
+  const pills=dp.map(p=>`<span class="cp ${pCls(p.series,p.status,p.type)}" title="${escPK(artName(p.artist_id))}" draggable="true" data-id="${escPK(p.id)}" onclick="openLM(${jsqAttr(p.id)},event)" ondragstart="dragStart(event,${jsqAttr(p.id)})" ondragend="dragEnd(event)"><span class="cp-dot ${pDot(p.series,p.type)}"></span>${pLabel(p.series,p.type,p.title)}</span>`).join('');
+  return rp+pills;
+}
+
+function renderYear(){
+  const el=document.getElementById('yv');if(!el)return;
+  const sm=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fm=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const wdn=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const months=[];for(let i=0;i<12;i++){const d=new Date(cY,cM+i,1);months.push({y:d.getFullYear(),m:d.getMonth()});}
+  const last=months[11];
+  document.getElementById('mlbl').textContent=`${sm[cM]} ${cY} to ${sm[last.m]} ${last.y}`;
+  const t=todayStr();
+  let h='<div class="yr-wrap"><div class="yr-grid"><div class="yr-h yr-corner"></div>'+months.map(x=>`<div class="yr-h">${fm[x.m]} ${x.y}</div>`).join('');
+  for(let r=0;r<37;r++){
+    const wd=r%7,we=wd>=5;
+    h+=`<div class="yr-wd${we?' we':''}">${wdn[wd]}</div>`;
+    months.forEach(x=>{
+      const first=(new Date(x.y,x.m,1).getDay()+6)%7;
+      const dn=r-first+1,tot=new Date(x.y,x.m+1,0).getDate();
+      if(dn<1||dn>tot){h+=`<div class="yr-c out${we?' we':''}"></div>`;return;}
+      const ds=`${x.y}-${String(x.m+1).padStart(2,'0')}-${String(dn).padStart(2,'0')}`;
+      h+=`<div class="yr-c${we?' we':''}${ds===t?' today':''}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')"><span class="yr-n">${dn}</span><div class="yr-e">${calPills(ds)}</div></div>`;
+    });
+  }
+  h+='</div></div>';
+  el.innerHTML=h;
 }
 
 function renderCal(){
@@ -2153,12 +2203,12 @@ function renderCal(){
     const dow=dt.getDay();
     const bestTime=POST_DAYS[dow];
     const it=today.getDate()===d&&today.getMonth()===cM&&today.getFullYear()===cY;
-    const dp=aLib.filter(p=>p.post_date===ds&&calPass(p.artist_id));
-    const rp=aRel.filter(r=>r.release_date===ds&&calPass(r.artist_id)).map(r=>`<span class="cp prel" title="${escPK(artName(r.artist_id))}" onclick="openRM(${jsqAttr(r.id)})"><span class="cp-dot dot-release"></span>${escPK((artName(r.artist_id)?artName(r.artist_id).split(' ')[0]+': ':'')+r.release_name)}</span>`).join('');
-    const pills=dp.map(p=>`<span class="cp ${pCls(p.series,p.status,p.type)}" title="${escPK(artName(p.artist_id))}" draggable="true" data-id="${escPK(p.id)}" onclick="openLM(${jsqAttr(p.id)},event)" ondragstart="dragStart(event,${jsqAttr(p.id)})" ondragend="dragEnd(event)"><span class="cp-dot ${pDot(p.series,p.type)}"></span>${pLabel(p.series,p.type,p.title)}</span>`).join('');
-    h+=`<div class="cd${it?' today':''}${bestTime?' post-day':''}" data-date="${ds}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')""><div class="cdn">${d}</div>${rp}${pills}</div>`;
+    const pillsHtml=calPills(ds);
+    h+=`<div class="cd${it?' today':''}${bestTime?' post-day':''}" data-date="${ds}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')""><div class="cdn">${d}</div>${pillsHtml}</div>`;
   }
   g.innerHTML=h;
+  if(cvMode==='list')renderListV();
+  if(cvMode==='year')renderYear();
 }
 
 // DRAG AND DROP
