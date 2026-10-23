@@ -117,6 +117,7 @@ textarea{resize:vertical;min-height:80px}
 .yr-c{display:flex;gap:7px;align-items:flex-start;padding:5px 8px;border-top:1px solid var(--b1);border-left:1px solid var(--b1);min-width:0;cursor:pointer}
 .yr-c.out{cursor:default;background:transparent}
 .yr-c.we{background:rgba(255,255,255,.05)}
+.yr-h.yr-jan,.yr-c.yr-jan{border-left:2px solid var(--b3)}
 .yr-c.we .yr-n small{color:var(--cmid)}
 .yr-c:not(.out):hover{background:rgba(255,255,255,.08)}
 .yr-c.today{box-shadow:inset 0 0 0 2px var(--gbright)}
@@ -2165,18 +2166,20 @@ function renderYear(){
   const sm=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fm=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const wdn=['MON','TUE','WED','THU','FRI','SAT','SUN'];
-  const months=[];for(let i=0;i<12;i++){const d=new Date(cY,cM+i,1);months.push({y:d.getFullYear(),m:d.getMonth()});}
-  const last=months[11];
+  const END_YEAR=2030;
+  const count=Math.max(12,(END_YEAR-cY)*12+(12-cM));
+  const months=[];for(let i=0;i<count;i++){const d=new Date(cY,cM+i,1);months.push({y:d.getFullYear(),m:d.getMonth()});}
+  const last=months[months.length-1];
   document.getElementById('mlbl').textContent=`${sm[cM]} ${cY} to ${sm[last.m]} ${last.y}`;
   const t=todayStr();
-  let h='<div class="yr-wrap"><div class="yr-grid">'+months.map(x=>`<div class="yr-h">${fm[x.m]} ${x.y}</div>`).join('');
+  let h=`<div class="yr-wrap"><div class="yr-grid" style="grid-template-columns:repeat(${months.length},minmax(230px,1fr))">`+months.map(x=>`<div class="yr-h${x.m===0?' yr-jan':''}">${fm[x.m]} ${x.y}</div>`).join('');
   for(let r=0;r<31;r++){
     months.forEach(x=>{
       const dn=r+1,tot=new Date(x.y,x.m+1,0).getDate();
-      if(dn>tot){h+='<div class="yr-c out"></div>';return;}
+      if(dn>tot){h+=`<div class="yr-c out${x.m===0?' yr-jan':''}"></div>`;return;}
       const wd=(new Date(x.y,x.m,dn).getDay()+6)%7,we=wd>=5;
       const ds=`${x.y}-${String(x.m+1).padStart(2,'0')}-${String(dn).padStart(2,'0')}`;
-      h+=`<div class="yr-c${we?' we':''}${ds===t?' today':''}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')"><span class="yr-n"><small>${wdn[wd]}</small>${dn}</span><div class="yr-e">${calPills(ds)}</div></div>`;
+      h+=`<div class="yr-c${we?' we':''}${x.m===0?' yr-jan':''}${ds===t?' today':''}" onclick="calCellClick(event,'${ds}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event,'${ds}')"><span class="yr-n"><small>${wdn[wd]}</small>${dn}</span><div class="yr-e">${calPills(ds)}</div></div>`;
     });
   }
   h+='</div></div>';
