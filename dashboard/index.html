@@ -593,8 +593,9 @@ textarea{resize:vertical;min-height:80px}
 <div class="mo" id="rmod">
   <div class="md">
     <div class="mt" id="rmt">New release</div>
-    <div class="fr"><div class="fg"><label class="fl">Release name</label><input type="text" id="r-name"></div><div class="fg"><label class="fl">Artist</label><select id="r-art"></select></div></div>
+    <div class="fr"><div class="fg"><label class="fl">Release name</label><input type="text" id="r-name"></div><div class="fg"><label class="fl">Artist</label><select id="r-art" onchange="fillRelParent()"></select></div></div>
     <div class="fg"><label class="fl">Tier</label><select id="r-tier"><option value="single">Single</option><option value="ep">EP</option><option value="album">Album</option></select><div class="lerr" id="r-tier-note" style="display:none">Tier is locked once a release is created, since the task list is generated at creation time.</div></div>
+    <div class="fg"><label class="fl">Part of (optional)</label><select id="r-parent"></select><div style="font-size:11px;color:var(--cdim);margin-top:4px">Link a single to its EP or album so they show together. Only that artist's EPs and albums are listed.</div></div>
     <div class="fr"><div class="fg"><label class="fl">Release date</label><input type="date" id="r-date"></div><div class="fg"><label class="fl">Campaign start</label><input type="date" id="r-cs"></div></div>
     <div class="fr"><div class="fg"><label class="fl">Distributor</label><input type="text" id="r-dist"></div><div class="fg"><label class="fl">ISRC</label><input type="text" id="r-isrc"></div></div>
     <div class="fr"><div class="fg"><label class="fl">Status</label><select id="r-stat"><option>In Progress</option><option>Released</option><option>On Hold</option></select></div><div class="fg"><label class="fl">Pre-save link</label><input type="text" id="r-pre"></div></div>
@@ -760,7 +761,19 @@ function safeUrl(v){try{const u=new URL(String(v??''),window.location.origin);re
 function htmlId(v){return escPK(String(v??'').replace(/[^A-Za-z0-9_-]/g,'_'));}
 function nlPK(v){return escPK(v).replace(/\n/g,'<br>');}
 function getArtistPKSeed(a){const c=getPKContent(a.id);return {...c,headline:c.headline||a.name||'Artist Name',location:c.location||a.location||'',genre:c.genre||a.genre||'',bio:c.bio||a.bio||'',email:c.email||a.email||'',instagram:c.instagram||a.instagram||'',spotify:c.spotify||a.spotify_url||''};}
-function pkReleasesText(artistId){return aRel.filter(r=>r.artist_id===artistId).map(r=>[r.release_name,r.release_date?new Date(r.release_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'',r.streaming_link||''].filter(Boolean).join(' · ')).join('\n');}
+function pkReleasesText(artistId){
+  const t=todayStr();
+  return aRel.filter(r=>String(r.artist_id)===String(artistId)&&(r.status==='Released'||(r.release_date&&r.release_date<=t)))
+    .sort((a,b)=>(b.release_date||'').localeCompare(a.release_date||''))
+    .map(r=>[r.release_name,r.release_date?new Date(r.release_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'',r.streaming_link||''].filter(Boolean).join(' · ')).join('\n');
+}
+function pullPKReleases(artistId){
+  const el=document.getElementById('pk-releases');if(!el)return;
+  const t=pkReleasesText(artistId);
+  if(!t){alert('No released tracks for this artist in the Release Tracker yet. Unreleased ones are left off on purpose.');return;}
+  if(el.value.trim()&&el.value.trim()!==t.trim()&&!confirm('Replace the current text with the list from the Release Tracker?'))return;
+  el.value=t;updatePKField(el);
+}
 let pkPersistTimer=null;
 async function persistPKData(artistId){
   const pk=getPressKit(artistId);if(!pk)return;
@@ -981,6 +994,7 @@ function buildPKEditor(artistId){
   story+=pkField('pk-track-title','Featured track',c.track_title,'Track title','updatePKField');
   story+='<div class="fr">'+pkField('pk-track-year','Track year',c.track_year||'','2026','updatePKField')+'<div class="fg"><label class="fl">Press kit PDF URL</label><input id="pk-pdf" type="text" value="'+escPK(c.press_kit_pdf_url)+'" placeholder="https://…/press-kit.pdf" oninput="updatePKField(this)"><div style="margin-top:8px"><input id="pk-pdf-upload-'+artistId+'" type="file" accept=".pdf,application/pdf" onchange="uploadPKPdf(\''+artistId+'\',this)"><div id="pk-pdf-upload-status-'+artistId+'" class="pk-note" style="margin-top:6px">'+(c.press_kit_pdf_url?'Existing PDF URL saved. Upload a new PDF to replace it.':'No press kit PDF uploaded yet.')+'</div></div></div></div>';
   story+=pkField('pk-releases','Selected releases',c.releases||pkReleasesText(artistId),'Release · date · link, one per line','updatePKField','textarea');
+  story+=`<div style="margin:-6px 0 14px"><button class="btn bg bsm" type="button" onclick="pullPKReleases(${jsqAttr(artistId)})">Pull released tracks from Release Tracker</button></div>`;
   story+=pkField('pk-achievements','Highlights / achievements',c.achievements,'Festival support, radio, press, awards…','updatePKField','textarea');
   story+=pkField('pk-c1-title','Extra section 1: headline',c.custom_1_title,'Optional, e.g. Live, Sessions, Recommended listening','updatePKField');
   story+=pkField('pk-c1-text','Extra section 1: text',c.custom_1_text,'Optional. Leave empty to hide this section','updatePKField','textarea');
@@ -2053,7 +2067,7 @@ function renderHome(){
   let tasks=[];
   aRel.forEach(r=>{
     if(isArch(r.artist_id))return;
-    const myTasks=aRelTasks.filter(t=>t.release_id===r.id).sort((a,b)=>a.sort_order-b.sort_order);
+    const myTasks=relTasksOf(r.id).sort((a,b)=>a.sort_order-b.sort_order);
     if(!myTasks.length)return;
     const phaseMap=new Map();
     myTasks.forEach(t=>{if(!phaseMap.has(t.phase_key))phaseMap.set(t.phase_key,{key:t.phase_key,days:t.phase_days,tasks:[]});phaseMap.get(t.phase_key).tasks.push(t);});
@@ -2087,6 +2101,16 @@ function renderHome(){
   // ideas
   const pi=aIdeas.filter(i=>i.status==='pending'||i.status==='yes').slice(0,4);
   document.getElementById('h-ideas').innerHTML=pi.length?pi.map(i=>`<div class="bi"><div class="pd ${i.status==='yes'?'dg':'dd'}"></div><div class="bit"><div class="bit-t">${escPK(i.title)}</div><div class="bit-s">${escPK(i.series||'No series')}</div></div></div>`).join(''):'<div class="bem">No ideas queued up</div>';
+}
+
+// RELEASE LINKS (singles that belong to an EP or album)
+function relChildren(rid){return aRel.filter(r=>r.parent_release_id&&String(r.parent_release_id)===String(rid)).sort((a,b)=>(a.release_date||'').localeCompare(b.release_date||''));}
+function relName(rid){const r=aRel.find(x=>String(x.id)===String(rid));return r?r.release_name:'';}
+// An EP or album that has its singles tracked as their own releases does not need the single steps in its own checklist
+function relTasksOf(rid){
+  const r=aRel.find(x=>x.id===rid);
+  const hide=r&&(r.tier==='ep'||r.tier==='album')&&relChildren(rid).length>0;
+  return aRelTasks.filter(t=>t.release_id===rid&&!(hide&&/^(ep|alb)_single\d/.test(String(t.task_key||''))));
 }
 
 // ARCHIVE
@@ -2455,7 +2479,7 @@ function buildTierRelCard(r,inDetail,startOpen){
   const now=new Date();
   const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
   const d=rd?Math.ceil((rd-now)/86400000):null;
-  const myTasks=aRelTasks.filter(t=>t.release_id===r.id).sort((a,b)=>a.sort_order-b.sort_order);
+  const myTasks=relTasksOf(r.id).sort((a,b)=>a.sort_order-b.sort_order);
   const phaseMap=new Map();
   myTasks.forEach(t=>{
     if(!phaseMap.has(t.phase_key))phaseMap.set(t.phase_key,{key:t.phase_key,label:t.phase_label,days:t.phase_days,tasks:[]});
@@ -2476,6 +2500,7 @@ function buildTierRelCard(r,inDetail,startOpen){
         <div class="ran">${inDetail?'':escPK((a?.name||'Unknown')+' · ')}${rd?rd.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):''} ${r.status?'· '+escPK(r.status):''}</div>
         <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           ${tierLabel?`<span class="tag" style="background:${tierColor};color:#0d0d0d;font-weight:600">${tierLabel}</span>`:''}
+          ${r.parent_release_id&&relName(r.parent_release_id)?`<span class="tag td">Part of ${escPK(relName(r.parent_release_id))}</span>`:''}
           ${wKey&&phaseMap.get(wKey)?`<span class="tag ta">${escPK(phaseMap.get(wKey).label)}</span>`:''}
           ${myTasks.length?`<div style="display:flex;align-items:center;gap:8px;min-width:140px">
             <div class="rpb" style="width:100px"><div class="rpf" id="rpf-${htmlId(r.id)}" style="width:${pct}%"></div></div>
@@ -2489,6 +2514,7 @@ function buildTierRelCard(r,inDetail,startOpen){
       </div>
     </div>
     <div class="rc-body ${isOpen?'open':''}">
+      ${relChildren(r.id).length?`<div style="border:1px solid var(--b1);border-radius:8px;padding:10px 14px;margin-bottom:12px"><div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--cdim);margin-bottom:6px">Singles on this ${r.tier==='album'?'album':'EP'}</div>${relChildren(r.id).map(c=>`<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--cream);padding:3px 0;cursor:pointer" onclick="openRM(${jsqAttr(c.id)})"><span>${escPK(c.release_name)}</span><span style="color:var(--cdim)">${c.release_date?new Date(c.release_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'no date'} · ${escPK(c.status||'')}</span></div>`).join('')}<div style="font-size:11px;color:var(--cdim);margin-top:6px">The single steps are hidden from this checklist because each single has its own.</div></div>`:''}
       ${!myTasks.length?'<div class="empty" style="padding:1rem 0">No tasks found for this release, tasks are only generated when a release is first created with this tier selected.</div>':''}
       ${phases.map(p=>{
         const isCur=p.key===wKey;
@@ -2510,7 +2536,7 @@ async function toggleTierTask(taskId,cur,rid,artId){
   aRelTasks=aRelTasks.map(t=>t.id===taskId?{...t,done:!cur}:t);
   const ti=document.getElementById(`ti-${htmlId(taskId)}`);
   if(ti){ti.classList.toggle('done');ti.querySelector('.cc2').textContent=!cur?'✓':'';}
-  const myTasks=aRelTasks.filter(t=>t.release_id===rid);
+  const myTasks=relTasksOf(rid);
   const doneCt=myTasks.filter(t=>t.done).length;
   const pct=myTasks.length?Math.round(doneCt/myTasks.length*100):0;
   const rpn=document.getElementById(`rpn-${htmlId(rid)}`),rpf=document.getElementById(`rpf-${htmlId(rid)}`);
@@ -2800,7 +2826,7 @@ async function runBrain(){
     const a=aArt.find(x=>x.id===r.artist_id);
     const rd=r.release_date?new Date(r.release_date+'T12:00:00'):null;
     const days=rd?Math.ceil((rd-now)/86400000):null;
-    const myTasks=aRelTasks.filter(t=>t.release_id===r.id);
+    const myTasks=relTasksOf(r.id);
     const done=myTasks.filter(t=>t.done).length;
     return `- "${r.release_name}" by ${a?.name||'unknown'} — status: ${r.status}. Release date: ${rd?rd.toLocaleDateString('en-GB'):'not set'}. ${days!==null?(days>0?days+'d until release':Math.abs(days)+'d since release'):''}. Progress: ${myTasks.length?done+'/'+myTasks.length+' tasks complete':'no tasks tracked yet'}.`;
   }).join('\n');
@@ -3194,12 +3220,23 @@ function openRM(id){
   document.getElementById('r-tier').disabled=!!r;
   document.getElementById('r-tier-note').style.display=r?'block':'none';
   document.getElementById('r-art').innerHTML=aArt.filter(a=>!a.archived||a.id===r?.artist_id).map(a=>`<option value="${escPK(a.id)}" ${r?.artist_id===a.id?'selected':''}>${escPK(a.name)}</option>`).join('');
+  fillRelParent(r?r.parent_release_id:'');
   document.getElementById('rmod').classList.add('open');
 }
-function openRMFA(aid){openRM(null);document.getElementById('r-art').value=aid;}
+function fillRelParent(sel){
+  const el=document.getElementById('r-parent');if(!el)return;
+  const cur=sel!==undefined&&sel!==null?String(sel):el.value;
+  const art=document.getElementById('r-art').value;
+  const opts=aRel.filter(x=>String(x.artist_id)===String(art)&&(x.tier==='ep'||x.tier==='album')&&x.id!==eRel);
+  el.innerHTML='<option value="">None (standalone)</option>'+opts.map(x=>`<option value="${escPK(x.id)}" ${cur===String(x.id)?'selected':''}>${escPK(x.release_name)}${x.tier==='album'?' (album)':' (EP)'}</option>`).join('');
+}
+function openRMFA(aid){openRM(null);document.getElementById('r-art').value=aid;fillRelParent('');}
 async function saveRelease(){
   const d={release_name:document.getElementById('r-name').value,artist_id:document.getElementById('r-art').value,release_date:document.getElementById('r-date').value||null,campaign_start:document.getElementById('r-cs').value||null,distributor:document.getElementById('r-dist').value,isrc:document.getElementById('r-isrc').value,status:document.getElementById('r-stat').value,presave_link:document.getElementById('r-pre').value,streaming_link:document.getElementById('r-str').value,notes:document.getElementById('r-notes').value};
   if(!d.release_name)return alert('Release name required');
+  const rpar=document.getElementById('r-parent').value;
+  const rprev=eRel?aRel.find(x=>x.id===eRel):null;
+  if(rpar||(rprev&&rprev.parent_release_id))d.parent_release_id=rpar||null;
   const tier=document.getElementById('r-tier').value;
   let artId=d.artist_id;
   if(eRel){await db('releases','PATCH',d,eRel);aRel=aRel.map(r=>r.id===eRel?{...r,...d}:r);}
