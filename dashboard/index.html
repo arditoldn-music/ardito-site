@@ -2068,8 +2068,9 @@ async function init(){
     console.error('Ardito dashboard failed to load data:',e);
     document.getElementById('greet').insertAdjacentHTML('afterend','<div style="color:#c87941;font-size:calc(13px*var(--fs,1));margin-top:8px;">Couldn\'t load your data. Open the browser console (right click, Inspect, Console tab) to see why.</div>');
   }
-  const savedPage=sessionStorage.getItem('ap')||'home';
-  nav(savedPage);
+  const route=location.hash.slice(1)||sessionStorage.getItem('ap')||'home';
+  applyRoute(route);
+  try{history.replaceState({r:route},'','#'+route);}catch(e){}
 }
 
 function setG(){
@@ -2081,6 +2082,32 @@ function setG(){
 function toggleMobileMenu(){
   document.getElementById('main-sb').classList.toggle('mobile-open');
 }
+
+// BROWSER BACK/FORWARD: every tab and artist page gets its own history entry
+let histRestoring=false;
+function histPush(route){
+  if(histRestoring)return;
+  const cur=history.state&&history.state.r;
+  if(cur===route)return;
+  try{history.pushState({r:route},'','#'+route);}catch(e){}
+}
+function applyRoute(route){
+  const parts=String(route||'home').split('/');
+  const p=parts[0]||'home',id=parts.slice(1).join('/');
+  histRestoring=true;
+  try{
+    document.querySelectorAll('.mo.open').forEach(m=>m.classList.remove('open'));
+    if(!document.getElementById('page-'+p)||!document.getElementById('nav-'+p)){nav('home');}
+    else{
+      nav(p);
+      if(p==='roster'&&id&&aArt.find(a=>String(a.id)===id))showAD(aArt.find(a=>String(a.id)===id).id);
+    }
+  }finally{histRestoring=false;}
+}
+window.addEventListener('popstate',e=>{
+  const r=(e.state&&e.state.r)||location.hash.slice(1)||'home';
+  applyRoute(r);
+});
 
 function nav(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -2103,6 +2130,7 @@ function nav(p){
   if(p==='templates')renderTemplates();
   if(p==='brain')runBrain();
   if(p==='presskits')renderPressKits();
+  histPush(p);
 }
 
 function wk(d){
@@ -2510,7 +2538,7 @@ function renderListV(){
 
 // ROSTER
   
-function showRL(){document.getElementById('rlv').style.display='block';document.getElementById('adv').style.display='none';}
+function showRL(){document.getElementById('rlv').style.display='block';document.getElementById('adv').style.display='none';histPush('roster');}
 const STAGE_ORDER={Active:0,'In Conversation':1,Watching:2,Paused:3,Alumni:4,'Fell Through':5};
 const STAGE_TAG={Watching:'ta','In Conversation':'tc',Active:'tg',Paused:'tr',Alumni:'td','Fell Through':'tx'};
 
@@ -2591,6 +2619,7 @@ function showAD(id){
       <div class="rc-body" id="obcont-${htmlId(id)}">${buildOnboardSection(id)}</div>
     </div>`;
   loadLog(id);
+  histPush('roster/'+id);
 }
 
 // CONTACT LOG
