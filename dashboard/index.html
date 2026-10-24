@@ -2079,7 +2079,7 @@ function renderHome(){
   ht.innerHTML=tasks.length?tasks.slice(0,5).map(t=>`<div class="bi"><div class="pd ${t.u?'dr':'da'}"></div><div class="bit"><div class="bit-t">${escPK(t.l)}</div><div class="bit-s">${escPK(t.s)}</div></div></div>`).join(''):'<div class="bem">No urgent release tasks</div>';
   // followups
   const CHASE_STAGES=['Active','In Conversation'];
-  const fu=aArt.filter(a=>!a.archived&&CHASE_STAGES.includes(a.stage)).map(a=>{const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
+  const fu=aArt.filter(a=>!a.archived&&CHASE_STAGES.includes(a.stage)).map(a=>{const l=lastContactOf(a)?new Date(lastContactOf(a)+'T12:00:00'):null;const d=l?Math.floor((now-l)/86400000):999;return{...a,ds:d};}).filter(a=>a.priority==='This week'||a.ds>14).sort((a,b)=>b.ds-a.ds);
   document.getElementById('h-followups').innerHTML=fu.length?fu.slice(0,5).map(a=>`<div class="bi"><div class="pd ${a.ds>21?'dr':'da'}"></div><div class="bit"><div class="bit-t">${escPK(a.name)}${a.ds>21?' · overdue':''}</div><div class="bit-s">${escPK(a.next_step||a.stage)}${a.ds<999?' · '+a.ds+'d since contact':''}</div></div></div>`).join(''):'<div class="bem">All artists up to date</div>';
   // posts
   const wp=aLib.filter(p=>{if(!p.post_date||isArch(p.artist_id))return false;const d=new Date(p.post_date+'T12:00:00');return d>=now&&d<=we;});
@@ -2133,6 +2133,14 @@ function copyFeed(){
   else{document.execCommand('copy');done();}
 }
 
+// LAST CONTACT = the later of the logged note date and any past Meeting entry linked to the artist
+function meetingsFor(aid){const t=todayStr();return aLib.filter(p=>p.type==='meeting'&&String(p.artist_id)===String(aid)&&p.post_date&&p.post_date<=t);}
+function lastContactOf(a){
+  let best=a.last_contact||'';
+  meetingsFor(a.id).forEach(p=>{if(p.post_date>best)best=p.post_date;});
+  return best||null;
+}
+
 // CALENDAR LINKS (artist filter, names, next up)
 function calArtVal(){const el=document.getElementById('cal-art');return el?el.value:'';}
 function calPass(artistId){if(isArch(artistId))return false;const v=calArtVal();if(!v)return true;if(v==='__none')return !artistId;return String(artistId)===v;}
@@ -2168,7 +2176,7 @@ function artCalHtml(aid){
   const more=up.length>12?`<div style="font-size:12px;color:var(--cdim);padding:4px 2px">${up.length-12} more in the calendar</div>`:'';
   return shown.map(row).join('')+more;
 }
-function refreshArtCal(){const e=document.getElementById('artcal');if(e&&e.dataset.aid)e.innerHTML=artCalHtml(e.dataset.aid);}
+function refreshArtCal(){const e=document.getElementById('artcal');if(e&&e.dataset.aid){e.innerHTML=artCalHtml(e.dataset.aid);loadLog(e.dataset.aid);}}
 
 // CALENDAR
 function chM(d){cM+=d;if(cM>11){cM=0;cY++;}if(cM<0){cM=11;cY--;}renderCal();}
@@ -2315,13 +2323,13 @@ function renderRoster(){
     if(!!a.archived!==!!b.archived)return a.archived?1:-1;
     const oa=STAGE_ORDER[a.stage]??99,ob=STAGE_ORDER[b.stage]??99;
     if(oa!==ob)return oa-ob;
-    const da=a.last_contact?new Date(a.last_contact):new Date(a.created_at||0);
-    const db=b.last_contact?new Date(b.last_contact):new Date(b.created_at||0);
+    const da=lastContactOf(a)?new Date(lastContactOf(a)):new Date(a.created_at||0);
+    const db=lastContactOf(b)?new Date(lastContactOf(b)):new Date(b.created_at||0);
     return db-da;
   });
   g.innerHTML=tog+sorted.map(a=>{
     const ini=escPK(a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase());
-    const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
+    const l=lastContactOf(a)?new Date(lastContactOf(a)+'T12:00:00'):null;
     const ds=l?Math.floor((new Date()-l)/86400000):null;
     const ov=ds&&ds>14;
     return`<div class="li" style="cursor:pointer${a.archived?';opacity:.55':''}" onclick="showAD(${jsqAttr(a.id)})">
@@ -2345,7 +2353,7 @@ function showAD(id){
   const rels=aRel.filter(r=>r.artist_id===id);
   const ini=escPK(a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase());
   const st=STAGE_TAG;
-  const l=a.last_contact?new Date(a.last_contact+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):' —';
+  const l=lastContactOf(a)?new Date(lastContactOf(a)+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):' —';
   const rHtml=rels.length?rels.map((r,i)=>buildRelCard(r,true,false)).join(''):`<div style="color:var(--cdim);font-size:13px;padding:1rem 0">No releases yet. <button class="btn bg bsm" onclick="openRMFA(${jsqAttr(id)})">Add one</button></div>`;
   document.getElementById('adcont').innerHTML=`
     <div class="adh"><div class="ada">${ini}</div><div><h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--cream)">${escPK(a.name)}</h2><div style="font-size:13px;color:var(--cdim);margin-top:2px">${escPK(a.location||'')} ${a.stage?'· <span class="tag '+(st[a.stage]||'td')+'">'+escPK(a.stage)+'</span>':''}</div></div><div style="margin-left:auto;display:flex;gap:6px"><button class="btn bg bsm" onclick="archiveArtist(${jsqAttr(a.id)},${a.archived?'false':'true'})">${a.archived?'Restore':'Archive'}</button><button class="btn bg bsm" onclick="openAM(${jsqAttr(a.id)})">Edit</button></div></div>
@@ -2394,13 +2402,20 @@ async function loadLog(artId){
   const logs=await db('contact_log','GET',null,null,`?artist_id=eq.${artId}&order=log_date.desc,created_at.desc`);
   const el=document.getElementById(`logcont-${artId}`);
   if(!el)return;
-  if(!logs.length){el.innerHTML='<div style="color:var(--cdim);font-size:13px;padding:0.5rem 0">No notes yet.</div>';return;}
-  el.innerHTML=logs.map(l=>{
-    const d=l.log_date?new Date(l.log_date+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):' —';
+  const items=[
+    ...logs.map(l=>({d:l.log_date,note:l.note,id:l.id,cal:false})),
+    ...meetingsFor(artId).map(p=>({d:p.post_date,note:p.title+(p.caption?': '+p.caption:''),id:p.id,cal:true}))
+  ].sort((a,b)=>(b.d||'').localeCompare(a.d||''));
+  if(!items.length){el.innerHTML='<div style="color:var(--cdim);font-size:13px;padding:0.5rem 0">No notes yet.</div>';return;}
+  el.innerHTML=items.map(l=>{
+    const d=l.d?new Date(l.d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):' -';
+    const btn=l.cal
+      ?`<button class="btn bg bsm" style="flex-shrink:0" onclick="openLM(${jsqAttr(l.id)},event)">Calendar</button>`
+      :`<button class="btn bg bsm" style="flex-shrink:0" onclick="delLog(${jsqAttr(l.id)},${jsqAttr(artId)})">×</button>`;
     return`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--b1)">
       <div style="font-size:11px;color:var(--cdim);flex-shrink:0;padding-top:2px;min-width:80px">${d}</div>
       <div style="font-size:13px;color:var(--cmid);flex:1;line-height:1.5">${escPK(l.note)}</div>
-      <button class="btn bg bsm" style="flex-shrink:0" onclick="delLog(${jsqAttr(l.id)},${jsqAttr(artId)})">×</button>
+      ${btn}
     </div>`;
   }).join('');
 }
@@ -2776,7 +2791,7 @@ async function runBrain(){
   const newsSummary=newsItems.slice(0,12).join('\n');
 
   const artistSummary=liveArt().map(a=>{
-    const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
+    const l=lastContactOf(a)?new Date(lastContactOf(a)+'T12:00:00'):null;
     const days=l?Math.floor((now-l)/86400000):null;
     return `- ${a.name} (${a.location||'unknown location'}, stage: ${a.stage}, priority: ${a.priority}). Last contact: ${days!==null?days+'d ago':'never'}. Next step: ${a.next_step||'none set'}. Notes: ${a.notes||'none'}.`;
   }).join('\n');
@@ -2945,7 +2960,7 @@ async function runAutoScout(){
 
   const now=new Date();
   const rosterContext=liveArt().map(a=>{
-    const l=a.last_contact?new Date(a.last_contact+'T12:00:00'):null;
+    const l=lastContactOf(a)?new Date(lastContactOf(a)+'T12:00:00'):null;
     const days=l?Math.floor((now-l)/86400000):null;
     return`${a.name} (${a.location||'unknown'}, ${a.stage}, last contact: ${days!==null?days+'d ago':'never'}, next step: ${a.next_step||'none'})`;
   }).join('\n');
