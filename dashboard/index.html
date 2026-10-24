@@ -1027,6 +1027,7 @@ function buildPKEditor(artistId){
   links+='<div class="fr">'+pkField('pk-email','Artist email',c.email,'artist@example.com','updatePKField')+pkField('pk-press-contact','Press contact',c.press_contact,'Name / company','updatePKField')+'</div>';
   links+=pkField('pk-press-email','Press email',c.press_email,'press@example.com','updatePKField');
   links+='<div class="fr">'+pkField('pk-instagram','Instagram',c.instagram,'@handle','updatePKField')+pkField('pk-spotify','Spotify',c.spotify,'https://open.spotify.com/…','updatePKField')+'</div>';
+  links+='<label style="display:flex;align-items:center;gap:8px;font-size:calc(12px*var(--fs,1));color:var(--cmid);margin:-4px 0 14px;cursor:pointer"><input type="checkbox" id="pk-spotify-player" style="width:auto" '+(c.hide_spotify_player?'':'checked')+' onchange="updatePKPlayer(this)"> Show the Spotify player on this EPK (the Spotify link stays either way)</label>';
   links+='<div class="fr">'+pkField('pk-apple','Apple Music',c.apple_music,'https://music.apple.com/…','updatePKField')+pkField('pk-soundcloud','SoundCloud',c.soundcloud,'https://soundcloud.com/…','updatePKField')+'</div>';
   links+='<div class="fr">'+pkField('pk-youtube','YouTube',c.youtube,'https://youtube.com/…','updatePKField')+pkField('pk-tiktok','TikTok',c.tiktok,'@handle','updatePKField')+'</div>';
   links+=pkField('pk-hyperfollow','Hyperfollow / DistroKid',c.hyperfollow,'https://…','updatePKField')+'</div>';
@@ -1123,6 +1124,11 @@ async function uploadPKPdf(artistId,input,opts){
   }finally{input.value='';}
 }
 
+function updatePKPlayer(el){
+  const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
+  savePKContentLocal(artistId,{...getPKContent(artistId),hide_spotify_player:!el.checked});
+  updatePKPreview(artistId);queuePKPersist(artistId);
+}
 function updatePKField(el){
   const artistId=document.querySelector('#pk-editor-root')?.dataset?.artistId||window.currentPKArtistId;if(!artistId)return;
   const ids=['pk-eyebrow','pk-headline','pk-location','pk-genre','pk-short','pk-bio','pk-quote','pk-quote-source','pk-image','pk-website','pk-email','pk-press-contact','pk-press-email','pk-instagram','pk-spotify','pk-hyperfollow','pk-apple','pk-soundcloud','pk-youtube','pk-tiktok','pk-track-title','pk-track-year','pk-pdf','pk-releases','pk-achievements','pk-c1-title','pk-c1-text','pk-c2-title','pk-c2-text','pk-video-url','pk-video-title','pk-contact-label','pk-press-label','pk-show-updated','pk-visibility','pk-font-heading','pk-weight-heading','pk-font-body','pk-weight-body','pk-bio-short','pk-fans','pk-ask','pk-listen-url','pk-listen-label','pk-live-title','pk-live-text','pk-downloads','pk-photo-credit','pk-booking-name','pk-booking-email','pk-rel-title','pk-rel-date','pk-rel-blurb','pk-rel-credits','pk-cover-url','pk-release-pdf','pk-rel-listen','pk-notes'];
@@ -1727,7 +1733,7 @@ function buildPKTemplateDocument(artistId,opts){
       return '<img'+attrs+'>';
     });
   }
-  const spotifyEmbed=epkSpotifyEmbedSrc(spotify);
+  const spotifyEmbed=c.hide_spotify_player?'':epkSpotifyEmbedSrc(spotify);
   if(spotifyEmbed){
     // Ledger Sheet's whole layout is locked to a 36px ruled-line grid (same constraint
     // already handled for section spacing and headshot size). The standard 152px embed
