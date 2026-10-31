@@ -109,6 +109,11 @@ p:last-child { margin-bottom: 0; }
 /* Faces sit in the upper part of a photo, so crop from higher up. */
 .frame--portrait img { object-position: 50% 28%; }
 .frame--wide img { object-position: 50% 35%; }
+/* The airplay video is upright (3:4), so give it an upright frame. */
+.frame--video { aspect-ratio: 3 / 4; max-width: 420px; }
+.frame--video video { object-fit: cover; background: #000; }
+.case-media { align-items: start; }
+
 /* Screenshots show in full, never cropped. */
 .frame--shot { aspect-ratio: auto; }
 .frame--shot img { height: auto; object-fit: contain; }
