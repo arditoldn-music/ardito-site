@@ -1,6 +1,27 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found</title></head>
-<body><script>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found | Ardito</title>
+<meta name="description" content="This page could not be found.">
+<link rel="canonical" href="https://ardito.co.uk/404.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Page not found | Ardito">
+<meta property="og:description" content="This page could not be found.">
+<meta property="og:url" content="https://ardito.co.uk/404.html">
+<meta property="og:image" content="https://ardito.co.uk/images/sweethearting-cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body id="top">
+<script>
 (function(){
   var path=location.pathname.replace(/\/+$/, '');
   if(path.indexOf('/epk/')===0){
@@ -8,6 +29,55 @@
     var slug=parts[1]||'';
     if(slug){ location.replace('/epk/?artist='+encodeURIComponent(slug)); return; }
   }
-  document.body.innerHTML='<h1>Page not found</h1>';
 })();
-</script></body></html>
+</script>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Ardito, home"><img src="/images/logo-black.svg" alt="Ardito" width="120" height="120"></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/#services">What Ardito does</a>
+      <a href="/case-studies.html">Case studies</a>
+      <a href="/work-with-me.html">Work with me</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<div class="wrap page-head">
+  <p class="label">404</p>
+  <h1>Page not found</h1>
+  <p class="lead">That page doesn't exist, or it has moved.</p>
+  <div class="cta-row"><a class="cta" href="/">Back to the homepage →</a></div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-left">
+      <img src="/images/logo-black.svg" alt="Ardito" width="120" height="120">
+      <div class="foot-contact">
+        <p>ardito.co.uk · <a href="https://instagram.com/ardito.ldn">@ardito.ldn</a></p>
+        <p><a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a></p>
+      </div>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="/">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/#services">What Ardito does</a>
+      <a href="/case-studies.html">Case studies</a>
+      <a href="/work-with-me.html">Work with me</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy-policy.html">Privacy</a>
+      <a href="/terms-of-service.html">Terms</a>
+      <a href="/dashboard">Team login</a>
+      <a class="cta" href="#top">Back to top ↑</a>
+    </nav>
+  </div>
+</footer>
+<script src="/main.js" defer></script>
+</body>
+</html>

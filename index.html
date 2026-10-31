@@ -1,254 +1,162 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ardito | Artist development and release management, London</title>
-<meta name="description" content="I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn't know existed and don't want to do, so you can keep your focus on the music.">
+<meta name="description" content="I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn&#x27;t know existed and don&#x27;t want to do.">
+<link rel="canonical" href="https://ardito.co.uk/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ardito | Artist development and release management, London">
+<meta property="og:description" content="I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn&#x27;t know existed and don&#x27;t want to do.">
+<meta property="og:url" content="https://ardito.co.uk/index.html">
+<meta property="og:image" content="https://ardito.co.uk/images/sweethearting-cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;family=Playfair+Display:wght@400;500&amp;display=swap">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:wght@400;500&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+<body id="top">
 <a class="skip" href="#main">Skip to content</a>
-
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="/" aria-current="page"><img src="/images/logo.svg" alt="Ardito" width="56" height="56"><span>LONDON</span></a>
+    <a class="brand" href="/" aria-label="Ardito, home"><img src="/images/logo-black.svg" alt="Ardito" width="120" height="120"></a>
     <nav class="nav" aria-label="Main">
       <a href="/" aria-current="page">Home</a>
-      <a href="/releases.html">Case studies</a>
-      <a href="/work-with-me.html">Work with me</a>
       <a href="/about.html">About</a>
+      <a href="/#services">What Ardito does</a>
+      <a href="/case-studies.html">Case studies</a>
+      <a href="/work-with-me.html">Work with me</a>
       <a href="/contact.html">Contact</a>
     </nav>
   </div>
 </header>
 
 <main id="main">
-
-  <div class="wrap hero">
-    <div class="hero-cover">
-      <a href="/case-002.html">
-        <p class="label">Latest campaign</p>
-        <div class="frame"><img src="/images/sweethearting-cover.jpg" alt="Sweethearting cover art, Omjine" width="1200" height="1200"></div>
-        <div class="hero-meta"><span>ARD 002</span><span>10.07.2026</span></div>
-        <h2>Omjine · Sweethearting</h2>
-        <p class="muted">First Spin on Amazing Radio and top 3 in the Audition Poll. No ad spend.</p>
-        <span class="more">Read the case study →</span>
-      </a>
-    </div>
-    <div class="hero-text">
-      <p class="label">Artist development and release management</p>
-      <h1>For artists nobody has found yet.</h1>
-      <p class="lead">I'm Laura. I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn't know existed and don't want to do, so you can keep your focus on the music.</p>
-      <div class="btns">
-        <a class="btn btn--solid" href="/contact.html">Ask for a quote</a>
-        <a class="btn" href="/releases.html">Read the case studies</a>
-      </div>
+<section class="wrap hero" aria-label="Introduction">
+  <div class="hero-text" id="about">
+    <div class="short-rule"></div>
+    <p class="label">Artist development and release management</p>
+    <h1>For artists nobody has found yet.</h1>
+    <p class="body-lg">I'm Laura. I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn't know existed and don't want to do.</p>
+    <p class="body-lg">That way, you can keep your focus on the music.</p>
+    <div class="cta-row">
+      <a class="cta" href="/case-studies.html">Read the case studies →</a>
+      <a class="cta" href="/contact.html">Get in touch →</a>
     </div>
   </div>
-
-  <div class="played" aria-label="Played on">
-    <div class="wrap">
-      <p class="label">Played on</p>
-      <div class="ticker" id="ticker">
-        <div class="ticker-track">
-          <ul>
-            <li>Amazing Radio</li>
-            <li>FBi Radio</li>
-            <li>Radio Wigwam</li>
-            <li>Gecko Radio</li>
-          </ul>
-          <ul aria-hidden="true">
-            <li>Amazing Radio</li>
-            <li>FBi Radio</li>
-            <li>Radio Wigwam</li>
-            <li>Gecko Radio</li>
-          </ul>
-        </div>
-      </div>
-      <button class="ticker-toggle" type="button" aria-controls="ticker" aria-pressed="false">Pause</button>
+  <figure class="hero-fig">
+    <div class="hero-media">
+      <img src="/images/omjine-first-airplay-poster.jpg" alt="Omjine smiling at her laptop as she hears her song picked for radio" width="720" height="960">
+      <a class="play" href="/images/omjine-first-airplay.mp4" data-video="/images/omjine-first-airplay.mp4" data-poster="/images/omjine-first-airplay-poster.jpg" aria-label="Play the video of Omjine hearing her first airplay"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false"><path d="M6 3.5v15l13-7.5z" fill="currentColor"></path></svg></a>
     </div>
-  </div>
+    <figcaption>Omjine hearing her first airplay.
+      <span class="fig-links"><a class="link" href="https://www.instagram.com/p/DakaYo4kgLs/" target="_blank" rel="noopener">See Omjine's post ↗</a><a class="link" href="https://open.spotify.com/track/69hX4CJ0AS8Ws85a5Dj33s" target="_blank" rel="noopener">Listen to sweethearting on Spotify ↗</a></span>
+    </figcaption>
+  </figure>
+</section>
 
-  <section class="section video-block">
-    <div class="wrap">
+<section class="wrap block" aria-label="Case study">
+  <div class="block-inner case-row">
+    <img class="cover-sm" src="/images/sweethearting-cover.jpg" alt="sweethearting cover art" width="200" height="200">
+    <div class="case-row-text">
+      <p class="label">01 / Case studies</p>
+      <h2>Omjine · sweethearting</h2>
+      <p class="muted">First Spin on Amazing Radio and top 3 in the Audition Poll. No ad spend.</p>
+      <div class="cta-row">
+        <a class="cta" href="/case-002.html">Read the case study →</a>
+        <a class="cta" href="https://open.spotify.com/track/69hX4CJ0AS8Ws85a5Dj33s" target="_blank" rel="noopener">Listen on Spotify ↗</a>
+      </div>
+    </div>
+    <ul class="results">
+      <li><span class="num">7</span><span class="cap">radio and press wins</span></li>
+      <li><span class="num">Top 3</span><span class="cap">Amazing Radio Audition Poll</span></li>
+      <li><span class="num">31</span><span class="cap">playlist adds on Spotify</span></li>
+    </ul>
+  </div>
+  <a class="quiet" href="/case-001.html">Also: Precious One, built from nothing in just two weeks →</a>
+</section>
+
+<section class="wrap block" aria-label="Artists">
+  <div class="block-inner split">
+    <div class="split-head">
+      <p class="label">02 / Artists</p>
+      <h2>Meet the artists</h2>
+      <p class="muted">The artists I'm working with at the moment, and more in the making.</p>
+    </div>
+    <div class="artists">
       <figure>
-        <div class="frame frame--video">
-          <video controls="controls" preload="none" playsinline="playsinline" poster="/images/omjine-first-airplay-poster.jpg">
-            <source src="/images/omjine-first-airplay.mp4" type="video/mp4">
-          </video>
-        </div>
-        <figcaption>Omjine hearing her first airplay.</figcaption>
+        <img src="/images/omjine.jpg" alt="Omjine" width="380" height="475">
+        <figcaption><a class="link strong" href="/artist-omjine.html" target="_blank" rel="noopener">Read about Omjine ↗</a></figcaption>
+      </figure>
+      <figure>
+        <img src="/images/india-button.jpg" alt="India Button" width="380" height="475">
+        <figcaption><a class="link strong" href="/artist-india-button.html" target="_blank" rel="noopener">Read about India Button ↗</a></figcaption>
       </figure>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Case studies</h2>
-        <a href="/releases.html">All case studies</a>
-      </div>
-      <ul class="releases">
-        <li>
-          <a href="/case-002.html">
-            <span class="thumb frame"><img src="/images/sweethearting-cover.jpg" alt="" width="600" height="600"></span>
-            <span class="cat">ARD 002</span>
-            <span class="artist">Omjine</span>
-            <span class="title">Sweethearting</span>
-            <span class="date">10.07.2026</span>
-            <span class="what">7 radio and press wins across the UK, US, Australia and Korea.</span>
-          </a>
-        </li>
-        <li>
-          <a href="/case-001.html">
-            <span class="thumb frame"><img src="/images/precious-one-cover.jpg" alt="" width="600" height="600"></span>
-            <span class="cat">ARD 001</span>
-            <span class="artist">Omjine</span>
-            <span class="title">Precious One</span>
-            <span class="date">10.04.2026</span>
-            <span class="what">Built from scratch in a fortnight. Now her most-streamed track.</span>
-          </a>
-        </li>
-                <li>
-          <div class="row">
-            <span class="thumb frame"><img src="/images/baring-it-all-cover.jpg" alt="" width="600" height="600"></span>
-            <span class="cat">ARD 003</span>
-            <span class="artist">India Button</span>
-            <span class="title">Baring It All</span>
-            <span class="date">25.11.2026</span>
-            <span class="what">Out soon. Campaign running now. <a class="presave" href="https://distrokid.com/hyperfollow/indiabutton/baring-it-all?ref=release" target="_blank" rel="noopener">Pre-save</a></span>
-          </div>
-        </li>
-      </ul>
+<section class="wrap block" id="services" aria-label="What I do">
+  <div class="block-inner split">
+    <div class="split-head">
+      <p class="label">03 / What I do</p>
+      <h2>From the first pitch to the write-up.</h2>
     </div>
-  </section>
+    <ol class="do">
+      <li><span class="n">01</span><h3>Radio and blog pitching</h3><p>Pitches written for each radio station, blog and outlet, with follow-up through the campaign.</p></li>
+      <li><span class="n">02</span><h3>Playlists</h3><p>I'll use free submission sites first. Paid credits only if agreed with the artist and if it's within budget.</p></li>
+      <li><span class="n">03</span><h3>EPK</h3><p>I'll create a press kit page of your own, with your bio, music, photos and links.</p></li>
+      <li><span class="n">04</span><h3>Release set-up</h3><p>I'll help you sort the admin: Distribution, release date, pre-save link and royalty registration, so radio plays earn money.</p></li>
+      <li><span class="n">05</span><h3>Plan and content</h3><p>We'll create a timeline mapped to your release date, and a content plan for before and after. I'll make sure to only include things that fit you and your brand!</p></li>
+      <li><span class="n">06</span><h3>Follow-up and write-up</h3><p>I chase unanswered pitches, track what worked, and write it up afterwards.</p></li>
+    </ol>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Artists</h2>
-      </div>
-      <p class="lead" style="margin-bottom: 32px;">A small roster on purpose. Names go up when the artist is ready to be found.</p>
-      <div class="artists">
-        <div class="artist">
-          <a href="/case-002.html">
-            <div class="frame frame--portrait"><img src="/images/omjine.jpg" alt="Omjine" width="800" height="1000"></div>
-            <h3>Omjine</h3>
-            <p>Seoul. Two campaigns so far.</p>
-          </a>
-        </div>
-                <div class="artist">
-          <div class="frame frame--portrait"><img src="/images/india-button.jpg" alt="India Button" width="800" height="1000"></div>
-          <h3>India Button</h3>
-          <p>Baring It All, out 25 November.</p>
-        </div>
-      </div>
+<section class="band" id="pricing" aria-label="Work with me">
+  <div class="wrap band-inner">
+    <div class="band-head">
+      <p class="label">04 / Work with me</p>
+      <h2>Where are you with your music?</h2>
     </div>
-  </section>
-
-  <section class="section" id="what-i-do">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>What I do</h2>
-        <span>The work behind a release, from the first pitch to the write-up.</span>
-      </div>
-      <ul class="do">
-        <li><h3>Radio and blog pitching</h3><p>Pitches written for each station and blog, sent on a Tuesday morning and followed up one by one.</p></li>
-        <li><h3>Playlists</h3><p>Free submission sites first, then paid credits only where the playlist really fits.</p></li>
-        <li><h3>EPK</h3><p>A press kit page for each artist, hosted here, with bio, music, photos and links.</p></li>
-        <li><h3>Release set-up</h3><p>Distribution, release date, pre-save link and royalty registration, so radio plays earn money.</p></li>
-        <li><h3>Plan and content</h3><p>A timeline mapped to your release date, and a content plan for before and after release day.</p></li>
-        <li><h3>Follow-up and write-up</h3><p>I chase unanswered pitches, track what worked, and write it up afterwards.</p></li>
-      </ul>
+    <div class="band-body">
+      <p class="band-lg">Tell me about your next release.</p>
+      <p class="band-sm">For artists at the start of something, and the labels and managers looking after them.</p>
+      <a class="btn btn-cream" href="/contact.html">Get in touch →</a>
+      <p class="band-xs">I do this alongside a full-time job, so I reply when I can.</p>
     </div>
-  </section>
-
-  <section class="section" id="services">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Work with me</h2>
-        <span>For artists under 5,000 followers. Before the wave.</span>
-      </div>
-      <ul class="services">
-        <li><h3>Release management</h3><p>I run the whole campaign with you. Distribution, editorial pitching, blogs, radio, playlists, socials, and the follow-up after release day.</p><span class="quote">By quote</span></li>
-        <li><h3>Artist development</h3><p>For when you're right at the start. Who you are as an artist, whether you're ready to release, and a plan that fits where you actually are.</p><span class="quote">By quote</span></li>
-        <li><h3>Strategy call</h3><p>An hour on your next release. You fill in a short form first so I come prepared, and you leave with three things to do.</p><span class="quote">By quote</span></li>
-        <li><h3>Pitch review</h3><p>Written notes on your pitch, bio and artwork before you send anything out.</p><span class="quote">By quote</span></li>
-      </ul>
-      <div class="btns">
-        <a class="btn btn--solid" href="/contact.html">Ask for a quote</a>
-        <a class="btn" href="/intake-form.html">Book a strategy call</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="pricing">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Pricing</h2>
-      </div>
-      <p class="lead">Every release is different, so I price each one after you and I have talked. Tell me what you're putting out and I'll come back to you with a quote.</p>
-      <div class="btns">
-        <a class="btn btn--solid" href="/contact.html">Ask for a quote</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="about">
-    <div class="wrap about">
-      <div class="frame frame--portrait"><img src="/images/laura.jpg" alt="Laura" width="800" height="1000"></div>
-      <div>
-        <h2>Ardito is me, Laura.</h2>
-        <p>I've worked in live events, touring admin, distribution and artist management, and I did a Music Business MA at BIMM London.</p>
-        <p>I keep meeting artists who make amazing music but they have no idea what to do with it once it is finished. I love a spreadsheet and a to-do list, so I decided to start helping where I can have the most impact, in the background, supporting their releases.</p>
-        <p>So far, I only work with artists under 5,000 followers, and I write up every campaign, results and all.</p>
-        <p>I do this while having a full-time job, so juggling the tasks is a challenge, but a really fun one.</p>
-        <p>The connections I've made so far are incredibly valuable and already show me that what I'm doing is needed and exactly where I want to be.</p>
-        <div class="btns"><a class="btn" href="/about.html">More about me</a></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="wrap">
-      <p class="label">Got a release coming up?</p>
-      <a class="email" href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a>
-      <p class="lead">Tell me what you're putting out and when. I do this alongside a full-time job, so I reply when I can.</p>
-      <div class="links">
-        <a href="https://instagram.com/ardito.ldn">Instagram @ardito.ldn</a>
-        <a href="/intake-form.html">Book a strategy call</a>
-      </div>
-    </div>
-  </section>
-
+  </div>
+</section>
 </main>
 
 <footer class="site-footer">
   <div class="wrap">
-    <img class="wordmark" src="/images/wordmark.svg" alt="Ardito" width="180" height="138">
-    <nav class="footer-links" aria-label="Footer">
+    <div class="foot-left">
+      <img src="/images/logo-black.svg" alt="Ardito" width="120" height="120">
+      <div class="foot-contact">
+        <p>ardito.co.uk · <a href="https://instagram.com/ardito.ldn">@ardito.ldn</a></p>
+        <p><a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a></p>
+      </div>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
       <a href="/">Home</a>
-      <a href="/releases.html">Case studies</a>
-      <a href="/work-with-me.html">Work with me</a>
       <a href="/about.html">About</a>
+      <a href="/#services">What Ardito does</a>
+      <a href="/case-studies.html">Case studies</a>
+      <a href="/work-with-me.html">Work with me</a>
       <a href="/contact.html">Contact</a>
-      <a href="https://instagram.com/ardito.ldn">Instagram</a>
-      <a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a>
       <a href="/privacy-policy.html">Privacy</a>
       <a href="/terms-of-service.html">Terms</a>
       <a href="/dashboard">Team login</a>
+      <a class="cta" href="#top">Back to top ↑</a>
     </nav>
-    <small>© 2026 Ardito. London.</small>
   </div>
 </footer>
-
 <script src="/main.js" defer></script>
 </body>
 </html>

@@ -1,34 +1,40 @@
-// Ardito. Shared script for every page. No frameworks.
+/* Ardito. Opens the airplay video in a pop-up when someone presses play. */
 (function () {
-  // Leave a plain empty frame when an image or video file is not there yet.
-  function markMissing(el) {
-    var frame = el.closest('.frame');
-    if (frame) frame.classList.add('is-missing');
+  var triggers = document.querySelectorAll('[data-video]');
+  if (!triggers.length || typeof HTMLDialogElement === 'undefined') return;
+
+  var dialog = document.createElement('dialog');
+  dialog.className = 'video-dialog';
+  dialog.setAttribute('aria-label', 'Video');
+  dialog.innerHTML = '<button class="video-close" type="button">Close</button><video controls playsinline></video>';
+  document.body.appendChild(dialog);
+
+  var video = dialog.querySelector('video');
+  var last = null;
+
+  function close() {
+    video.pause();
+    if (dialog.open) dialog.close();
   }
-  document.querySelectorAll('.frame img').forEach(function (img) {
-    if (img.complete && img.naturalWidth === 0) markMissing(img);
-    img.addEventListener('error', function () { markMissing(img); });
-  });
-  document.querySelectorAll('.frame video source').forEach(function (source) {
-    source.addEventListener('error', function () { markMissing(source.parentElement); });
-  });
 
-  // Pause and play button for the Played on strip.
-  document.querySelectorAll('.ticker-toggle').forEach(function (btn) {
-    var ticker = document.getElementById(btn.getAttribute('aria-controls'));
-    if (!ticker) return;
-    btn.addEventListener('click', function () {
-      var paused = ticker.classList.toggle('is-paused');
-      btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
-      btn.textContent = paused ? 'Play' : 'Pause';
+  triggers.forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      last = el;
+      video.src = el.getAttribute('data-video');
+      video.poster = el.getAttribute('data-poster') || '';
+      dialog.showModal();
+      var p = video.play();
+      if (p && p.catch) p.catch(function () {});
     });
   });
 
-  // Only one video plays at a time.
-  var videos = document.querySelectorAll('video');
-  videos.forEach(function (v) {
-    v.addEventListener('play', function () {
-      videos.forEach(function (other) { if (other !== v) other.pause(); });
-    });
+  dialog.querySelector('.video-close').addEventListener('click', close);
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) close(); });
+  dialog.addEventListener('close', function () {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    if (last) last.focus();
   });
 })();
