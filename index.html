@@ -1,481 +1,263 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-GB">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Ardito — Artist Development & Release Management</title>
-<link rel="icon" type="image/png" href="favicon.png"/>
-<link rel="apple-touch-icon" href="favicon.png"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet"/><style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --black:#0d0d0d;
-  --cream:#e8e0d0;
-  --green-dark:#1a2e1a;
-  --green-mid:#2d4a2d;
-  --slate:#1e2a38;
-  --off-white:#f0ece4;
-  --warm-dark:#1c1a14;
-}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--cream);font-family:'DM Sans',sans-serif;line-height:1.6;overflow-x:hidden}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,13,13,0.97);backdrop-filter:blur(10px);border-bottom:1px solid rgba(232,224,208,0.1);padding:0 40px}
-.nav-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;height:64px}
-.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
-.nav-logo-svg{width:40px;height:40px}
-.nav-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:18px;color:#e8e0d0;letter-spacing:2px}
-.nav-links{display:flex;align-items:center;gap:28px}
-.nav-links a{color:rgba(232,224,208,0.75);font-size:13px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;font-family:'DM Sans',sans-serif}
-.nav-links a:hover{color:#e8e0d0}
-.nav-cta{background:#2d4a2d;color:#e8e0d0 !important;padding:9px 20px;border-radius:4px;font-size:11px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:background .2s}
-.nav-cta:hover{background:#3a5e3a !important}
-.nav-team{color:rgba(232,224,208,0.35) !important;font-size:11px;letter-spacing:1px;text-decoration:none}
-.nav-team:hover{color:rgba(232,224,208,0.55) !important}
-
-/* HERO */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 40px 80px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%, rgba(45,74,45,0.15) 0%, transparent 60%),radial-gradient(ellipse at 70% 20%, rgba(30,42,56,0.1) 0%, transparent 50%)}
-.hero-inner{max-width:900px;width:100%;position:relative;z-index:1}
-.hero-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.55);margin-bottom:24px;font-family:'DM Sans',sans-serif}
-.hero-headline{font-family:'Playfair Display',Georgia,serif;font-size:clamp(48px,7vw,84px);font-weight:700;line-height:1.05;margin-bottom:28px;color:#e8e0d0}
-.hero-headline em{font-style:italic;color:rgba(232,224,208,0.8)}
-.hero-sub{font-size:clamp(16px,2vw,19px);color:rgba(232,224,208,0.8);max-width:560px;line-height:1.75;margin-bottom:48px;font-family:'DM Sans',sans-serif}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
-.btn-primary{background:var(--cream);color:var(--black);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;font-weight:700;transition:all .2s}
-.btn-primary:hover{background:var(--off-white)}
-.btn-secondary{background:transparent;color:var(--cream);padding:14px 28px;border-radius:4px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.25);transition:all .2s}
-.btn-secondary:hover{border-color:rgba(232,224,208,0.5)}
-.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(232,224,208,0.3);font-size:11px;letter-spacing:2px;text-transform:uppercase}
-.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom, rgba(232,224,208,0.3), transparent)}
-
-/* SECTIONS */
-section{padding:100px 40px}
-.section-inner{max-width:1200px;margin:0 auto}
-.section-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(232,224,208,0.5);margin-bottom:16px;font-family:'DM Sans',sans-serif}
-.section-heading{font-family:'Playfair Display',Georgia,serif;font-size:clamp(32px,4vw,52px);font-weight:700;line-height:1.15;margin-bottom:20px;color:#e8e0d0}
-.section-sub{font-size:16px;color:rgba(232,224,208,0.75);max-width:560px;line-height:1.75;margin-bottom:60px;font-family:'DM Sans',sans-serif}
-.divider{width:100%;height:1px;background:rgba(232,224,208,0.06)}
-
-/* WHAT WE DO */
-#services{background:var(--warm-dark)}
-.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px}
-.service-card{background:rgba(232,224,208,0.03);border:1px solid rgba(232,224,208,0.06);padding:40px 36px;transition:background .2s}
-.service-card:hover{background:rgba(232,224,208,0.05)}
-.service-num{font-family:'Playfair Display',Georgia,serif;font-size:48px;color:rgba(232,224,208,0.08);font-weight:700;line-height:1;margin-bottom:16px}
-.service-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:12px;color:#e8e0d0}
-.service-desc{font-size:14px;color:rgba(232,224,208,0.75);line-height:1.75;font-family:'DM Sans',sans-serif}
-
-/* TOOLS */
-#tools{background:var(--black)}
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.tool-card{background:var(--green-dark);border:1px solid rgba(45,74,45,0.4);border-radius:8px;padding:36px 32px;position:relative;overflow:hidden;transition:border-color .2s}
-.tool-card:hover{border-color:rgba(45,74,45,0.8)}
-.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green-mid),transparent)}
-.tool-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:12px}
-.tool-title{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:10px;color:var(--cream)}
-.tool-desc{font-size:14px;color:rgba(232,224,208,0.6);line-height:1.7;margin-bottom:24px}
-.tool-price{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:var(--cream);margin-bottom:20px}
-.tool-price span{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;color:rgba(232,224,208,0.4)}
-.tool-features{list-style:none;margin-bottom:28px}
-.tool-features li{font-size:13px;color:rgba(232,224,208,0.6);padding:7px 0;border-bottom:1px solid rgba(232,224,208,0.06);display:flex;gap:10px;align-items:flex-start}
-.tool-features li::before{content:'—';color:var(--green-mid);flex-shrink:0}
-.tool-btn{display:block;background:rgba(232,224,208,0.08);color:var(--cream);text-align:center;padding:12px;border-radius:4px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid rgba(232,224,208,0.12);transition:all .2s}
-.tool-btn:hover{background:rgba(232,224,208,0.12)}
-.tool-card.featured{background:var(--green-mid);border-color:rgba(45,74,45,0.8)}
-.tool-card.featured .tool-btn{background:var(--cream);color:var(--black);border-color:var(--cream)}
-.tool-card.featured .tool-btn:hover{background:var(--off-white)}
-
-/* PRICING */
-#pricing{background:var(--warm-dark)}
-.pricing-table{width:100%;border-collapse:collapse}
-.pricing-table th{text-align:left;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.35);padding:12px 20px;border-bottom:1px solid rgba(232,224,208,0.08)}
-.pricing-table td{padding:20px;border-bottom:1px solid rgba(232,224,208,0.05);font-size:14px;color:rgba(232,224,208,0.7);vertical-align:top}
-.pricing-table tr.clickable{cursor:pointer}
-.pricing-table tr.clickable:hover td{background:rgba(232,224,208,0.04)}
-.tier-name{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);font-weight:700}
-.tier-price{font-family:'Playfair Display',Georgia,serif;font-size:24px;color:var(--cream);font-weight:700}
-.tier-badge{display:inline-block;background:var(--green-mid);color:var(--cream);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-left:8px;vertical-align:middle}
-
-/* ABOUT */
-#about{background:var(--black)}
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.about-logo{width:200px;height:200px;border-radius:50%;border:1px solid rgba(232,224,208,0.15);display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:32px}
-.about-logo-inner{width:160px;height:160px;border-radius:50%;border:0.5px solid rgba(232,224,208,0.08);display:flex;align-items:center;justify-content:center}
-.about-logo-text{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:28px;color:var(--cream);letter-spacing:3px}
-.about-text p{font-size:16px;color:rgba(232,224,208,0.65);line-height:1.8;margin-bottom:20px}
-.about-text p strong{color:var(--cream);font-weight:500}
-.about-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;padding-top:48px;border-top:1px solid rgba(232,224,208,0.08)}
-.stat-num{font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;color:var(--cream)}
-.stat-label{font-size:12px;color:rgba(232,224,208,0.4);letter-spacing:0.5px;margin-top:4px}
-@media(max-width:768px){.about-grid{grid-template-columns:1fr}}
-
-/* CONTACT */
-#contact{background:var(--green-dark)}
-.contact-inner{max-width:700px;margin:0 auto;text-align:center}
-.contact-inner .section-heading{font-size:clamp(36px,5vw,60px)}
-.contact-inner .section-sub{margin:0 auto 48px;max-width:480px}
-.contact-options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
-.contact-card{background:rgba(232,224,208,0.05);border:1px solid rgba(232,224,208,0.1);border-radius:6px;padding:28px 24px;text-align:left}
-.contact-card-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,224,208,0.4);margin-bottom:8px}
-.contact-card-title{font-family:'Playfair Display',Georgia,serif;font-size:18px;color:var(--cream);margin-bottom:8px}
-.contact-card-desc{font-size:13px;color:rgba(232,224,208,0.5);line-height:1.6;margin-bottom:16px}
-.contact-card-link{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream);text-decoration:none;border-bottom:1px solid rgba(232,224,208,0.2);padding-bottom:2px;transition:border-color .2s}
-.contact-card-link:hover{border-color:var(--cream)}
-@media(max-width:600px){.contact-options{grid-template-columns:1fr}}
-
-/* FOOTER */
-footer{background:var(--black);padding:40px;border-top:1px solid rgba(232,224,208,0.06)}
-.footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.footer-logo{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:16px;letter-spacing:1px;color:rgba(232,224,208,0.4)}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:12px;color:rgba(232,224,208,0.3);text-decoration:none;transition:color .2s}
-.footer-links a:hover{color:rgba(232,224,208,0.6)}
-.footer-copy{font-size:11px;color:rgba(232,224,208,0.2)}
-
-/* MOBILE NAV */
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
-.hamburger span{width:22px;height:1.5px;background:var(--cream);transition:all .3s}
-.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:32px}
-.mobile-menu.open{display:flex}
-.mobile-menu a{font-family:'Playfair Display',Georgia,serif;font-size:32px;color:var(--cream);text-decoration:none}
-@media(max-width:768px){
-  .hamburger{display:flex}
-  .nav-links{display:none}
-  section{padding:70px 24px}
-  nav{padding:0 24px}
-  .hero{padding:100px 24px 60px}
-  .pricing-table{display:block;overflow-x:auto}
-  .tools-grid{grid-template-columns:1fr}
-  .about-grid{grid-template-columns:1fr}
-  .about-grid>div:last-child{order:-1}
-  .about-grid img{width:140px;height:140px}
-  .services-grid{grid-template-columns:1fr}
-  .hero-btns{flex-direction:column}
-  .btn-primary,.btn-secondary{text-align:center}
-  .contact-options{grid-template-columns:1fr}
-  .about-stats{grid-template-columns:repeat(3,1fr)}
-  .footer-inner{flex-direction:column;text-align:center}
-  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
-}
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ardito | Artist development and release management, London</title>
+<meta name="description" content="I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn't know existed and don't want to do, so you can keep your focus on the music.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;family=Playfair+Display:wght@400;500&amp;display=swap">
+<link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-inner">
-    <a href="#" class="nav-logo">
-      <img src="logo.png" alt="Ardito" style="width:44px;height:44px;object-fit:contain"/>
-    </a>
-    <div class="nav-links">
-      <a href="#services">What we do</a>
-      <a href="#tools">Tools</a>
-      <a href="#pricing">Pricing</a>
-      <a href="#about">About</a>
-      <a href="#contact">Work with us</a>
-      <a href="#contact" class="nav-cta">Get in touch</a>
-    </div>
-    <div class="hamburger" onclick="toggleMenu()">
-      <span></span><span></span><span></span>
-    </div>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-current="page"><img src="/images/logo.svg" alt="Ardito" width="56" height="56"><span>LONDON</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/releases.html">Releases</a>
+      <a href="/work-with-me.html">Work with me</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
   </div>
-</nav>
+</header>
 
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobile-menu">
-  <a href="#services" onclick="toggleMenu()">What we do</a>
-  <a href="#tools" onclick="toggleMenu()">Tools</a>
-  <a href="#pricing" onclick="toggleMenu()">Pricing</a>
-  <a href="#about" onclick="toggleMenu()">About</a>
-  <a href="#contact" onclick="toggleMenu()">Work with us</a>
-  <a href="/dashboard" style="font-size:16px;opacity:0.4">Team login →</a>
-</div>
+<main id="main">
 
-<!-- HERO -->
-<section class="hero" id="home">
-  <div class="hero-inner">
-    <div class="hero-label">Artist Development & Release Management</div>
-    <h1 class="hero-headline">
-      Your music deserves<br/>
-      <em>to be heard.</em>
-    </h1>
-    <p class="hero-sub">Ardito works with independent artists who are serious about their releases. We handle the strategy, the outreach, and the parts most artists never get to.</p>
-    <div class="hero-btns">
-      <a href="#contact" class="btn-primary">Work with us</a>
-      <a href="#tools" class="btn-secondary">Browse the tools</a>
+  <div class="wrap hero">
+    <div class="hero-cover">
+      <a href="/case-002.html">
+        <p class="label">Latest campaign</p>
+        <div class="frame"><img src="/images/sweethearting-cover.jpg" alt="Sweethearting cover art, Omjine" width="1200" height="1200"></div>
+        <div class="hero-meta"><span>ARD 002</span><span>10.07.2026</span></div>
+        <h2>Omjine · Sweethearting</h2>
+        <p class="muted">First Spin on Amazing Radio and top 3 in the Audition Poll. No ad spend.</p>
+        <span class="more">Read the case study →</span>
+      </a>
     </div>
-  </div>
-  <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    scroll
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- WHAT WE DO -->
-<section id="services">
-  <div class="section-inner">
-    <div class="section-label">What we do</div>
-    <h2 class="section-heading">Release management<br/>done right.</h2>
-    <p class="section-sub">From distribution setup to post-release follow-up. We handle the campaign so you can focus on the music.</p>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-num">01</div>
-        <div class="service-title">Release Management</div>
-        <p class="service-desc">Full campaign management for single releases. Distribution, editorial pitching, blog and radio outreach, playlist pitching, social strategy, and post-release analysis.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-num">02</div>
-        <div class="service-title">Artist Development</div>
-        <p class="service-desc">For artists at the start. Brand identity, release readiness, audience building, and a plan that makes sense for where you actually are.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-num">03</div>
-        <div class="service-title">Strategy Sessions</div>
-        <p class="service-desc">A focused 60-minute session to map your next release, fix what's not working, and leave with a clear plan. Pre-call audit included.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-num">04</div>
-        <div class="service-title">DIY Tools</div>
-        <p class="service-desc">Not ready to work with us yet? Our playbooks, outreach tracker, and budget calculator give you the system to run your own campaign properly.</p>
+    <div class="hero-text">
+      <p class="label">Artist development and release management</p>
+      <h1>For artists nobody has found yet.</h1>
+      <p class="lead">I'm Laura. I run release campaigns for early independent artists: pitching, radio, press, distribution, and all the stuff you didn't know existed and don't want to do, so you can keep your focus on the music.</p>
+      <div class="btns">
+        <a class="btn btn--solid" href="/contact.html">Ask for a quote</a>
+        <a class="btn" href="/releases.html">Read the case studies</a>
       </div>
     </div>
   </div>
-</section>
 
-<div class="divider"></div>
-
-<!-- TOOLS -->
-<section id="tools">
-  <div class="section-inner">
-    <div class="section-label">The Tools</div>
-    <h2 class="section-heading">Do it yourself.<br/><em>Do it well.</em></h2>
-    <p class="section-sub">Built by a release manager for artists who want to run their own campaigns without guessing what comes next.</p>
-    <div class="tools-grid">
-      <div class="tool-card">
-        <div class="tool-tag">Playbook</div>
-        <div class="tool-title">Release Management Playbook</div>
-        <p class="tool-desc">28 days. Every action mapped to your real release date. Day-by-day briefs, tasks, and example copy - from distribution setup to post-release.</p>
-        <div class="tool-price">£14.99 <span>one-off</span></div>
-        <ul class="tool-features">
-          <li>28-day interactive checklist</li>
-          <li>Date-aware calendar</li>
-          <li>Example pitch copy included</li>
-          <li>Pre-save and distribution guides</li>
-          <li>Works for any genre or budget</li>
-        </ul>
-        <a href="https://arditox.gumroad.com/l/suiwnp" target="_blank" class="tool-btn">Get the Playbook</a>
+  <div class="played" aria-label="Played on">
+    <div class="wrap">
+      <p class="label">Played on</p>
+      <div class="ticker" id="ticker">
+        <div class="ticker-track">
+          <ul>
+            <li>Amazing Radio</li>
+            <li>FBi Radio</li>
+            <li>Radio Wigwam</li>
+            <li>Gecko Radio</li>
+          </ul>
+          <ul aria-hidden="true">
+            <li>Amazing Radio</li>
+            <li>FBi Radio</li>
+            <li>Radio Wigwam</li>
+            <li>Gecko Radio</li>
+          </ul>
+        </div>
       </div>
-      <div class="tool-card featured">
-        <div class="tool-tag">Bundle</div>
-        <div class="tool-title">Playbook + Outreach Tracker + Budget Calculator</div>
-        <p class="tool-desc">The full DIY release toolkit. Playbook, 93+ pre-loaded curator and blog contacts filtered by genre, and a budget calculator that tells you where every pound should go.</p>
-        <div class="tool-price">£29 <span>one-off</span></div>
-        <ul class="tool-features">
-          <li>Everything in the Playbook</li>
-          <li>93+ vetted contacts across 6 genres</li>
-          <li>Blogs, playlists, radio - UK and EU</li>
-          <li>Status tracking and CSV export</li>
-          <li>Budget calculator with spend breakdown</li>
-        </ul>
-        <a href="https://arditox.gumroad.com/l/jzhenz" target="_blank" class="tool-btn">Get the Bundle</a>
-      </div>
-      <div class="tool-card">
-        <div class="tool-tag">Coming Soon</div>
-        <div class="tool-title">Gig Promo Playbook</div>
-        <p class="tool-desc">21 days to a full room. The same system as the release playbook, built for promoting live shows. Join the waitlist to be notified first.</p>
-        <div class="tool-price">£15 <span>at launch</span></div>
-        <ul class="tool-features">
-          <li>21-day gig promo system</li>
-          <li>Date-aware posting calendar</li>
-          <li>Venue and ticket link guides</li>
-          <li>Works for solo artists and bands</li>
-          <li>Reusable for every show</li>
-        </ul>
-        <a href="mailto:ardito.ldn@gmail.com?subject=Gig Playbook Waitlist" class="tool-btn">Join the Waitlist</a>
-      </div>
+      <button class="ticker-toggle" type="button" aria-controls="ticker" aria-pressed="false">Pause</button>
     </div>
   </div>
-</section>
 
-<div class="divider"></div>
+  <section class="section video-block">
+    <div class="wrap">
+      <figure>
+        <div class="frame frame--wide">
+          <video controls="controls" preload="none" playsinline="playsinline" poster="/images/omjine-first-airplay-poster.jpg">
+            <source src="/images/omjine-first-airplay.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption>Omjine hearing her first airplay.</figcaption>
+      </figure>
+    </div>
+  </section>
 
-<!-- PRICING -->
-<section id="pricing">
-  <div class="section-inner">
-    <div class="section-label">Pricing</div>
-    <h2 class="section-heading">Start where you are.</h2>
-    <p class="section-sub">From the tools to the full managed service. Every tier includes everything in the one below it.</p>
-    <table class="pricing-table">
-      <thead>
-        <tr>
-          <th>Tier</th>
-          <th>Price</th>
-          <th>What's included</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/suiwnp','_blank')">
-          <td><div class="tier-name">The Playbook</div></td>
-          <td><div class="tier-price">£14.99</div></td>
-          <td>28-day release management checklist. Day-by-day briefs, tasks, and example copy. Self-serve, no support. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
-        </tr>
-        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jzhenz','_blank')">
-          <td><div class="tier-name">Bundle</div><span class="tier-badge">Best value</span></td>
-          <td><div class="tier-price">£29</div></td>
-          <td>Playbook + 93+ contact outreach tracker (genre-filtered, UK and EU) + budget calculator. Everything you need to run a release yourself. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
-        </tr>
-        <tr class="clickable" onclick="window.open('https://arditox.gumroad.com/l/jtrli','_blank')">
-          <td><div class="tier-name">Pitch Review</div></td>
-          <td><div class="tier-price">£35 <span style="font-size:12px;color:rgba(232,224,208,0.4)">intro</span></div></td>
-          <td>Everything in the Bundle, plus a written review of your pitch copy, bio, and artwork from Laura. One round of feedback, 48-hour turnaround. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Buy</span></td>
-        </tr>
-        <tr class="clickable" onclick="window.open('mailto:ardito.ldn@gmail.com?subject=Strategy Call','_blank')">
-          <td><div class="tier-name">Strategy Call</div></td>
-          <td><div class="tier-price">£120</div></td>
-          <td>Everything above, plus a 60-minute call. Pre-call intake form, tailored campaign plan, three actions to leave with. The playbook customised for your release. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
-        </tr>
-        <tr class="clickable" onclick="window.location='mailto:ardito.ldn@gmail.com?subject=Full Management Enquiry'">
-          <td><div class="tier-name">Full Management</div></td>
-          <td><div class="tier-price">Bespoke</div></td>
-          <td>Ardito runs the campaign with you. Distribution, pitching, blog and radio outreach, social strategy, post-release follow-up. Enquire for a quote. <span style="color:rgba(232,224,208,0.4);font-size:12px">↗ Enquire</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Releases</h2>
+        <a href="/releases.html">All releases</a>
+      </div>
+      <ul class="releases">
+        <li>
+          <a href="/case-002.html">
+            <span class="thumb frame"><img src="/images/sweethearting-cover.jpg" alt="" width="600" height="600"></span>
+            <span class="cat">ARD 002</span>
+            <span class="artist">Omjine</span>
+            <span class="title">Sweethearting</span>
+            <span class="date">10.07.2026</span>
+            <span class="what">7 radio and press wins across the UK, US, Australia and Korea.</span>
+          </a>
+        </li>
+        <li>
+          <a href="/case-001.html">
+            <span class="thumb frame"><img src="/images/precious-one-cover.jpg" alt="" width="600" height="600"></span>
+            <span class="cat">ARD 001</span>
+            <span class="artist">Omjine</span>
+            <span class="title">Precious One</span>
+            <span class="date">10.04.2026</span>
+            <span class="what">Built from scratch in a fortnight. Now her most-streamed track.</span>
+          </a>
+        </li>
+                <li>
+          <div class="row">
+            <span class="thumb frame"><img src="/images/baring-it-all-cover.jpg" alt="" width="600" height="600"></span>
+            <span class="cat">ARD 003</span>
+            <span class="artist">India Button</span>
+            <span class="title">Baring It All</span>
+            <span class="date">25.11.2026</span>
+            <span class="what">Out soon. Campaign running now. <a class="presave" href="https://distrokid.com/hyperfollow/indiabutton/baring-it-all?ref=release" target="_blank" rel="noopener">Pre-save</a></span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
 
-<div class="divider"></div>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Artists</h2>
+      </div>
+      <p class="lead" style="margin-bottom: 32px;">A small roster on purpose. Names go up when the artist is ready to be found.</p>
+      <div class="artists">
+        <div class="artist">
+          <a href="/case-002.html">
+            <div class="frame frame--portrait"><img src="/images/omjine.jpg" alt="Omjine" width="800" height="1000"></div>
+            <h3>Omjine</h3>
+            <p>Seoul. Two campaigns so far.</p>
+          </a>
+        </div>
+                <div class="artist">
+          <div class="frame frame--portrait"><img src="/images/india-button.jpg" alt="India Button" width="800" height="1000"></div>
+          <h3>India Button</h3>
+          <p>Baring It All, out 25 November.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-inner">
-    <div class="about-grid">
+  <section class="section" id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Work with me</h2>
+        <span>For artists under 5,000 followers. Before the wave.</span>
+      </div>
+      <ul class="services">
+        <li><h3>Release management</h3><p>I run the whole campaign with you. Distribution, editorial pitching, blogs, radio, playlists, socials, and the follow-up after release day.</p><span class="quote">By quote</span></li>
+        <li><h3>Artist development</h3><p>For when you're right at the start. Who you are as an artist, whether you're ready to release, and a plan that fits where you actually are.</p><span class="quote">By quote</span></li>
+        <li><h3>Strategy call</h3><p>An hour on your next release. You fill in a short form first so I come prepared, and you leave with three things to do.</p><span class="quote">By quote</span></li>
+        <li><h3>Pitch review</h3><p>Written notes on your pitch, bio and artwork before you send anything out. Back within 48 hours.</p><span class="quote">By quote</span></li>
+      </ul>
+      <div class="btns">
+        <a class="btn btn--solid" href="/contact.html">Ask for a quote</a>
+        <a class="btn" href="/intake-form.html">Book a strategy call</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tools">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Tools</h2>
+        <span>The same system I use, for running a release yourself.</span>
+      </div>
+      <div class="tools">
+        <div class="tool">
+          <div class="tool-cover tool-cover--cream"><span class="small">ARDITO · TOOL 01</span><span class="big">28<span class="unit">days</span></span><span class="small">RELEASE PLAYBOOK</span></div>
+          <div class="tool-name"><h3>Release Playbook</h3><span>£14.99</span></div>
+          <p>Every task mapped to your real release date, with example pitch copy.</p>
+          <a href="https://arditox.gumroad.com/l/suiwnp">Buy the playbook</a>
+        </div>
+        <div class="tool">
+          <div class="tool-cover tool-cover--green"><span class="small">ARDITO · TOOL 02</span><span class="big">93<span class="unit">contacts</span></span><span class="small">THE BUNDLE</span></div>
+          <div class="tool-name"><h3>The Bundle</h3><span>£29</span></div>
+          <p>The playbook, plus curator, blog and radio contacts sorted by genre, and a budget calculator.</p>
+          <a href="https://arditox.gumroad.com/l/jzhenz">Buy the bundle</a>
+        </div>
+        <div class="tool">
+          <div class="tool-cover tool-cover--line"><span class="small">ARDITO · TOOL 03 · SOON</span><span class="big">21<span class="unit">days</span></span><span class="small">GIG PROMO PLAYBOOK</span></div>
+          <div class="tool-name"><h3>Gig Promo Playbook</h3><span>£15</span></div>
+          <p>Three weeks to fill a room. Out soon.</p>
+          <a href="mailto:ardito.ldn@gmail.com?subject=Gig%20Promo%20Playbook%20waitlist">Join the waitlist</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Pricing</h2>
+      </div>
+      <p class="lead">Every release is different, so I price each one after you and I have talked. Tell me what you're putting out and I'll send you a quote within 48 hours.</p>
+      <div class="btns">
+        <a class="btn btn--solid" href="/contact.html">Ask for a quote</a>
+        <a class="btn" href="#tools">See the tools</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap about">
+      <div class="frame frame--portrait"><img src="/images/laura.jpg" alt="Laura" width="800" height="1000"></div>
       <div>
-        <div class="section-label">About</div>
-        <h2 class="section-heading">Artist-first.<br/><em>Always.</em></h2>
-        <div class="about-text">
-          <p>Ardito is a release management and artist development agency for <strong>early-stage independent artists</strong>. We work with artists who are serious about their music and ready to put it out - not artists who already have a team.</p>
-          <p>Founded by <strong>Laura</strong>, a Music Business MA graduate (Distinction) from BIMM London with a background spanning live events co-production, touring administration, distribution, and artist management. Laura built Ardito because she kept seeing the same pattern: artists making genuinely good music who had no idea what to do with it once it was finished.</p>
-          <p>We work with artists under 5,000 followers. That's not a limitation - it's the point. Before the wave is where the work matters most.</p>
-        </div>
-        <div class="about-stats">
-          <div>
-            <div class="stat-num">28</div>
-            <div class="stat-label">Days in a full campaign</div>
-          </div>
-          <div>
-            <div class="stat-num">93+</div>
-            <div class="stat-label">Vetted contacts in the tracker</div>
-          </div>
-          <div>
-            <div class="stat-num">6</div>
-            <div class="stat-label">Genres covered</div>
-          </div>
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <img src="logo.png" alt="Ardito" style="width:220px;height:220px;object-fit:contain;opacity:0.85;margin-bottom:32px"/>
-        <p style="font-size:13px;color:rgba(232,224,208,0.35);text-align:center;max-width:260px;line-height:1.6">London-based. Working with independent artists across the UK and internationally.</p>
+        <h2>Ardito is me, Laura.</h2>
+        <p>I've worked in live events, touring admin, distribution and artist management, and I did a Music Business MA at BIMM London.</p>
+        <p>I kept meeting artists who'd made something good and had no idea what to do with it once it was finished. So I started doing the bit after.</p>
+        <p>I only work with artists under 5,000 followers, and I write up every campaign, results and all.</p>
+        <div class="btns"><a class="btn" href="/about.html">More about me</a></div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="divider"></div>
-
-<!-- CASE STUDIES -->
-<section id="work" style="background:var(--warm-dark)">
-  <div class="section-inner">
-    <div class="section-label">Real work</div>
-    <h2 class="section-heading" style="margin-bottom:8px">Case studies</h2>
-    <p class="section-sub" style="margin-bottom:40px">Two campaigns, same artist, five weeks apart in lead time.</p>
-    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
-
-      <div style="background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;padding:40px;flex:1;min-width:320px;max-width:600px">
-        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#3d6a3d;margin-bottom:8px">Case 002</div>
-        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:20px">July 2026</div>
-        <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#e8e0d0;margin-bottom:8px">Omjine — Sweethearting</h3>
-        <p style="font-size:13px;color:rgba(232,224,208,0.5);margin-bottom:24px">Seoul-based singer-songwriter. A shift toward Yeah Yeah Yeahs and The xx, built with five weeks of lead time instead of two.</p>
-        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:24px">Where Precious One tested what's possible with no runway at all, Sweethearting tested what changes when there's time to actually run a campaign properly. Full pitches, individual follow-ups, an Instagram DM push to radio and curators, and outreach into Omjine's own academic network on top of the usual press list.</p>
-        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:32px">The difference showed. Amazing Radio gave it UK and USA airplay and a top 3 Audition Poll place, BBC Introducing's upload was listened to by programming, and five more stations and outlets picked it up, including a reply from a German station written to in German. Zero replies last time, real coverage this time.</p>
-        <a href="/case-002.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.5px;padding:10px 22px;border-radius:4px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#3d6a3d'" onmouseout="this.style.background='#2d4a2d'">Read the full case study</a>
+  <section class="section">
+    <div class="wrap">
+      <p class="label">Got a release coming up?</p>
+      <a class="email" href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a>
+      <p class="lead">Tell me what you're putting out and when. I read everything and reply within 48 hours.</p>
+      <div class="links">
+        <a href="https://instagram.com/ardito.ldn">Instagram @ardito.ldn</a>
+        <a href="/intake-form.html">Book a strategy call</a>
       </div>
-
-      <div style="background:#111;border:1px solid rgba(232,224,208,0.08);border-radius:10px;padding:40px;flex:1;min-width:320px;max-width:600px">
-        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.3);margin-bottom:8px">Case 001</div>
-        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(232,224,208,0.35);margin-bottom:20px">April 2026</div>
-        <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;color:#e8e0d0;margin-bottom:8px">Omjine — Precious One</h3>
-        <p style="font-size:13px;color:rgba(232,224,208,0.5);margin-bottom:24px">Seoul-based singer-songwriter. Home recorded, minimal, vocally strong. Somewhere between Cat Power and The xx.</p>
-        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:24px">Omjine came to Ardito two weeks before her single was due out with a finished track and no campaign infrastructure behind it. No mailing list, no press contacts, no outreach history. The brief came in without a fee attached — two weeks, one single, build everything from scratch.</p>
-        <p style="font-size:14px;color:rgba(232,224,208,0.75);line-height:1.8;margin-bottom:32px">What followed was a full release: PRO registration fixed, 62 contacts imported into Mailchimp, 15 personalised pitch emails to blogs and radio stations, Spotify editorial pitch submitted, platform access secured, and two email campaigns written and sent. Precious One is now her most-streamed track.</p>
-        <a href="/case-001.html" style="display:inline-block;background:#2d4a2d;color:#e8e0d0;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.5px;padding:10px 22px;border-radius:4px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#3d6a3d'" onmouseout="this.style.background='#2d4a2d'">Read the full case study</a>
-      </div>
-
     </div>
-  </div>
-</section>
-<div class="divider"></div>
+  </section>
 
-<!-- CONTACT -->
-<section id="contact" style="background:var(--green-dark)">
-  <div class="section-inner">
-    <div class="contact-inner">
-      <div class="section-label">Work with us</div>
-      <h2 class="section-heading">Ready when you are.</h2>
-      <p class="section-sub">Whether you want to run your own release or want Ardito to run it with you - start here and we'll figure out the right fit.</p>
-      <div class="contact-options">
-        <div class="contact-card">
-          <div class="contact-card-label">For artists</div>
-          <div class="contact-card-title">Start a conversation</div>
-          <p class="contact-card-desc">Tell us about your release, where you are, and what you're trying to achieve. No hard sell, no obligations.</p>
-          <a href="mailto:ardito.ldn@gmail.com?subject=I'd like to work with Ardito" class="contact-card-link">Email us</a>
-        </div>
-        <div class="contact-card">
-          <div class="contact-card-label">Strategy call</div>
-          <div class="contact-card-title">Book a session</div>
-          <p class="contact-card-desc">60 minutes, £120. Fill in the pre-call intake form and we'll come prepared. Three actions to leave with.</p>
-          <a href="/intake-form.html" class="contact-card-link">Fill in the form</a>
-        </div>
-      </div>
-      <p style="font-size:13px;color:rgba(232,224,208,0.35)">Or find us on Instagram: <a href="https://instagram.com/ardito.ldn" style="color:rgba(232,224,208,0.5);text-decoration:none">@ardito.ldn</a></p>
-    </div>
-  </div>
-</section>
+</main>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-logo"><img src="logo.png" alt="Ardito" style="height:32px;object-fit:contain;opacity:0.5"/></div>
-   <div class="footer-links">
-<a href="#services">What we do</a>
-<a href="#tools">Tools</a>
-<a href="#pricing">Pricing</a>
-<a href="#about">About</a>
-<a href="/contact.html">Contact</a>
-<a href="https://instagram.com/ardito.ldn">Instagram</a>
-<a href="/privacy-policy.html">Privacy Policy</a>
-<a href="/terms-of-service.html">Terms of Service</a>
-<a href="/dashboard" style="opacity:0.4">Team</a>
-</div>
-    <div class="footer-copy">© 2026 Ardito. London.</div>
+<footer class="site-footer">
+  <div class="wrap">
+    <img class="wordmark" src="/images/wordmark.svg" alt="Ardito" width="180" height="138">
+    <nav class="footer-links" aria-label="Footer">
+      <a href="/releases.html">Releases</a>
+      <a href="/work-with-me.html">Work with me</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://instagram.com/ardito.ldn">Instagram</a>
+      <a href="mailto:ardito.ldn@gmail.com">ardito.ldn@gmail.com</a>
+      <a href="/privacy-policy.html">Privacy</a>
+      <a href="/terms-of-service.html">Terms</a>
+      <a href="/dashboard">Team login</a>
+    </nav>
+    <small>© 2026 Ardito. London.</small>
   </div>
 </footer>
 
-<script>
-function toggleMenu(){
-  document.getElementById('mobile-menu').classList.toggle('open');
-}
-document.getElementById('mobile-menu').addEventListener('click',function(e){
-  if(e.target===this) toggleMenu();
-});
-window.addEventListener('scroll',function(){
-  const nav=document.querySelector('nav');
-  nav.style.borderBottomColor=window.scrollY>20?'rgba(232,224,208,0.08)':'transparent';
-});
-</script>
+<script src="/main.js" defer></script>
 </body>
 </html>
