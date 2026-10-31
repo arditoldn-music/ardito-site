@@ -327,3 +327,97 @@ p:last-child { margin-bottom: 0; }
   .ticker ul[aria-hidden="true"], .ticker-toggle { display: none; }
   .releases .thumb { transition: none; }
 }
+
+/* ---------------------------------------------------------------
+   Update: smaller type, sections in boxes, covers always showing.
+   These come last on purpose, so they win over the rules above.
+---------------------------------------------------------------- */
+:root { --max: 1120px; }
+
+body { font-size: 1rem; line-height: 1.6; }
+@media (min-width: 900px) { body { font-size: 1.0625rem; } }
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+@media (min-width: 900px) {
+  h1 { font-size: 2.875rem; }
+  h2 { font-size: 1.875rem; }
+  h3 { font-size: 1.3125rem; }
+}
+
+.label { font-size: 0.8125rem; }
+.lead { font-size: 1.0625rem; max-width: 56rem; }
+@media (min-width: 900px) { .lead { font-size: 1.1875rem; } }
+.btn { min-height: 46px; padding: 0 20px; }
+
+/* Each section sits in its own box */
+.section { padding: 12px 0; }
+.section + .section { border-top: 0; }
+.section > .wrap {
+  width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
+  max-width: none; margin: 0 auto; padding: 24px 20px;
+  background: var(--frame); border: 1px solid var(--line);
+}
+@media (min-width: 900px) { .section > .wrap { padding: 36px 40px; } }
+.section-head { margin-bottom: 22px; }
+
+.hero-cover h2 { font-size: 1.375rem; }
+.hero { padding-bottom: 40px; }
+@media (min-width: 900px) { .hero { padding-bottom: 56px; } }
+.ticker ul { font-size: 1.25rem; }
+
+/* Video next to its caption */
+.video-block figure { display: grid; gap: 16px; align-items: end; }
+@media (min-width: 900px) { .video-block figure { grid-template-columns: minmax(0, 420px) 1fr; gap: 32px; } }
+
+/* Case study lists: cover always showing, nothing pops up over the text */
+.releases { border-top: 0; }
+.releases li { border-bottom: 0; border-top: 1px solid var(--line); }
+.releases li:last-child { border-bottom: 1px solid var(--line); }
+.releases a, .releases .row { padding: 14px 0; }
+.releases .title { font-size: 1.25rem; }
+@media (min-width: 900px) {
+  .releases-head,
+  .releases a, .releases .row {
+    grid-template-columns: 72px 6rem 9rem minmax(0, 1fr) 6.5rem minmax(0, 1.4fr);
+    gap: 20px;
+  }
+  .releases .thumb {
+    position: static; width: 72px; transform: none; opacity: 1;
+    pointer-events: auto; grid-row: auto; align-self: center;
+  }
+  .releases .date, .releases .what { font-size: 1rem; }
+  .releases a:hover .title { text-decoration: underline; text-underline-offset: 4px; }
+}
+
+/* What I do */
+.do { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+@media (min-width: 700px) { .do { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .do { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.do li { border: 1px solid var(--line); background: var(--black); padding: 16px 18px; }
+.do h3 { font-size: 1.125rem; margin-bottom: 6px; }
+.do p { color: var(--muted); font-size: 0.9375rem; margin: 0; }
+
+/* Smaller type elsewhere */
+.services h2, .services h3 { font-size: 1.25rem; }
+@media (min-width: 900px) { .services h2, .services h3 { font-size: 1.375rem; } }
+.email { font-size: 1.75rem; }
+@media (min-width: 900px) { .email { font-size: 2.5rem; } }
+.callout { padding: 22px; margin-top: 28px; }
+@media (min-width: 900px) { .callout { padding: 32px; } }
+
+/* Case study pages: each part in its own box */
+.stat strong { font-size: 1.75rem; }
+.case { gap: 16px; }
+@media (min-width: 900px) { .case { gap: 20px; } }
+.case h2 { font-size: 1.375rem; }
+.case section, .learned {
+  background: var(--frame); border: 1px solid var(--line); padding: 20px 22px;
+}
+.case section + section { margin-top: 16px; }
+.learned { border-top: 1px solid var(--line); }
+.learned h2 { font-size: 1.25rem; }
+
+/* Page titles line up with the header and the boxes below them */
+.wrap.page-head { padding-left: var(--gutter); padding-right: var(--gutter); }
