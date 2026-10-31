@@ -118,7 +118,7 @@ figcaption { margin-top: 10px; font-size: 13px; color: var(--muted); }
 .split-head .muted { margin-top: 14px; max-width: 24rem; }
 .artists { flex: 2 1 460px; min-width: 0; display: flex; flex-wrap: wrap; gap: 28px; }
 .artists figure { flex: 0 1 190px; min-width: 0; margin: 0; }
-.artists img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 22%; background: var(--frame); }
+.artists img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 22%; background: var(--frame); }
 .artists figcaption { margin-top: 8px; font-size: 14px; color: var(--ink); }
 
 .do { flex: 2 1 460px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 44px 40px; }
@@ -147,7 +147,7 @@ figcaption { margin-top: 10px; font-size: 13px; color: var(--muted); }
 /* about */
 .about { padding-top: 48px; display: flex; flex-wrap: wrap; gap: 40px 64px; align-items: flex-start; }
 .about-photo { flex: 0 1 380px; min-width: 0; }
-.about-photo img, .artist-photo img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 28%; background: var(--frame); }
+.about-photo img, .artist-photo img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 28%; background: var(--frame); }
 .about-text { flex: 2 1 420px; min-width: 0; }
 .prose { margin-top: 28px; max-width: 38rem; }
 .prose p { margin-bottom: 14px; }
@@ -208,8 +208,9 @@ a.row:hover { opacity: 1; }
 .card { margin-top: 48px; border: 1px solid var(--rule); padding: 32px; max-width: 48rem; }
 .card h2 { margin-bottom: 0; }
 .card > .muted { margin-top: 14px; }
-.questions { margin: 24px 0 24px; padding-left: 24px; list-style: decimal; font-size: 16px; line-height: 1.55; }
-.questions li { margin: 0 0 10px; padding-left: 4px; }
+.wants { margin: 20px 0 20px; padding-left: 22px; list-style: disc; font-size: 17px; line-height: 1.55; }
+.wants li { margin: 0 0 10px; padding-left: 4px; }
+.card .muted { margin: 14px 0 20px; }
 
 /* artist pages */
 .artist { padding-top: 48px; display: flex; flex-wrap: wrap; gap: 40px 64px; align-items: flex-start; }
