@@ -1343,7 +1343,7 @@ items.forEach(it=>{
 const title=it.title,text=it.text;
 if(!text&&!it.video&&!it.build)return;
 const paras=text.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-const fill=el=>{el.textContent='';paras.forEach((pp,pi)=>{if(pi){el.appendChild(doc.createElement('br'));el.appendChild(doc.createElement('br'));}pp.split(/\r?\n/).forEach((l,i)=>{if(i)el.appendChild(doc.createElement('br'));el.appendChild(doc.createTextNode(l));});});};
+const bl=/^\s*[-\u2013\u2014\u2022]\s+/;const fill=el=>{el.textContent='';paras.forEach((pp,pi)=>{if(pi){el.appendChild(doc.createElement('br'));el.appendChild(doc.createElement('br'));}const ls=pp.split(/\r?\n/);if(ls.every(l=>bl.test(l))){ls.forEach(l=>{const s=doc.createElement('span');s.style.cssText='display:block;margin:0 0 .6em;padding-left:1.1em;text-indent:-1.1em;text-align:left';s.textContent='\u2022 '+l.trim().replace(bl,'');el.appendChild(s);});}else{ls.forEach((l,i)=>{if(i)el.appendChild(doc.createElement('br'));el.appendChild(doc.createTextNode(l));});}});};
 let nodes,parent;
 if(bio){
 nodes=bio.nodes.map(x=>x.cloneNode(true));
@@ -1411,7 +1411,7 @@ const sc=doc.createElement('script');
 sc.textContent="(function(){try{var r=document.querySelector('[data-epk-ref-head]');if(!r)return;var cs=getComputedStyle(r),bc=getComputedStyle(document.body).color;document.querySelectorAll('.epk-fix,.epk-runtime-title').forEach(function(t){['fontFamily','fontSize','fontWeight','fontStyle','letterSpacing','textTransform','lineHeight'].forEach(function(q){t.style[q]=cs[q];});t.style.color=bc;t.style.marginBottom=cs.marginBottom;t.style.display='block';});}catch(e){}})();";
 body.appendChild(sc);
 }catch(e){try{console.warn('epkExtras',e);}catch(_){}}}
-function epkSetLines(el,text,doc){el.textContent='';String(text).split(/\r?\n/).filter(x=>x.trim()).forEach((l,i)=>{if(i)el.appendChild(doc.createElement('br'));el.appendChild(doc.createTextNode(l));});}
+function epkSetLines(el,text,doc){el.textContent='';el.style.fontWeight='400';const host=el.parentElement;if(host&&host.classList&&host.classList.contains('stats-line'))host.style.textAlign='left';String(text).split(/\r?\n/).filter(x=>x.trim()).forEach(l=>{const s=doc.createElement('span');s.style.cssText='display:block;margin:0 0 .6em;padding-left:1.1em;text-indent:-1.1em;text-align:left';s.textContent='\u2022 '+l.trim().replace(/^[-\u2013\u2014\u2022]\s*/,'');el.appendChild(s);});}
 function epkApplySectionOrder(doc,c){
   const body=doc.body;
   const order=[...new Set(Array.isArray(c.section_order)?c.section_order.filter(Boolean):[])];
