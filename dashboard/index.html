@@ -1333,7 +1333,7 @@ const mkEntries=txt=>String(txt||'').split(/\r?\n/).map(l=>l.trim()).filter(Bool
 const mkList=entries=>{const w=doc.createElement('div');w.className='epk-list';entries.forEach(en=>{const p=doc.createElement('p');p.setAttribute('style','margin:0 0 .5em');if(en.url){const a=doc.createElement('a');a.setAttribute('href',en.url);a.setAttribute('target','_blank');a.setAttribute('rel','noopener noreferrer');a.textContent=en.text;p.appendChild(a);}else{p.textContent=en.text;}if(en.strong)p.style.fontWeight='600';if(en.dim)p.style.opacity='.7';w.appendChild(p);});return w;};
 
 const achText=String(c.achievements||'').trim();
-if(achText){const first=norm(achText.split(/\r?\n/).find(x=>x.trim())||'').slice(0,28);if(first&&!norm(body.textContent).includes(first))items.push({title:'Highlights',text:achText});}
+if(achText){const first=norm(achText.split(/\r?\n/).find(x=>x.trim())||'').replace(/^[-\u2013\u2014\u2022]\s*/,'').slice(0,28);if(first&&!norm(body.textContent).includes(first))items.push({title:'Highlights',text:achText});}
 {const ask=String(c.ask_line||'').trim(),liveE=mkEntries(c.live_text);if(ask||liveE.length){const ents=(ask?[{text:ask,strong:true}]:[]).concat(liveE);items.push({title:String(c.live_title||'').trim()||'Live',text:'',build:()=>mkList(ents)});}}
 {const relPdf=(()=>{const u=String(c.release_pdf_url||'').trim();const h=u?publicHref('Link',u):'';return h?[{text:'Release sheet (PDF)',url:h}]:[];})();
 const dl=mkEntries(c.downloads_text).concat(relPdf),cr=String(c.photo_credit||'').trim().replace(/^photo:?\s*/i,'');if(dl.length){const ents=dl.concat(cr?[{text:'Photo: '+cr,dim:true}]:[]);items.push({title:'Downloads',text:'',build:()=>mkList(ents)});}}
