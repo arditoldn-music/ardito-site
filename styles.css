@@ -1,6 +1,10 @@
 /* Ardito. Shared styles for every page. */
+/* ADDED: Kalam Light is the pink handwriting font. This one line loads it for every page. It has to stay at the very top of the file. */
+@import url("https://fonts.googleapis.com/css2?family=Kalam:wght@300&display=swap");
+
 
 :root {
+  --pink: #FC75B4;
   --bg: #f0ece4;
   --ink: #0d0d0d;
   --cream: #e8e0d0;
@@ -80,9 +84,11 @@ h3 { font-size: 20px; line-height: 1.2; }
 }
 .brand { display: block; line-height: 0; }
 .brand img { width: 120px; height: 120px; }
-.nav { display: flex; flex-wrap: wrap; gap: 0 28px; font-size: 13px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }
-.nav a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
-.nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 6px; }
+/* CHANGED: the menu is now a green bar (same green as the preview banner) with cream text, on every page */
+.nav { display: flex; flex-wrap: wrap; gap: 0 28px; padding: 0 28px; background: var(--mid-green); color: var(--cream); font-size: 13px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }
+.nav a { display: inline-flex; align-items: center; min-height: 56px; color: var(--cream); text-decoration: none; }
+.nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+@media (max-width: 700px) { .nav { gap: 0 18px; padding: 0 16px; font-size: 12px; letter-spacing: 0.14em; } .nav a { min-height: 38px; } .nav { padding-top: 6px; padding-bottom: 6px; } }
 
 /* home hero */
 .hero { padding-top: 40px; display: flex; flex-wrap: wrap; align-items: center; gap: 40px 56px; }
@@ -257,3 +263,23 @@ a.row:hover { opacity: 1; }
   @view-transition { navigation: none; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+/* ADDED: tiny pink handwriting accents. Decoration only, hidden from screen readers in the page code. */
+.hand { font-family: "Kalam", "Segoe Script", cursive; font-weight: 300; color: var(--pink); line-height: 1; white-space: nowrap; pointer-events: none; }
+.sign { margin: 12px 0 0; }
+.sign .hand { display: inline-block; font-size: 28px; transform: rotate(-3deg); }
+.note-line { margin: 10px 0 0; }
+.hand-note { display: inline-flex; align-items: flex-start; gap: 4px; font-size: 18px; transform: rotate(-2deg); }
+.hand-note svg { flex: none; width: 24px; height: 24px; margin-top: 2px; overflow: visible; }
+
+/* ADDED: stops one lonely word sitting on its own last line, on every page */
+h1, h2, h3 { text-wrap: balance; }
+p, li, figcaption { text-wrap: pretty; }
+/* intro lines use the whole width of the page instead of stopping at a narrow limit */
+.lead, .page-head .lead { max-width: none; text-wrap: pretty; }
+
+/* ADDED: the Contact tab is a cream box on the green menu bar, so it stands out as the thing to press */
+.nav a[href="/contact.html"] { align-self: center; min-height: 36px; padding: 0 18px; margin-left: 4px; background: var(--cream); color: var(--green); }
+.nav a[href="/contact.html"]:hover { opacity: 1; background: #fff; }
+.nav a[href="/contact.html"][aria-current="page"] { text-decoration: none; }
+@media (max-width: 700px) { .nav a[href="/contact.html"] { min-height: 32px; padding: 0 12px; margin-left: 0; } }
