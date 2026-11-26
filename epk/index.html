@@ -530,6 +530,13 @@ const hasStreaming=!!(spotify||apple||hyperfollow||soundcloud||youtube||tiktok||
 html=epkPostProcess(html,c);
 html=html.replace(/<[^>]*>[^<]*Internal notes[^<]*<\/[^>]+>/gi,'').replace(/>[^<]*Not shown in preview[^<]*</gi,'><');const colors={...(PK_DEFAULT_COLORS[pk.template]||PK_DEFAULT_COLORS['ardito-signature']||{}),...((pk.theme&&pk.theme[pk.template])||{})};const photoRule=hasPhotoSlot?'.ardito-epk-photo{object-fit:'+imageFit+';object-position:'+imageX+'% '+imageY+'%;}':'';const spacingRule=epkSpacingCss(pk.template,c.section_spacing);const sizeRule=epkPhotoSizeCss(pk.template,c.headshot_size);html=html.replace('</head>','<style id="ardito-epk-runtime">:root{--bg:'+esc(colors.bg||'')+';--text:'+esc(colors.ink||'')+';--ink:'+esc(colors.ink||'')+';--accent:'+esc(colors.accent||'')+';--text-dim:color-mix(in srgb, var(--text) 65%, var(--bg));}'+photoRule+spacingRule+sizeRule+EPK_PRINT_CSS+'</style></head>');const robotsTag='<meta name="robots" content="'+(c.search_visibility==='visible'?'index,follow':'noindex,nofollow')+'">';if(/<meta[^>]+name=["']robots["'][^>]*>/i.test(html))html=html.replace(/<meta[^>]+name=["']robots["'][^>]*>/i,robotsTag);else html=html.replace('</head>',robotsTag+'</head>');return html;}
 
+/* ADDED (1 of 2): the friendly 'no longer online' page. Sits just above diagnosticState. */
+function goneState(){
+document.title='Ardito · Press Kit';
+try{const rob=document.querySelector('meta[name="robots"]');if(rob)rob.setAttribute('content','noindex,nofollow');}catch(e){}
+document.getElementById('app').innerHTML='<div class="state"><h1>This press kit is no longer online</h1><p>The page for this artist has been taken down, so the link you followed does not go anywhere now.</p><p>If you are looking for their music or want to get in touch, email <a href="mailto:ardito.ldn@gmail.com" style="color:inherit">ardito.ldn@gmail.com</a> and I\'ll point you in the right direction.</p></div>';
+}
+
 function diagnosticState(code,title,detail){
 console.error('[Ardito EPK '+code+']',detail||'');
 document.title='Ardito · Press Kit · '+code;
@@ -562,7 +569,9 @@ return;
 }
 
 if(!rows.length){
-diagnosticState('NO_PUBLISHED_ROW','Press kit unavailable','No published EPK row was returned for slug: '+slug);
+/* ADDED (2 of 2): replaces the old NO_PUBLISHED_ROW diagnostic line. */
+console.warn('[Ardito EPK] No published row for slug: '+slug);
+goneState();
 return;
 }
 
