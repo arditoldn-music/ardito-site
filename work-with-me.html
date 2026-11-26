@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Work with me | Ardito</title>
-<meta name="description" content="Every release is different, so I price each one after you and I have talked.">
+<title>Work with Ardito</title>
+<meta name="description" content="Fixed packages and one-off services for independent artists. Paid slots open in April 2027.">
 <link rel="canonical" href="https://ardito.co.uk/work-with-me.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Work with me | Ardito">
-<meta property="og:description" content="Every release is different, so I price each one after you and I have talked.">
+<meta property="og:title" content="Work with Ardito">
+<meta property="og:description" content="Fixed packages and one-off services for independent artists. Paid slots open in April 2027.">
 <meta property="og:url" content="https://ardito.co.uk/work-with-me.html">
 <meta property="og:image" content="https://ardito.co.uk/images/ardito-share.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -19,6 +19,96 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:wght@400;500&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+<!-- ===== STYLES FOR THIS PAGE ONLY. Nothing else on the site uses these. ===== -->
+<style>
+[id^="svc-"], #packages, #one-off, #guide { scroll-margin-top: 24px; }
+.sec { margin-top: 40px; min-width: 0; }
+.sec h2 { margin-top: 10px; }
+.sec-sub { margin: 10px 0 0; color: var(--muted); font-size: 16px; }
+
+/* small pink handwritten touches: the .hand style and the pink colour live in styles.css */
+
+/* choice cards (normal colours) */
+.choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+.choose a { display: flex; flex-direction: column; justify-content: space-between; gap: 18px; min-height: 150px; padding: 22px; text-decoration: none; border: 1px solid var(--rule); background: #f8f5ee; }
+.choose a:hover { opacity: 1; background: #fff; }
+.choose h2 { margin: 0; font-size: 28px; }
+.choose p { margin: 8px 0 0; font-size: 15px; color: var(--muted); }
+.choose .go { font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+@media (max-width: 560px) { .choose { gap: 10px; } .choose a { padding: 16px; min-height: 0; } .choose h2 { font-size: 21px; } .choose p { font-size: 14px; } }
+
+/* guide (collapsed) */
+.guide-wrap { position: relative; margin-top: 38px; }
+.hand-guide { position: absolute; right: 56px; top: -28px; font-size: 18px; transform: rotate(-3deg); }
+.hand-guide svg { position: absolute; left: 100%; top: 6px; width: 26px; height: 26px; margin-left: 3px; overflow: visible; }
+@media (max-width: 560px) { .hand-guide { right: 34px; font-size: 15px; } .hand-guide svg { width: 22px; height: 22px; } }
+.guide-box { margin: 0; border: 1px solid var(--rule); background: #f8f5ee; }
+.guide-box > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 58px; padding: 0 22px; letter-spacing: 0; text-transform: none; font-size: 18px; font-weight: 500; }
+.guide-box > summary .g-sub { display: none; font-weight: 400; font-size: 15px; color: var(--muted); margin-left: 12px; }
+@media (min-width: 700px) { .guide-box > summary .g-sub { display: inline; } }
+.guide-box > summary .g-left { flex: 1; }
+.guide { margin: 0; padding: 0 22px; border-top: 1px solid var(--rule); }
+.guide li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.guide li:first-child { border-top: 0; }
+.guide .if { flex: 2 1 300px; }
+.guide .then { flex: 1 1 200px; font-weight: 500; }
+.guide .then a { text-underline-offset: 4px; }
+.guide-note { margin: 0; padding: 14px 22px 18px; font-size: 15px; color: var(--muted); border-top: 1px solid var(--rule); }
+
+/* two columns: one-off services on the left, packages on the right */
+.cols { display: grid; grid-template-columns: 1fr; gap: 0 48px; align-items: start; }
+@media (min-width: 900px) { .cols { grid-template-columns: 4fr 7fr; } }
+@media (max-width: 899px) { #packages { order: -1; } }
+
+/* categories */
+.cat { margin-top: 24px; }
+.cat-h { padding-top: 0; }
+.cat-sub { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+.chip { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--rule); color: var(--ink); }
+
+/* package cards (normal colours) */
+.pcard { margin-top: 14px; padding: 22px; background: #f8f5ee; border: 1px solid var(--rule); }
+.pcard h3 { margin-top: 12px; font-size: 26px; line-height: 1.1; }
+.pcard > p { margin: 8px 0 4px; color: var(--muted); }
+
+/* one-off services: one per line, collapsed until tapped */
+.jobs { margin-top: 12px; }
+.job { margin: 0 0 8px; border: 1px solid var(--rule); background: #f8f5ee; }
+.job > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 10px 16px; letter-spacing: 0; text-transform: none; font-size: 16px; font-weight: 400; }
+.job-text { flex: 1; min-width: 0; }
+.job-name { display: block; font-family: "Playfair Display", Georgia, serif; font-size: 19px; line-height: 1.2; }
+.job-line { display: block; margin-top: 3px; font-size: 14px; line-height: 1.35; color: var(--muted); }
+.job-body { padding: 12px 16px 16px; border-top: 1px solid var(--rule); }
+.job-body > p { margin: 0 0 10px; font-size: 15px; color: var(--muted); }
+.job-body ul.in { list-style: disc; padding-left: 20px; margin: 0; font-size: 15px; color: var(--muted); }
+.job-body ul.in li { margin: 0 0 6px; padding-left: 2px; }
+.job-body .out { margin: 12px 0 0; font-size: 14px; color: var(--muted); }
+.job-body .out strong { font-weight: 500; color: var(--ink); }
+
+.epk-card { max-width: none; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 56px; }
+.epk-head { flex: 1 1 280px; min-width: 0; }
+.epk-body { flex: 2 1 420px; min-width: 0; }
+.epk-body .muted { margin: 0 0 12px; }
+.epk-body .muted:last-child { margin: 0; }
+
+/* read more dropdowns, and the small dark + that turns into an x when open, with a pink shadow (the only pink in the cards) */
+details { margin-top: 4px; }
+summary { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; list-style: none; font-size: 13px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
+summary::-webkit-details-marker { display: none; }
+.plus { position: relative; flex: none; width: 22px; height: 22px; transition: transform 0.2s ease; filter: drop-shadow(0 1px 3px rgba(252, 117, 180, 0.95)); }
+.plus::before, .plus::after { content: ""; position: absolute; left: 50%; top: 50%; background: var(--ink); border-radius: 2px; }
+.plus::before { width: 14px; height: 2px; margin: -1px 0 0 -7px; }
+.plus::after { width: 2px; height: 14px; margin: -7px 0 0 -1px; }
+details[open] > summary .plus { transform: rotate(45deg); }
+summary .t-close { display: none; }
+details[open] > summary .t-open { display: none; }
+details[open] > summary .t-close { display: inline; }
+.more { padding: 4px 0 8px; }
+.more ul.in { list-style: disc; padding-left: 20px; margin: 0; font-size: 15px; color: var(--muted); }
+.more ul.in li { margin: 0 0 6px; padding-left: 2px; }
+.more .out { margin: 12px 0 0; font-size: 14px; color: var(--muted); }
+.more .out strong { font-weight: 500; color: var(--ink); }
+</style>
 </head>
 <body id="top">
 <a class="skip" href="#main">Skip to content</a>
@@ -36,26 +126,417 @@
   </div>
 </header>
 
+<!--
+HOW TO EDIT THIS PAGE
+- Top of page: two choice cards, then the collapsed guide ("Not sure what to go for?").
+- Below that, ONE-OFF SERVICES (left, one per line) and PACKAGES (right) sit side by side on a wide screen. Each is split into CATEGORIES.
+- Each service sits between a START and END comment. To change wording, edit inside that block only.
+- To remove a service: delete from its START line to its END line. Also delete its row in the GUIDE, or that row will point nowhere.
+- To add a service: copy a whole START to END block into the category you want, change the words, and give it a new id (id="svc-something").
+- The small pink handwritten bits are marked "PINK". Delete the marked line to remove one. The pink + on every Read more is in the style block, search for ".plus".
+- Also marked: page head, EPK box, footnote, and the green LABELS band at the bottom.
+-->
 <main id="main">
+<!-- ################ PAGE HEAD (title, intro, buttons) ################ -->
 <div class="wrap page-head">
-  <p class="label">Work with me</p>
-  <h1>Work with me</h1>
-  <p class="lead">Every release is different, so I price each one after you and I have talked.<br>Tell me what you're putting out and I'll come back to you with a quote.</p>
+  <p class="label">Work with Ardito</p>
+  <h1>Work with Ardito</h1>
+  <p class="lead">Paid slots open in April 2027, and prices are confirmed then. Email me if you'd like to be first in line.</p>
   <div class="cta-row">
-    <a class="cta" href="/contact.html">Get in touch →</a>
-    <a class="cta" href="/contact.html">Book a strategy call →</a>
-    <!-- ADDED: link to the new packages page. Delete this one line to undo. -->
-    <a class="cta" href="/packages.html">See what I offer →</a>
+    <a class="cta" href="/contact.html#questions-h">Join the list →</a>
+    <a class="cta" href="#labels">For labels and managers ↓</a>
+  </div>
+
+  <!-- ################ CHOICE CARDS: PACKAGES OR ONE-OFF ################ -->
+  <div class="choose">
+    <a href="#one-off"><span><h2>One-off services</h2><p>Not ready for a full package? Book one thing and see how I work.</p></span><span class="go">See one-off services ↓</span></a>
+    <a href="#packages"><span><h2>Packages</h2><p>A fixed plan for a whole stage: knowing where you stand, getting ready, or running a release.</p></span><span class="go">See packages ↓</span></a>
+  </div>
+
+  <!-- ################ GUIDE: WHICH ONE IS FOR ME (collapsed until opened) ################ -->
+  <div class="guide-wrap">
+    <!-- PINK 1 of 2: handwritten note pointing at the guide -->
+    <span class="hand hand-guide" aria-hidden="true">not sure? start here<svg viewBox="0 0 34 34" aria-hidden="true"><path d="M3 4 C 18 2, 28 12, 29 28 M29 28 L 22 21 M29 28 L 35 21" fill="none" stroke="#FC75B4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    <details class="guide-box" id="guide">
+      <summary><span class="g-left">Which one is for me?<span class="g-sub">Find the sentence that sounds like you</span></span><span class="plus"></span></summary>
+      <ul class="guide">
+    <li><span class="if">I'm not sure where I'm at, or whether a campaign is worth it yet</span><span class="then"><a href="#svc-starter-assessment">Starter assessment</a></span></li>
+    <li><span class="if">I have music but no clear look, story or plan</span><span class="then"><a href="#svc-foundation">Foundation</a></span></li>
+    <li><span class="if">I have a single coming and want to send the pitches myself</span><span class="then"><a href="#svc-media-strategy">Media strategy</a></span></li>
+    <li><span class="if">I have a single coming and want someone to send them for me</span><span class="then"><a href="#svc-single-campaign">Single campaign</a></span></li>
+    <li><span class="if">I'm putting out an EP</span><span class="then"><a href="#svc-ep-or-multi-release">EP or multi-release</a></span></li>
+    <li><span class="if">I have a question about a plan, a bio or a pitch</span><span class="then"><a href="#svc-ask-me-anything-call">Ask me anything call</a></span></li>
+    <li><span class="if">I need my bio, one-liner and pitch openers written up</span><span class="then"><a href="#svc-copy-pack">Copy pack</a></span></li>
+    <li><span class="if">I'm planning a photo shoot</span><span class="then"><a href="#svc-photo-shoot-brief">Photo shoot brief</a></span></li>
+    <li><span class="if">I want gigs or sessions</span><span class="then"><a href="#svc-gig-and-session-outreach">Gig and session outreach</a></span></li>
+    <li><span class="if">I want to get comfortable on camera and have clips to post</span><span class="then"><a href="#svc-conversation-clips">Conversation clips</a></span></li>
+    <li><span class="if">I want a press kit I can send to people</span><span class="then"><a href="#svc-press-kit-epk-on-its-own">Press kit (EPK) on its own</a></span></li>
+      </ul>
+      <p class="guide-note">Releasing in less than 6 weeks? Email me and I'll tell you what is realistic. A single campaign needs 6 weeks before release.</p>
+    </details>
   </div>
 </div>
+
 <div class="wrap">
-  <ul class="services">
-    <li><h2>Release management</h2><p>I run the whole campaign with you. That will include distribution, editorial pitching, blogs, radio, playlists, socials, and the follow-up after release day.</p><span class="q">By quote</span></li>
-    <li><h2>Artist development</h2><p>This is best for when you're right at the start. We'll figure out together who you are as an artist, whether you're ready to release, and a plan that fits where you are.</p><span class="q">By quote</span></li>
-    <li><h2>Strategy call</h2><p>An hour on your next release. You email me a few answers first so I come prepared, and you leave with three things to do.</p><span class="q">By quote</span></li>
-    <li><h2>Pitch review</h2><p>Written notes on your pitch, bio and artwork before you send anything out.</p><span class="q">By quote</span></li>
-  </ul>
+<div class="cols">
+  <!-- ################ SECTION: ONE-OFF SERVICES (left column) ################ -->
+  <section class="sec" id="one-off">
+    <p class="label">One-off services</p>
+    <h2>Start with one thing</h2>
+    <p class="sec-sub">Not ready for a full package? Book one service and see how I work.</p>
+  <!-- ---------- CATEGORY: Talk it through ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Talk it through</p>
+    <div class="jobs">
+    <!-- ===== START: Ask me anything call ===== -->
+    <details class="job" id="svc-ask-me-anything-call">
+      <summary><span class="job-text"><span class="job-name">Ask me anything call</span><span class="job-line">30 minutes, any question about your release</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>30 minutes on a release plan, a bio, a pitch, or anything about getting your music heard.</p>
+          <ul class="in">
+            <li>One 30 minute call</li>
+            <li>No prep needed and no write-up</li>
+          </ul>
+          <p class="out"><strong>Not included:</strong> written follow-up, research or documents.</p>
+      </div>
+    </details>
+    <!-- ===== END: Ask me anything call ===== -->
+
+    </div>
+  </div>
+
+  <!-- ---------- CATEGORY: Your words and your look ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Your words and your look</p>
+    <div class="jobs">
+    <!-- ===== START: Copy pack ===== -->
+    <details class="job" id="svc-copy-pack">
+      <summary><span class="job-text"><span class="job-name">Copy pack</span><span class="job-line">Your bio and pitch lines, written up</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>Your bio, one-liner and pitch openers, written up and ready to use.</p>
+          <ul class="in">
+            <li>A 30 minute conversation first, in person or on a call</li>
+            <li>Your bio at 3 lengths and a one-line description</li>
+            <li>The text for a one-sheet</li>
+            <li>3 pitch openers: radio, press and blogs, playlists</li>
+            <li>One round of corrections</li>
+          </ul>
+          <p class="out"><strong>Not included:</strong> sending anything, press releases, building your EPK page.</p>
+      </div>
+    </details>
+    <!-- ===== END: Copy pack ===== -->
+
+    <!-- ===== START: Photo shoot brief ===== -->
+    <details class="job" id="svc-photo-shoot-brief">
+      <summary><span class="job-text"><span class="job-name">Photo shoot brief</span><span class="job-line">A brief to give your photographer</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>Everything a photographer needs to shoot what you actually have in mind.</p>
+          <ul class="in">
+            <li>A moodboard and a shot list of 8 to 10 shots</li>
+            <li>Outfit ideas</li>
+            <li>2 or 3 photographer suggestions with rough prices</li>
+            <li>A one page brief to send to your photographer</li>
+          </ul>
+          <p class="out"><strong>Not included:</strong> the photographer fee, studio hire, booking, or attending the shoot.</p>
+      </div>
+    </details>
+    <!-- ===== END: Photo shoot brief ===== -->
+
+    <!-- ===== START: Shoot coordination ===== -->
+    <details class="job" id="svc-shoot-coordination">
+      <summary><span class="job-text"><span class="job-name">Shoot coordination</span><span class="job-line">I deal with your photographer for you</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>I liaise with your photographer, so you do not have to.</p>
+          <ul class="in">
+            <li>Scheduling, logistics and follow-up until your photos are delivered</li>
+          </ul>
+          <p class="out"><strong>What I need first:</strong> the photo shoot brief done first.</p>
+          <p class="out"><strong>Not included:</strong> the photographer fee, studio hire, or attending the shoot.</p>
+      </div>
+    </details>
+    <!-- ===== END: Shoot coordination ===== -->
+
+    <!-- ===== START: Profile setup session ===== -->
+    <details class="job" id="svc-profile-setup-session">
+      <summary><span class="job-text"><span class="job-name">Profile setup session</span><span class="job-line">We set up your profiles together, live</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>A 60 minute screen-share where we set up your profiles together.</p>
+          <ul class="in">
+            <li>Spotify for Artists claimed and filled in</li>
+            <li>Your bio, handles, pinned posts and EPK link sorted</li>
+            <li>A short written checklist of what we did</li>
+          </ul>
+          <p class="out"><strong>What I need first:</strong> a release uploaded or booked with a distributor.</p>
+          <p class="out"><strong>Not included:</strong> doing it without you, ongoing management, writing your bio.</p>
+      </div>
+    </details>
+    <!-- ===== END: Profile setup session ===== -->
+
+    </div>
+  </div>
+
+  <!-- ---------- CATEGORY: Content and your page ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Content and your page</p>
+    <div class="jobs">
+    <!-- ===== START: Conversation clips ===== -->
+    <details class="job" id="svc-conversation-clips">
+      <summary><span class="job-text"><span class="job-name">Conversation clips</span><span class="job-line">A relaxed chat turned into short clips</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>A relaxed hour together, turned into short clips for your socials. Clips only, not a full video interview.</p>
+          <ul class="in">
+            <li>1 hour together, with 30 to 45 minutes of it filmed on my phone</li>
+            <li>6 short clips for Instagram and TikTok</li>
+            <li>Captions if you want them</li>
+          </ul>
+      </div>
+    </details>
+    <!-- ===== END: Conversation clips ===== -->
+
+    <!-- ===== START: Press kit (EPK) on its own ===== -->
+    <details class="job" id="svc-press-kit-epk-on-its-own">
+      <summary><span class="job-text"><span class="job-name">Press kit (EPK) on its own</span><span class="job-line">A press page for you, hosted on my site</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>Your EPK page without the rest of Foundation.</p>
+          <ul class="in">
+            <li>One page on ardito.co.uk, built from a shortlist of designs</li>
+            <li>A one page PDF to keep</li>
+            <li>One round of corrections</li>
+          </ul>
+          <p class="out"><strong>What I need first:</strong> your bio, photos and links.</p>
+          <p class="out"><strong>Not included:</strong> writing your bio, photography, custom design.</p>
+      </div>
+    </details>
+    <!-- ===== END: Press kit (EPK) on its own ===== -->
+
+    <!-- ===== START: Press kit refresh ===== -->
+    <details class="job" id="svc-press-kit-refresh">
+      <summary><span class="job-text"><span class="job-name">Press kit refresh</span><span class="job-line">Updates to your existing press kit</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>Changes to an existing Ardito press kit.</p>
+          <ul class="in">
+            <li>Up to three changes: a new release, new photos or a new bio</li>
+            <li>A refreshed PDF</li>
+          </ul>
+          <p class="out"><strong>Not included:</strong> new pages or custom design. One refresh per release is included in the single campaign.</p>
+      </div>
+    </details>
+    <!-- ===== END: Press kit refresh ===== -->
+
+    </div>
+  </div>
+
+  <!-- ---------- CATEGORY: Get heard ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Get heard</p>
+    <div class="jobs">
+    <!-- ===== START: Pitch pack ===== -->
+    <details class="job" id="svc-pitch-pack">
+      <summary><span class="job-text"><span class="job-name">Pitch pack</span><span class="job-line">Outlets and pitches for you to send</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>For artists who would rather send their own pitches.</p>
+          <ul class="in">
+            <li>12 outlets I have researched for you, in a tracker</li>
+            <li>2 pitch versions and a one-sheet</li>
+          </ul>
+          <p class="out"><strong>What I need first:</strong> mastered music and a one-liner.</p>
+          <p class="out"><strong>Not included:</strong> sending, follow-ups.</p>
+      </div>
+    </details>
+    <!-- ===== END: Pitch pack ===== -->
+
+    <!-- ===== START: Gig and session outreach ===== -->
+    <details class="job" id="svc-gig-and-session-outreach">
+      <summary><span class="job-text"><span class="job-name">Gig and session outreach</span><span class="job-line">I contact venues and sessions for you</span></span><span class="plus"></span></summary>
+      <div class="job-body">
+          <p>Finding live and session opportunities near you.</p>
+          <ul class="in">
+            <li>Research on up to 25 venues or promoters, with contact routes</li>
+            <li>One message template, with personalised lines for the top 10</li>
+            <li>Sent by me, with one follow-up, and a tracker</li>
+          </ul>
+          <p class="out"><strong>What I need first:</strong> a live video or recording to send.</p>
+          <p class="out"><strong>Not included:</strong> booking, travel, promoting the gigs.</p>
+      </div>
+    </details>
+    <!-- ===== END: Gig and session outreach ===== -->
+
+    </div>
+  </div>
+
+  </section>
+
+  <!-- ################ SECTION: PACKAGES (right column) ################ -->
+  <section class="sec" id="packages">
+    <p class="label">Packages</p>
+    <h2>Pick where you are</h2>
+    <p class="sec-sub">Fixed lists of what you get, so you know the scope before you agree to anything.</p>
+  <!-- ---------- CATEGORY: Know where you stand ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Know where you stand</p>
+    <p class="cat-sub">Start here if you are not sure what you need yet.</p>
+    <!-- ===== START: Starter assessment ===== -->
+    <div class="pcard" id="svc-starter-assessment">
+      <span class="chip">A call and a write-up</span>
+      <h3>Starter assessment</h3>
+      <p>A call and a short write-up on where you are as an artist and whether a campaign is worth it right now.</p>
+        <details>
+          <summary><span class="t-open">Read more</span><span class="t-close">Show less</span><span class="plus"></span></summary>
+          <div class="more">
+            <ul class="in">
+              <li>A 45 minute call</li>
+              <li>A 2 page write-up: where you sit as an artist, with 3 artists to compare yourself to</li>
+              <li>A readiness checklist</li>
+              <li>5 next steps, each with the reason behind it</li>
+              <li>My honest answer on running a campaign: yes, later, or not yet</li>
+            </ul>
+            <p class="out"><strong>What I need first:</strong> some music to listen to. A demo or a live video is fine.</p>
+            <p class="out"><strong>Not included:</strong> bio writing, an EPK, a content plan, pitching, or ongoing advice after the write-up.</p>
+          </div>
+        </details>
+    </div>
+    <!-- ===== END: Starter assessment ===== -->
+
+  </div>
+
+  <!-- ---------- CATEGORY: Get ready to release ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Get ready to release</p>
+    <p class="cat-sub">The work that makes a release land.</p>
+    <!-- ===== START: Foundation ===== -->
+    <div class="pcard" id="svc-foundation">
+      <span class="chip">Before you release</span>
+      <h3>Foundation</h3>
+      <p>Your identity, your look and a plan, before anything goes out.</p>
+        <details>
+          <summary><span class="t-open">Read more</span><span class="t-close">Show less</span><span class="plus"></span></summary>
+          <div class="more">
+            <ul class="in">
+              <li>A kickoff call, and a conversation to capture your own words (in person if you are in London, otherwise on video)</li>
+              <li>An artist direction document: 3 positioning options with 1 recommended, 3 comparison artists, 3 story hooks, a one-liner and your bio at 3 lengths</li>
+              <li>A social audit and baseline</li>
+              <li>A six week content plan: 2 to 3 posts a week, what to film and the line to put on screen, plus a one page guide to what is working on Reels right now</li>
+              <li>A light release timeline for one single</li>
+              <li>A one page goals and budget sheet, and an asset checklist</li>
+              <li>One EPK page on ardito.co.uk, built from a shortlist of designs, plus a one page PDF to keep</li>
+              <li>One catch-up call and one round of changes within 14 days</li>
+            </ul>
+            <p class="out"><strong>What I need first:</strong> a mix or demo to listen to, and you being up for an interview.</p>
+            <p class="out"><strong>Not included:</strong> outlet research, pitching, editing or posting your content, photography, ads, a logo or custom design.</p>
+          </div>
+        </details>
+    </div>
+    <!-- ===== END: Foundation ===== -->
+
+  </div>
+
+  <!-- ---------- CATEGORY: Run a release ---------- -->
+  <div class="cat">
+    <p class="label cat-h">Run a release</p>
+    <p class="cat-sub">Pick how much of the work you want me to do.</p>
+    <!-- ===== START: Media strategy ===== -->
+    <div class="pcard" id="svc-media-strategy">
+      <span class="chip">You send the pitches</span>
+      <h3>Media strategy</h3>
+      <p>A researched plan for getting one release in front of the right people. You do the sending.</p>
+        <details>
+          <summary><span class="t-open">Read more</span><span class="t-close">Show less</span><span class="plus"></span></summary>
+          <div class="more">
+            <ul class="in">
+              <li>A release narrative with 3 pitch angles</li>
+              <li>A researched list of 20 to 30 outlets, each with a named contact, why it fits and a priority, in a tracker you keep</li>
+              <li>A pitch schedule and a one-sheet</li>
+              <li>3 pitch templates: radio, press and blogs, playlists</li>
+              <li>My view on what to chase and what to leave alone</li>
+              <li>One review call</li>
+            </ul>
+            <p class="out"><strong>What I need first:</strong> mastered music, a bio and a photo. Ideally 8 to 12 weeks before release, 6 at the very least.</p>
+            <p class="out"><strong>Not included:</strong> sending pitches, follow-ups, ads, paid plugging.</p>
+          </div>
+        </details>
+    </div>
+    <!-- ===== END: Media strategy ===== -->
+
+    <!-- ===== START: Single campaign ===== -->
+    <div class="pcard" id="svc-single-campaign">
+      <span class="chip">I send the pitches</span>
+      <h3>Single campaign</h3>
+      <p>The media strategy, plus the sending, for one single. I start 6 weeks before release and finish 2 weeks after.</p>
+        <details>
+          <summary><span class="t-open">Read more</span><span class="t-close">Show less</span><span class="plus"></span></summary>
+          <div class="more">
+            <ul class="in">
+              <li>Everything in the media strategy</li>
+              <li>Up to 20 personalised pitches, each with its own opening line and the top 5 written by hand</li>
+              <li>4 to 5 free submission platforms</li>
+              <li>One follow-up round</li>
+              <li>Interview coordination if anyone replies asking for one</li>
+              <li>A release day plan and a short weekly progress update</li>
+              <li>An outreach tracker, and one EPK refresh with the release details</li>
+              <li>A 2 page end report and a 30 minute review call</li>
+            </ul>
+            <p class="out"><strong>What I need first:</strong> artwork, a confirmed release date and the upload under way.</p>
+            <p class="out"><strong>Not included:</strong> ads, video edits, posting for you, paid radio plugging, distribution, or any guarantee of coverage or plays.</p>
+          </div>
+        </details>
+    </div>
+    <!-- ===== END: Single campaign ===== -->
+
+    <!-- ===== START: EP or multi-release ===== -->
+    <div class="pcard" id="svc-ep-or-multi-release">
+      <span class="chip">Three releases, one plan</span>
+      <h3>EP or multi-release</h3>
+      <p>Foundation, two single campaigns and an EP push, on one plan. The two singles come from the same EP.</p>
+        <details>
+          <summary><span class="t-open">Read more</span><span class="t-close">Show less</span><span class="plus"></span></summary>
+          <div class="more">
+            <ul class="in">
+              <li>The full Foundation</li>
+              <li>Two single campaigns</li>
+              <li>One EP push with an updated narrative, one EP pitch and up to 10 new contacts that I research and contact</li>
+              <li>One shared timeline and tracker, a short summary after each release and a final report</li>
+            </ul>
+            <p class="out"><strong>What I need first:</strong> 4 or 5 finished songs and a release schedule. It runs for about 12 to 16 weeks.</p>
+            <p class="out"><strong>Not included:</strong> a fourth release, new artwork or photography, social media management, video editing, ads, live booking.</p>
+          </div>
+        </details>
+    </div>
+    <!-- ===== END: EP or multi-release ===== -->
+
+  </div>
+
+  </section>
 </div>
+
+  <!-- ################ BOX: WHAT HAPPENS TO THE ARTIST PAGE (EPK) ################ -->
+  <div class="card epk-card" aria-labelledby="epk-h" style="margin-top:56px">
+    <div class="epk-head">
+      <p class="label">Your press kit (EPK)</p>
+      <h2 id="epk-h">What happens to your press kit when we finish.</h2>
+    </div>
+    <div class="epk-body">
+      <p class="muted">Your press kit is the one page I build for you on ardito.co.uk, at ardito.co.uk/epk/your-name, that you send to radio, blogs and venues. After we finish it stays live for at least six months, exactly as it was on our last day, and you keep the PDF. Updates after that are a paid refresh. After six months it comes down unless we have agreed to keep it up, and anyone opening an old link sees a short note, not an error.</p>
+      <p class="muted">Your words, photos and music stay yours. The template and site are mine.</p>
+    </div>
+  </div>
+
+  <!-- ################ FOOTNOTE: NO GUARANTEES AND EXTRAS ################ -->
+  <p class="muted small" style="margin-top:28px">I can't promise coverage, plays or playlist adds, and I won't. Radio, blog and playlist pitching is what I do, and I will tell you honestly what I think each release has a chance at. Anything outside a package is quoted separately before I start. Paid platforms, ads and anything you pay a third party for are never included.
+  <!-- PINK 2 of 2: handwritten sign-off -->
+  <span class="hand" aria-hidden="true" style="display:inline-block;font-size:28px;margin-left:8px;transform:rotate(-4deg)">Laura x</span></p>
+</div>
+
+<!-- ################ SMALL SCRIPT: opens a service's Read more when you tap its link in the guide ################ -->
+<script>
+(function(){
+  function openFor(id){var el=id&&document.getElementById(id);if(!el)return;if(el.tagName==='DETAILS'){el.open=true;return;}var d=el.querySelector('details');if(d)d.open=true;}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="#svc-"]');if(a)openFor(a.getAttribute('href').slice(1));});
+  window.addEventListener('hashchange',function(){openFor(location.hash.slice(1));});
+  openFor(location.hash.slice(1));
+})();
+</script>
+
+<!-- ################ LABELS BAND (unchanged from the old page, line breaks removed) ################ -->
 <section class="band band-spaced" id="labels" aria-label="For labels and managers">
   <div class="wrap band-inner">
     <div class="band-head">
@@ -63,7 +544,7 @@
       <h2>Running a label? I can handle the releases.</h2>
     </div>
     <div class="band-body">
-      <p class="band-lg band-prose">If you run a small label or manage a few artists and time is tight on your side to handle release campaigns, I can take that on, one release at a time.<br>I write the pitches, build the contact lists and run the timeline.<br>I only take on a few projects at once, so tell me about your artist and we will work out the best way of collaborating.</p>
+      <p class="band-lg band-prose">If you run a small label or manage a few artists and time is tight on your side to handle release campaigns, I can take that on, one release at a time. I write the pitches, build the contact lists and run the timeline. I only take on a few projects at once, so tell me about your artist and we will work out the best way of collaborating.</p>
       <a class="btn btn-cream" href="mailto:ardito.ldn@gmail.com?subject=Labels%20and%20managers">Tell me about your label →</a>
     </div>
   </div>
